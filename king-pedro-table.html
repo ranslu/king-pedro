@@ -325,8 +325,16 @@
     <div class="sheet">
       <h2>Who's playing?</h2>
       <div id="seatRows"></div>
-      <p class="hint">Partnerships are fixed: South + North vs. West + East. Any seat left on "AI" is played by the table's AI.</p>
+      <p class="hint">Partnerships are fixed: South + North vs. West + East. Any seat left on "AI" is played by the table's AI. With 2+ humans, hands stay hidden between turns — pass the device when prompted.</p>
       <button class="go" id="startBtn">Start game</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="revealGate">
+    <div class="sheet" style="text-align:center">
+      <h2 id="revealWho">Pass the device</h2>
+      <p class="hint">Make sure no one else can see the screen, then reveal your hand.</p>
+      <button class="go" id="revealBtn">Show my hand</button>
     </div>
   </div>
 </div>
@@ -663,7 +671,7 @@ function* playHand(dealer,gameScore){
 const el = id => document.getElementById(id);
 const State = {
   dealer:0, gameScore:[0,0], gen:null, lastEvent:null, resumeValue:undefined, paused:false,
-  human:[false,false,false,false], awaitingPlay:null,
+  human:[false,false,false,false], awaitingPlay:null, passAndPlay:false, revealedSeat:null,
   hands:[[],[],[],[]], revealed:[true,true,true,true], folded:[false,false,false,false],
   trump:null, bid:null, declarer:-1, dealer_now:0, trick:[], auto:false, timer:null, gameOver:false
 };
@@ -779,11 +787,12 @@ function applyEvent(e){
   switch(e.type){
     case "deal": {
       State.dealer_now=e.dealer; State.declarer=-1; State.trump=null; State.bid=null;
-      State.folded=[false,false,false,false];
-      State.revealed = State.human.some(Boolean) ? State.human.slice() : [true,true,true,true];
+      State.folded=[false,false,false,false]; State.revealedSeat=null;
+      if(State.passAndPlay) State.revealed=[false,false,false,false];
+      else State.revealed = State.human.some(Boolean) ? State.human.slice() : [true,true,true,true];
       State.hands=e.hands.map(h=>h.slice()); State.trick=[]; State.awaitingPlay=null;
       renderAll(true);
-      const showPeek = State.human[e.dealer] || !State.human.some(Boolean);
+      const showPeek = !State.passAndPlay && (State.human[e.dealer] || !State.human.some(Boolean));
       ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each${showPeek?` and peeks the bottom card <b>${cardStr(e.peeked)}</b>`:` and quietly peeks the bottom card`}.`);
       break; }
     case "bid": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"bid",e.bid));
@@ -844,8 +853,23 @@ function applyEvent(e){
   }
 }
 
-// ---- human decision panel ----
+// ---- human decision panel (gated behind a "pass the device" reveal when 2+ humans share this screen) ----
 function showDecision(y){
+  if(State.passAndPlay && State.revealedSeat!==y.seat){
+    el("revealWho").textContent=`Pass the device to ${PLAYERS[y.seat].name}`;
+    el("revealGate").classList.add("show");
+    el("revealBtn").onclick=()=>{
+      el("revealGate").classList.remove("show");
+      State.revealedSeat=y.seat;
+      State.revealed=[false,false,false,false]; State.revealed[y.seat]=true;
+      renderHands(false);
+      renderDecisionBody(y);
+    };
+    return;
+  }
+  renderDecisionBody(y);
+}
+function renderDecisionBody(y){
   const box=el("decision");
   const name=PLAYERS[y.seat].name;
   if(y.needInput==="bid"){
@@ -907,6 +931,9 @@ function step(){
 function resumeAfterHuman(value){
   State.resumeValue=value; State.paused=false; State.awaitingPlay=null;
   hideDecision();
+  if(State.passAndPlay){
+    State.revealedSeat=null; State.revealed=[false,false,false,false]; renderHands(false);
+  }
   if(State.auto) tick(); else step();
 }
 function startAuto(){ State.auto=true; el("autoBtn").textContent="Pause ❚❚"; tick(); }
@@ -927,11 +954,12 @@ function newGame(){
   stopAuto();
   State.dealer=Math.floor(Math.random()*4); State.gameScore=[0,0];
   State.gen=null; State.resumeValue=undefined; State.lastEvent=null; State.paused=false;
-  State.gameOver=false; State.trick=[]; State.awaitingPlay=null;
+  State.gameOver=false; State.trick=[]; State.awaitingPlay=null; State.revealedSeat=null;
   State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1;
   State.folded=[false,false,false,false];
-  State.revealed = State.human.some(Boolean) ? State.human.slice() : [true,true,true,true];
-  hideDecision();
+  State.revealed = State.passAndPlay ? [false,false,false,false]
+    : (State.human.some(Boolean) ? State.human.slice() : [true,true,true,true]);
+  hideDecision(); el("revealGate").classList.remove("show");
   renderAll(false); ticker("New game — press <b>Step ▸</b> or <b>Auto ▶</b> to begin.");
   el("banner").classList.remove("show");
 }
@@ -967,6 +995,7 @@ function closeSetup(){ el("setupOverlay").classList.remove("show"); }
 function applySetupSelections(){
   const humansInSeatOrder=setupHuman.map((v,i)=>v?i:-1).filter(i=>i>=0);
   State.human=setupHuman.slice();
+  State.passAndPlay = humansInSeatOrder.length>=2;
   for(let s=0;s<4;s++){
     if(setupHuman[s]){
       const idx=humansInSeatOrder.indexOf(s);
