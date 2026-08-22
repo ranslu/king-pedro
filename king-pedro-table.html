@@ -321,12 +321,44 @@
     <label>Speed <input type="range" id="speed" min="1" max="10" value="6"></label>
   </div>
 
+  <div class="overlay" id="modeOverlay">
+    <div class="sheet" style="text-align:center">
+      <h2>How are you playing?</h2>
+      <p class="hint" style="margin-top:0">Partnerships are fixed: South + North vs. West + East. Any seat not taken by a person is played by the table's AI.</p>
+      <button class="go" id="modeLocalBtn">Play on this device</button>
+      <button class="go ghost" id="modeOnlineBtn" style="margin-top:.5rem">Play online with others</button>
+    </div>
+  </div>
+
   <div class="overlay" id="setupOverlay">
     <div class="sheet">
       <h2>Who's playing?</h2>
       <div id="seatRows"></div>
-      <p class="hint">Partnerships are fixed: South + North vs. West + East. Any seat left on "AI" is played by the table's AI. With 2+ humans, hands stay hidden between turns — pass the device when prompted.</p>
+      <p class="hint">With 2+ humans on this device, hands stay hidden between turns — pass the device when prompted.</p>
       <button class="go" id="startBtn">Start game</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="onlineOverlay">
+    <div class="sheet" style="text-align:center">
+      <div id="onlineJoinStage">
+        <h2>Play online</h2>
+        <button class="go" id="createRoomBtn">Create a new game</button>
+        <p class="hint">— or join one already started —</p>
+        <input id="joinCodeInput" maxlength="4" placeholder="CODE"
+          style="width:100%;text-transform:uppercase;text-align:center;font-family:'Cinzel',serif;
+                 font-size:1.15rem;letter-spacing:.15em;padding:.5rem;margin-bottom:.6rem;
+                 border-radius:8px;border:1px solid #b39f72;background:#fffdf6;color:#2a2010">
+        <button class="go ghost" id="joinRoomBtn">Join game</button>
+        <p class="hint" id="onlineError" style="color:#a33;display:none"></p>
+      </div>
+      <div id="onlineLobbyStage" style="display:none">
+        <h2>Room <span id="lobbyCode"></span></h2>
+        <p class="hint" style="margin-top:0">Share this code — everyone joins at the same page and clicks "Join game."</p>
+        <div id="lobbySeatRows"></div>
+        <button class="go" id="lobbyStartBtn" style="display:none">Start game</button>
+        <p class="hint" id="lobbyWait" style="display:none">Waiting for the host to start…</p>
+      </div>
     </div>
   </div>
 
@@ -669,11 +701,13 @@ function* playHand(dealer,gameScore){
    RENDER / PLAYBACK
    ============================================================ */
 const el = id => document.getElementById(id);
+const SERVER_URL = "https://king-pedro-online.king-pedro-server.workers.dev";
 const State = {
   dealer:0, gameScore:[0,0], gen:null, lastEvent:null, resumeValue:undefined, paused:false,
   human:[false,false,false,false], awaitingPlay:null, passAndPlay:false, revealedSeat:null,
   hands:[[],[],[],[]], revealed:[true,true,true,true], folded:[false,false,false,false],
-  trump:null, bid:null, declarer:-1, dealer_now:0, trick:[], auto:false, timer:null, gameOver:false
+  trump:null, bid:null, declarer:-1, dealer_now:0, trick:[], auto:false, timer:null, gameOver:false,
+  onlineMode:false, mySeat:-1, isHost:false, roomCode:"", ws:null
 };
 
 function cardEl(c,trump,opts={}){
@@ -788,11 +822,12 @@ function applyEvent(e){
     case "deal": {
       State.dealer_now=e.dealer; State.declarer=-1; State.trump=null; State.bid=null;
       State.folded=[false,false,false,false]; State.revealedSeat=null;
-      if(State.passAndPlay) State.revealed=[false,false,false,false];
+      if(State.onlineMode){ State.revealed=[false,false,false,false]; State.revealed[State.mySeat]=true; }
+      else if(State.passAndPlay) State.revealed=[false,false,false,false];
       else State.revealed = State.human.some(Boolean) ? State.human.slice() : [true,true,true,true];
       State.hands=e.hands.map(h=>h.slice()); State.trick=[]; State.awaitingPlay=null;
       renderAll(true);
-      const showPeek = !State.passAndPlay && (State.human[e.dealer] || !State.human.some(Boolean));
+      const showPeek = State.onlineMode ? (e.peeked!=null) : (!State.passAndPlay && (State.human[e.dealer] || !State.human.some(Boolean)));
       ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each${showPeek?` and peeks the bottom card <b>${cardStr(e.peeked)}</b>`:` and quietly peeks the bottom card`}.`);
       break; }
     case "bid": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"bid",e.bid));
@@ -855,6 +890,7 @@ function applyEvent(e){
 
 // ---- human decision panel (gated behind a "pass the device" reveal when 2+ humans share this screen) ----
 function showDecision(y){
+  if(State.onlineMode) return renderDecisionBody(y); // each player already only sees their own screen
   if(State.passAndPlay && State.revealedSeat!==y.seat){
     el("revealWho").textContent=`Pass the device to ${PLAYERS[y.seat].name}`;
     el("revealGate").classList.add("show");
@@ -915,7 +951,7 @@ function hideDecision(){ el("decision").classList.remove("show"); }
 // ---- step / auto: drive the generator one yielded item at a time ----
 function ensureGen(){ if(!State.gen && !State.gameOver){ State.gen=playHand(State.dealer,State.gameScore); } }
 function step(){
-  if(State.paused) return;
+  if(State.onlineMode || State.paused) return; // online games are driven entirely by server messages
   for(;;){
     if(State.gameOver && !State.gen){ stopAuto(); return; }
     ensureGen();
@@ -929,8 +965,13 @@ function step(){
   }
 }
 function resumeAfterHuman(value){
-  State.resumeValue=value; State.paused=false; State.awaitingPlay=null;
+  State.awaitingPlay=null;
   hideDecision();
+  if(State.onlineMode){
+    if(State.ws && State.ws.readyState===1) State.ws.send(JSON.stringify({type:"answer", value}));
+    return;
+  }
+  State.resumeValue=value; State.paused=false;
   if(State.passAndPlay){
     State.revealedSeat=null; State.revealed=[false,false,false,false]; renderHands(false);
   }
@@ -1009,14 +1050,113 @@ function applySetupSelections(){
   }
 }
 
-el("newBtn").onclick=openSetup;
+// ---- online mode: connect to the Cloudflare Worker room server ----
+function wsUrlFor(code){ return SERVER_URL.replace(/^http/,"ws") + "/room/" + code; }
+
+function connectToRoom(code, asHost){
+  State.roomCode=code;
+  const ws = new WebSocket(wsUrlFor(code));
+  State.ws=ws;
+  ws.onopen=()=>{ showLobbyStage(); el("lobbyCode").textContent=code; };
+  ws.onmessage=(ev)=>{
+    let msg; try{ msg=JSON.parse(ev.data); } catch { return; }
+    if(msg.type==="welcome"){ State.isHost=msg.isHost; }
+    else if(msg.type==="roster"){
+      State.isHost=msg.isHost; State.mySeat=msg.yourSeat;
+      State.human = msg.roster.map(r=>r.claimed);
+      msg.roster.forEach(r=>{ PLAYERS[r.seat].name=r.name; PLAYERS[r.seat].tag=r.tag; });
+      renderLobbyRoster(msg.roster, msg.isHost);
+      if(msg.started){ State.onlineMode=true; closeOnline(); beginOnlineGame(); }
+    }
+    else if(msg.type==="event"){ applyEvent(msg.event); }
+    else if(msg.type==="needInput"){ showDecision(msg); }
+    else if(msg.type==="error"){ ticker(`<b>Server:</b> ${msg.message}`); }
+  };
+  ws.onclose=()=>{ if(!State.onlineMode) { el("onlineError").style.display="block"; el("onlineError").textContent="Connection lost. Try again."; } };
+  ws.onerror=()=>{};
+}
+function renderLobbyRoster(roster, isHost){
+  const wrap=el("lobbySeatRows"); wrap.innerHTML="";
+  roster.forEach(r=>{
+    const row=document.createElement("div");
+    row.className="seatRow"+(r.claimed?" human":"");
+    const mine = r.seat===State.mySeat;
+    row.innerHTML =
+      `<div class="who"><b>${SEAT_POS[r.seat]}</b><small>${r.claimed? r.name+(mine?" (you)":"") : "open — AI plays if empty"}</small></div>`+
+      (mine ? `<button class="toggle on" type="button">Leave</button>`
+            : (r.claimed ? `<button class="toggle" type="button" disabled>Taken</button>`
+                         : `<button class="toggle" type="button">Sit here</button>`));
+    wrap.appendChild(row);
+    const btn=row.querySelector("button");
+    if(!btn.disabled){
+      btn.onclick=()=>{
+        if(mine) State.ws.send(JSON.stringify({type:"releaseSeat", seat:r.seat}));
+        else {
+          const nm=(prompt("Your name?","")||"").trim();
+          State.ws.send(JSON.stringify({type:"claimSeat", seat:r.seat, name:nm}));
+        }
+      };
+    }
+  });
+  el("lobbyStartBtn").style.display = isHost ? "inline-block" : "none";
+  el("lobbyWait").style.display = isHost ? "none" : "block";
+}
+function showLobbyStage(){ el("onlineJoinStage").style.display="none"; el("onlineLobbyStage").style.display="block"; }
+function closeOnline(){ el("onlineOverlay").classList.remove("show"); }
+function setLocalControlsVisible(v){
+  const d = v ? "" : "none";
+  el("stepBtn").style.display=d; el("autoBtn").style.display=d;
+  document.querySelectorAll(".controls label").forEach(l=>l.style.display=d);
+}
+function beginOnlineGame(){
+  State.gameOver=false; State.dealer=0; State.gameScore=[0,0]; State.trick=[];
+  State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1;
+  State.folded=[false,false,false,false]; hideDecision(); el("revealGate").classList.remove("show");
+  setLocalControlsVisible(false);
+  renderAll(false); ticker("Online game starting…"); el("banner").classList.remove("show");
+}
+async function createRoom(){
+  el("onlineError").style.display="none";
+  try{
+    const res = await fetch(SERVER_URL + "/api/new-room");
+    const data = await res.json();
+    connectToRoom(data.code, true);
+  } catch(err){
+    el("onlineError").style.display="block";
+    el("onlineError").textContent="Couldn't reach the server. Check your connection and try again.";
+  }
+}
+function joinRoom(){
+  const code=(el("joinCodeInput").value||"").trim().toUpperCase();
+  el("onlineError").style.display="none";
+  if(code.length!==4){ el("onlineError").style.display="block"; el("onlineError").textContent="Enter the 4-letter room code."; return; }
+  connectToRoom(code, false);
+}
+
+// ---- mode select (top-level entry point) ----
+function openModeSelect(){
+  stopAuto();
+  if(State.ws){ try{State.ws.close();}catch{} State.ws=null; }
+  State.onlineMode=false; State.mySeat=-1; State.isHost=false;
+  setLocalControlsVisible(true);
+  el("onlineJoinStage").style.display="block"; el("onlineLobbyStage").style.display="none";
+  el("joinCodeInput").value=""; el("onlineError").style.display="none";
+  el("modeOverlay").classList.add("show");
+}
+el("modeLocalBtn").onclick=()=>{ el("modeOverlay").classList.remove("show"); openSetup(); };
+el("modeOnlineBtn").onclick=()=>{ el("modeOverlay").classList.remove("show"); el("onlineOverlay").classList.add("show"); };
+el("createRoomBtn").onclick=createRoom;
+el("joinRoomBtn").onclick=joinRoom;
+
+el("newBtn").onclick=openModeSelect;
 el("stepBtn").onclick=()=>{ stopAuto(); step(); };
 el("autoBtn").onclick=()=>{ State.auto?stopAuto():startAuto(); };
 el("startBtn").onclick=()=>{
   applySetupSelections(); closeSetup(); newGame(); startAuto();
 };
+el("lobbyStartBtn").onclick=()=>{ if(State.ws) State.ws.send(JSON.stringify({type:"startGame"})); };
 
-openSetup();
+openModeSelect();
 </script>
 </body>
 </html>
