@@ -248,6 +248,47 @@
     .card.deal-in,.trick .pc.in{ animation:none !important; opacity:1 !important; transform:translate(-50%,-50%) scale(1) !important; }
     .bubble{ transition:opacity .12s; }
   }
+
+  /* ---- setup sheet ---- */
+  .overlay{ position:absolute; inset:0; background:rgba(0,0,0,.72); z-index:80;
+    display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none;
+    transition:opacity .25s; }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+  .sheet{ background:linear-gradient(180deg,#fbf4e1,#e9dcbb); color:#2a2010;
+    border:2px solid var(--brass); border-radius:16px; padding:1.3rem 1.5rem;
+    max-width:min(92vw,460px); width:460px; box-shadow:0 20px 60px rgba(0,0,0,.6);
+    font-family:Georgia,serif; }
+  .sheet h2{ font-family:Cinzel,serif; font-size:1.05rem; margin-bottom:.7rem; text-align:center; }
+  .seatRow{ display:flex; align-items:center; gap:.55rem; padding:.4rem 0; border-bottom:1px solid rgba(0,0,0,.08); }
+  .seatRow:last-child{ border-bottom:none; }
+  .seatRow .who{ flex:1; font-size:.8rem; min-width:0; }
+  .seatRow .who b{ font-family:Cinzel,serif; display:block; font-size:.84rem; }
+  .seatRow .who small{ opacity:.65; }
+  .seatRow .toggle{ font-size:.68rem; padding:.32rem .6rem; min-width:44px; }
+  .seatRow .toggle.on{ background:linear-gradient(180deg,#8fd39a,#5fae72); border-color:#3f7a4d; color:#0c2410; }
+  .nameInput{ width:92px; font-family:Georgia,serif; font-size:.72rem; padding:.3rem .4rem;
+    border-radius:6px; border:1px solid #b39f72; background:#fffdf6; display:none; }
+  .seatRow.human .nameInput{ display:inline-block; }
+  .sheet .hint{ font-size:.68rem; opacity:.7; text-align:center; margin:.7rem 0 .9rem; }
+  .sheet .go{ width:100%; font-size:.86rem; padding:.55rem; }
+
+  /* ---- human decision panel ---- */
+  .decision{
+    position:absolute; left:50%; bottom:clamp(58px,9vh,84px); transform:translateX(-50%) translateY(130%);
+    z-index:70; background:linear-gradient(180deg,#fbf4e1,#e9dcbb); color:#2a2010;
+    border:2px solid var(--brass); border-radius:14px; padding:.7rem .9rem; text-align:center;
+    box-shadow:0 16px 40px rgba(0,0,0,.55); font-family:Georgia,serif; min-width:260px;
+    max-width:90vw; transition:transform .25s; pointer-events:none;
+  }
+  .decision.show{ transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  .decision h3{ font-family:Cinzel,serif; font-size:.86rem; margin-bottom:.4rem; }
+  .decision .row{ display:flex; gap:.4rem; justify-content:center; flex-wrap:wrap; margin-top:.5rem; }
+  .decision .bidNum{ font-family:Cinzel,serif; font-size:1.3rem; min-width:2.2em; display:inline-block; }
+  .decision button.suitBtn{ min-width:78px; }
+
+  .card.playable{ cursor:pointer; box-shadow:0 0 0 3px #6fe08a, 0 2px 5px var(--shadow); }
+  .card.playable:hover{ transform:translateY(-10px); transition:transform .12s; }
+  .card.notplayable{ opacity:.45; filter:grayscale(.4); }
 </style>
 </head>
 <body>
@@ -271,12 +312,22 @@
 
   <div class="ticker" id="ticker">Press <b>New game</b> to deal.</div>
   <div class="banner" id="banner"></div>
+  <div class="decision" id="decision"></div>
 
   <div class="controls">
     <button id="newBtn">New game</button>
     <button id="stepBtn" class="ghost">Step ▸</button>
     <button id="autoBtn">Auto ▶</button>
     <label>Speed <input type="range" id="speed" min="1" max="10" value="6"></label>
+  </div>
+
+  <div class="overlay" id="setupOverlay">
+    <div class="sheet">
+      <h2>Who's playing?</h2>
+      <div id="seatRows"></div>
+      <p class="hint">Partnerships are fixed: South + North vs. West + East. Any seat left on "AI" is played by the table's AI.</p>
+      <button class="go" id="startBtn">Start game</button>
+    </div>
   </div>
 </div>
 
@@ -381,7 +432,8 @@ const PLAYERS = [
   {seat:2,name:"Bohdan",     tag:"Chaotic",    color:"#e0a85a", aggr:1, chaos:2},
   {seat:3,name:"Lucky Lou",  tag:"Gambler",    color:"#9ad6a0", aggr:2, chaos:5},
 ];
-const TEAM_NAME = t => t===0 ? "Mike / Bohdan" : "Elena / Lou";
+const TEAM_NAME = t => t===0 ? `${PLAYERS[0].name} / ${PLAYERS[2].name}` : `${PLAYERS[1].name} / ${PLAYERS[3].name}`;
+const DEFAULT_PLAYERS = PLAYERS.map(p=>({...p}));
 function speak(seat,mood,arg){
   const pool = VOICES[seat][mood] || ["..."];
   let s = pool[Math.floor(Math.random()*pool.length)];
@@ -458,44 +510,57 @@ const maxBy=(a,f)=>a.reduce((b,c)=>f(c)>f(b)?c:b,a[0]);
 const minBy=(a,f)=>a.length?a.reduce((b,c)=>f(c)<f(b)?c:b,a[0]):null;
 const handSort=h=>h.slice().sort((a,b)=>SUITS.indexOf(a.suit)*20+a.rank-(SUITS.indexOf(b.suit)*20+b.rank));
 
-// ---- simulate a full hand into an event list ----
-function simulateHand(dealer,gameScore){
-  const ev=[];
+// ---- play a hand, yielding one event at a time; yields {needInput:...} and
+//      pauses (via .next(answer)) whenever a HUMAN seat must decide something ----
+function* playHand(dealer,gameScore){
   const hands=[[],[],[],[]];
   const deck=shuffle(freshDeck());
   let idx=0;
   for(let r=0;r<3;r++) for(let o=1;o<=4;o++){ const s=(dealer+o)%4; for(let k=0;k<3;k++) hands[s].push(deck[idx++]); }
   const stub=deck.slice(idx); // 16
   const peeked=stub[stub.length-1];
-  ev.push({type:"deal",hands:hands.map(handSort),dealer,peeked});
+  yield {type:"deal",hands:hands.map(handSort),dealer,peeked};
 
   // bidding
   let highBid=0, declarer=-1; const passed=[false,false,false,false];
   let turn=(dealer+1)%4, acts=0;
   while(passed.filter(Boolean).length<3 && highBid<RULES.maxBid && acts<16){
     if(!passed[turn] && turn!==declarer){
-      const p=PLAYERS[turn];
-      const a=appraise(hands[turn], turn===dealer?peeked:null);
-      const swing=p.chaos>0?(Math.floor(Math.random()*(2*p.chaos+1))-p.chaos):0;
-      const want=Math.max(0,Math.min(RULES.maxBid,26+a.score+p.aggr+swing));
       const need=Math.max(RULES.minBid,highBid+1);
-      if(want>=need){ highBid=Math.min(want,RULES.maxBid); declarer=turn; ev.push({type:"bid",seat:turn,bid:highBid}); }
-      else { passed[turn]=true; ev.push({type:"pass",seat:turn}); }
+      if(State.human[turn]){
+        const answer = yield {needInput:"bid", seat:turn, need, max:RULES.maxBid, highBid};
+        if(answer==="pass"){ passed[turn]=true; yield {type:"pass",seat:turn}; }
+        else { highBid=Math.max(need,Math.min(RULES.maxBid,answer|0)); declarer=turn; yield {type:"bid",seat:turn,bid:highBid}; }
+      } else {
+        const p=PLAYERS[turn];
+        const a=appraise(hands[turn], turn===dealer?peeked:null);
+        const swing=p.chaos>0?(Math.floor(Math.random()*(2*p.chaos+1))-p.chaos):0;
+        const want=Math.max(0,Math.min(RULES.maxBid,26+a.score+p.aggr+swing));
+        if(want>=need){ highBid=Math.min(want,RULES.maxBid); declarer=turn; yield {type:"bid",seat:turn,bid:highBid}; }
+        else { passed[turn]=true; yield {type:"pass",seat:turn}; }
+      }
     }
     turn=(turn+1)%4; acts++;
   }
-  if(declarer===-1){ declarer=dealer; highBid=RULES.minBid; ev.push({type:"stuck",seat:dealer,bid:highBid}); }
+  if(declarer===-1){ declarer=dealer; highBid=RULES.minBid; yield {type:"stuck",seat:dealer,bid:highBid}; }
   const bidTeam=declarer%2;
-  const trump=appraise(hands[declarer], declarer===dealer?peeked:null).suit;
-  ev.push({type:"trump",seat:declarer,trump,bid:highBid,bidTeam});
+
+  let trump;
+  if(State.human[declarer]){
+    const handForChoice = (declarer===dealer ? hands[declarer].concat([peeked]) : hands[declarer]).slice();
+    trump = yield {needInput:"trump", seat:declarer, hand:handForChoice};
+  } else {
+    trump = appraise(hands[declarer], declarer===dealer?peeked:null).suit;
+  }
+  yield {type:"trump",seat:declarer,trump,bid:highBid,bidTeam};
 
   // second deal: 4-card packets, dealer gets bottom 4
   let si=0;
   for(let o=1;o<=3;o++){ const s=(dealer+o)%4; for(let k=0;k<4;k++) hands[s].push(stub[si++]); }
   for(let k=0;k<4;k++) hands[dealer].push(stub[si++]);
-  ev.push({type:"deal2",hands:hands.map(handSort)});
+  yield {type:"deal2",hands:hands.map(handSort)};
 
-  // discard: keep ALL trumps, fill to 6 with best non-trumps
+  // discard: keep ALL trumps, fill to 6 with best non-trumps (mechanical — same for AI & human)
   for(let s=0;s<4;s++){
     const tr=hands[s].filter(c=>isTrump(c,trump));
     const nt=hands[s].filter(c=>!isTrump(c,trump)).sort((a,b)=>b.rank-a.rank);
@@ -506,55 +571,66 @@ function simulateHand(dealer,gameScore){
   const folded=[false,false,false,false];
   for(let s=0;s<4;s++){
     const tr=hands[s].filter(c=>isTrump(c,trump));
-    if(tr.length===0){ folded[s]=true; hands[s]=[]; ev.push({type:"fold",seat:s}); }
-    else if(wantsPass(hands[s],trump,PLAYERS[s].aggr,PLAYERS[s].chaos,s===declarer)){
-      const partner=(s+2)%4;
-      if(!folded[partner]){
-        ev.push({type:"passt",seat:s,partner,cards:tr.slice()});
-        hands[partner]=hands[partner].concat(tr);
-        for(let n=0;n<tr.length;n++){
-          const toss=minBy(hands[partner].filter(c=>points(c,trump)===0),c=>power(c,trump,trump))
-                  || minBy(hands[partner],c=>points(c,trump));
-          if(toss){ const i=hands[partner].indexOf(toss); hands[partner].splice(i,1); }
+    if(tr.length===0){ folded[s]=true; hands[s]=[]; yield {type:"fold",seat:s}; }
+    else {
+      let doPass;
+      if(s===declarer || tr.length>2){ doPass=false; }
+      else if(State.human[s]){ doPass = yield {needInput:"foldchoice", seat:s, trumps:tr.slice()}; }
+      else { doPass = wantsPass(hands[s],trump,PLAYERS[s].aggr,PLAYERS[s].chaos,s===declarer); }
+      if(doPass){
+        const partner=(s+2)%4;
+        if(!folded[partner]){
+          yield {type:"passt",seat:s,partner,cards:tr.slice()};
+          hands[partner]=hands[partner].concat(tr);
+          for(let n=0;n<tr.length;n++){
+            const toss=minBy(hands[partner].filter(c=>points(c,trump)===0),c=>power(c,trump,trump))
+                    || minBy(hands[partner],c=>points(c,trump));
+            if(toss){ const i=hands[partner].indexOf(toss); hands[partner].splice(i,1); }
+          }
+          folded[s]=true; hands[s]=[];
         }
-        folded[s]=true; hands[s]=[];
       }
     }
   }
-  ev.push({type:"settle",hands:hands.map(h=>handSort(h)),folded:folded.slice(),trump});
+  yield {type:"settle",hands:hands.map(h=>handSort(h)),folded:folded.slice(),trump};
 
   // play 6 tricks
   const handPts=[0,0];
   let leader=declarer;
   for(let tn=1;tn<=6;tn++){
-    ev.push({type:"trickStart",num:tn,leader});
+    yield {type:"trickStart",num:tn,leader};
     const trick=[];
     let ledSpoke=false;
     for(let step=0;step<4;step++){
       const s=(leader+step)%4;
       if(folded[s]||hands[s].length===0) continue;
-      // surrender: trump led + void of trump
+      // surrender: trump led + void of trump (forced, no decision either way)
       const trumpLed = trick.length>0 && isTrump(trick[0].card,trump);
       if(RULES.surrenderWhenVoidOnTrumpLead && trumpLed && !hands[s].some(c=>isTrump(c,trump))){
-        ev.push({type:"surrender",seat:s,cards:hands[s].slice()});
+        yield {type:"surrender",seat:s,cards:hands[s].slice()};
         folded[s]=true; hands[s]=[]; continue;
       }
       const force = (tn===1 && step===0);
-      let res=choosePlay(PLAYERS[s],hands[s],trick,trump,force);
       let card,say=null;
-      if(res.card){ card=res.card; say=res.say; } else card=res;
+      if(State.human[s]){
+        const legal = legalPlays(hands[s],trick,trump);
+        card = yield {needInput:"play", seat:s, hand:hands[s].slice(), legal, trick:trick.slice()};
+      } else {
+        let res=choosePlay(PLAYERS[s],hands[s],trick,trump,force);
+        if(res.card){ card=res.card; say=res.say; } else card=res;
+      }
       hands[s].splice(hands[s].indexOf(card),1);
       trick.push({seat:s,card});
-      ev.push({type:"play",seat:s,card, lead:step===0, say,
-               speakLead: step===0 && !ledSpoke && Math.random()<0.4});
-      // overload: trick 1 shed extras to reach 5
+      yield {type:"play",seat:s,card, lead:step===0, say,
+               speakLead: step===0 && !ledSpoke && Math.random()<0.4};
+      // overload: trick 1 shed extras to reach 5 (mechanical for everyone)
       if(tn===1){
         let extras=hands[s].length-5;
         while(extras>0){
           const bury=minBy(hands[s],c=>points(c,trump)*100+power(c,trump,trump));
           hands[s].splice(hands[s].indexOf(bury),1);
           trick.push({seat:s,card:bury,buried:true});
-          ev.push({type:"play",seat:s,card:bury,buried:true});
+          yield {type:"play",seat:s,card:bury,buried:true};
           extras--;
         }
       }
@@ -569,7 +645,7 @@ function simulateHand(dealer,gameScore){
       else trickPts+=pt;
     }
     handPts[win.seat%2]+=trickPts;
-    ev.push({type:"trickEnd",winner:win.seat,winCard:win.card,points:trickPts,captured:handPts.slice()});
+    yield {type:"trickEnd",winner:win.seat,winCard:win.card,points:trickPts,captured:handPts.slice()};
   }
 
   // score
@@ -578,8 +654,7 @@ function simulateHand(dealer,gameScore){
   if(made){ newScore[0]+=handPts[0]; newScore[1]+=handPts[1]; }
   else { newScore[bidTeam]-=highBid; newScore[1-bidTeam]+=handPts[1-bidTeam]; }
   const won = made && newScore[bidTeam]>=RULES.winningScore;
-  ev.push({type:"handResult",captured:handPts.slice(),made,bidTeam,bid:highBid,gameScore:newScore,won,declarer});
-  return {events:ev,newScore,won,winTeam:bidTeam};
+  yield {type:"handResult",captured:handPts.slice(),made,bidTeam,bid:highBid,gameScore:newScore,won,declarer};
 }
 
 /* ============================================================
@@ -587,7 +662,8 @@ function simulateHand(dealer,gameScore){
    ============================================================ */
 const el = id => document.getElementById(id);
 const State = {
-  dealer:0, gameScore:[0,0], events:[], i:0,
+  dealer:0, gameScore:[0,0], gen:null, lastEvent:null, resumeValue:undefined, paused:false,
+  human:[false,false,false,false], awaitingPlay:null,
   hands:[[],[],[],[]], revealed:[true,true,true,true], folded:[false,false,false,false],
   trump:null, bid:null, declarer:-1, dealer_now:0, trick:[], auto:false, timer:null, gameOver:false
 };
@@ -624,8 +700,14 @@ function renderHands(dealIn){
   PLAYERS.forEach(p=>{
     const h=el("h"+p.seat); h.innerHTML="";
     const cards=State.hands[p.seat]||[];
+    const aw = (State.awaitingPlay && State.awaitingPlay.seat===p.seat) ? State.awaitingPlay.legal : null;
     cards.forEach((c,k)=>{
       const node = State.revealed[p.seat] ? cardEl(c,State.trump,{dealIn,delay:k*45}) : backEl();
+      if(aw){
+        const isLegal = aw.some(lc=>lc.suit===c.suit&&lc.rank===c.rank);
+        if(isLegal){ node.classList.add("playable"); node.onclick=()=>resumeAfterHuman(c); }
+        else node.classList.add("notplayable");
+      }
       h.appendChild(node);
     });
   });
@@ -671,24 +753,47 @@ function banner(title,sub){ const b=el("banner"); b.innerHTML=`<h2>${title}</h2>
 
 function baseDelay(){ const s=+el("speed").value; return 1150 - s*100; } // 1050..150ms
 
+// ---- human seats get factual text instead of AI personality banter ----
+function simpleText(mood,arg){
+  switch(mood){
+    case "bid": return `Bid ${arg}`;
+    case "pass": return `Pass`;
+    case "stuck": return `Stuck at ${arg}`;
+    case "trump": return `Trump: ${arg}`;
+    case "feed": return `For you, partner!`;
+    case "lead": return `Leading.`;
+    case "fold": return `Folding.`;
+    case "passt": return `Passing ${arg} to partner.`;
+    case "win": return `Got it!`;
+    case "big": return `Big points!`;
+    case "made": return `Made it!`;
+    case "set": return `Set...`;
+    case "gg": return `GG!`;
+    default: return "";
+  }
+}
+function actionSpeak(seat,mood,arg){ return State.human[seat] ? simpleText(mood,arg) : speak(seat,mood,arg); }
+
 // ---- consume one event ----
 function applyEvent(e){
   switch(e.type){
-    case "deal":
+    case "deal": {
       State.dealer_now=e.dealer; State.declarer=-1; State.trump=null; State.bid=null;
-      State.folded=[false,false,false,false]; State.revealed=[true,true,true,true];
-      State.hands=e.hands.map(h=>h.slice()); State.trick=[];
+      State.folded=[false,false,false,false];
+      State.revealed = State.human.some(Boolean) ? State.human.slice() : [true,true,true,true];
+      State.hands=e.hands.map(h=>h.slice()); State.trick=[]; State.awaitingPlay=null;
       renderAll(true);
-      ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each and peeks the bottom card <b>${cardStr(e.peeked)}</b>.`);
-      break;
-    case "bid": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,speak(e.seat,"bid",e.bid));
+      const showPeek = State.human[e.dealer] || !State.human.some(Boolean);
+      ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each${showPeek?` and peeks the bottom card <b>${cardStr(e.peeked)}</b>`:` and quietly peeks the bottom card`}.`);
+      break; }
+    case "bid": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"bid",e.bid));
       ticker(`${PLAYERS[e.seat].name} bids <b>${e.bid}</b>.`); renderMedallion(); renderPlates(); break;
-    case "pass": bubble(e.seat,speak(e.seat,"pass")); ticker(`${PLAYERS[e.seat].name} passes.`); break;
-    case "stuck": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,speak(e.seat,"stuck"));
+    case "pass": bubble(e.seat,actionSpeak(e.seat,"pass")); ticker(`${PLAYERS[e.seat].name} passes.`); break;
+    case "stuck": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"stuck"));
       ticker(`No one bid — ${PLAYERS[e.seat].name} is stuck at <b>${e.bid}</b>.`); renderMedallion(); renderPlates(); break;
     case "trump":
       State.trump=e.trump; State.bid=e.bid; State.declarer=e.seat;
-      bubble(e.seat,speak(e.seat,"trump",SUIT_SYM[e.trump]+" "+e.trump));
+      bubble(e.seat,actionSpeak(e.seat,"trump",SUIT_SYM[e.trump]+" "+e.trump));
       ticker(`Trump is <b>${SUIT_SYM[e.trump]} ${e.trump}</b>. ${PLAYERS[e.seat].name} needs ${e.bid}.`);
       renderAll(false); break;
     case "deal2":
@@ -697,40 +802,41 @@ function applyEvent(e){
     case "settle":
       State.hands=e.hands.map(h=>h.slice()); State.folded=e.folded.slice(); renderAll(false);
       ticker(`Hands trimmed to six (all trumps kept).`); break;
-    case "fold": State.folded[e.seat]=true; State.hands[e.seat]=[]; bubble(e.seat,speak(e.seat,"fold"));
+    case "fold": State.folded[e.seat]=true; State.hands[e.seat]=[]; bubble(e.seat,actionSpeak(e.seat,"fold"));
       ticker(`${PLAYERS[e.seat].name} has no trump — folds.`); renderAll(false); break;
     case "passt":
-      bubble(e.seat,speak(e.seat,"passt",e.cards.map(cardStr).join(" ")));
+      bubble(e.seat,actionSpeak(e.seat,"passt",e.cards.map(cardStr).join(" ")));
       ticker(`${PLAYERS[e.seat].name} passes ${e.cards.map(cardStr).join(" ")} to ${PLAYERS[e.partner].name}, then folds.`);
       break;
-    case "trickStart": State.trick=[]; renderTrick();
+    case "trickStart": State.trick=[]; State.awaitingPlay=null; renderTrick();
       ticker(`Trick ${e.num} — ${PLAYERS[e.leader].name} leads.`); break;
     case "play":
       State.trick.push({seat:e.seat,card:e.card,buried:e.buried});
+      State.awaitingPlay=null;
       // remove the played card from the seat's displayed hand
       { const h=State.hands[e.seat]; const i=h.findIndex(c=>c.suit===e.card.suit&&c.rank===e.card.rank); if(i>=0) h.splice(i,1); }
       renderHands(false); renderTrick();
-      if(e.say==="feed") bubble(e.seat,speak(e.seat,"feed"));
-      else if(e.speakLead) bubble(e.seat,speak(e.seat,"lead"));
+      if(e.say==="feed") bubble(e.seat,actionSpeak(e.seat,"feed"));
+      else if(e.speakLead) bubble(e.seat,actionSpeak(e.seat,"lead"));
       if(!e.buried) ticker(`${PLAYERS[e.seat].name} plays <b>${cardStr(e.card)}</b>${points(e.card,State.trump)?` (${points(e.card,State.trump)} pts)`:""}.`);
       break;
     case "surrender":
-      State.folded[e.seat]=true; State.hands[e.seat]=[]; bubble(e.seat,speak(e.seat,"fold"));
+      State.folded[e.seat]=true; State.hands[e.seat]=[]; bubble(e.seat,actionSpeak(e.seat,"fold"));
       ticker(`${PLAYERS[e.seat].name} is out of trump — surrenders to the junk pile.`); renderAll(false); break;
     case "trickEnd":
-      bubble(e.winner,speak(e.winner,"win"));
-      if(e.points>=30) bubble((e.winner+1)%4, speak((e.winner+1)%4,"big"));
+      bubble(e.winner,actionSpeak(e.winner,"win"));
+      if(e.points>=30) bubble((e.winner+1)%4, actionSpeak((e.winner+1)%4,"big"));
       ticker(`${PLAYERS[e.winner].name} takes trick — +${e.points} to ${TEAM_NAME(e.winner%2)}.`);
       setTimeout(()=>{ State.trick=[]; renderTrick(); }, baseDelay()*0.6);
       break;
     case "handResult":
       State.gameScore=e.gameScore.slice(); renderRail();
-      if(e.made){ bubble(e.declarer,speak(e.declarer,"made"));
+      if(e.made){ bubble(e.declarer,actionSpeak(e.declarer,"made"));
         banner(`${TEAM_NAME(e.bidTeam)} made ${e.bid}`,`Captured ${e.captured[0]}–${e.captured[1]}. Score ${State.gameScore[0]}–${State.gameScore[1]}.`); }
-      else { bubble(e.declarer,speak(e.declarer,"set"));
+      else { bubble(e.declarer,actionSpeak(e.declarer,"set"));
         banner(`${TEAM_NAME(e.bidTeam)} set!`,`Back ${e.bid}. Score ${State.gameScore[0]}–${State.gameScore[1]}.`); }
       if(e.won){ State.gameOver=true; setTimeout(()=>{
-        bubble(e.declarer,speak(e.declarer,"gg"));
+        bubble(e.declarer,actionSpeak(e.declarer,"gg"));
         banner(`🏆 ${TEAM_NAME(e.bidTeam)} win!`,`${State.gameScore[e.bidTeam]} points — first past ${RULES.winningScore} on a made bid.`);
       }, baseDelay()); }
       State.dealer=(State.dealer+1)%4;
@@ -738,51 +844,150 @@ function applyEvent(e){
   }
 }
 
-// ---- step / auto ----
-function ensureEvents(){
-  if(State.i>=State.events.length){
-    if(State.gameOver) return false;
-    const sim=simulateHand(State.dealer,State.gameScore);
-    State.events=sim.events; State.i=0;
+// ---- human decision panel ----
+function showDecision(y){
+  const box=el("decision");
+  const name=PLAYERS[y.seat].name;
+  if(y.needInput==="bid"){
+    box.innerHTML = `<h3>${name} — your bid</h3>
+      <div>Current high bid: ${y.highBid||"none"} &middot; need at least ${y.need} (max ${y.max})</div>
+      <div class="row">
+        <button id="decMinus" class="ghost">−</button>
+        <span class="bidNum" id="bidNum">${y.need}</span>
+        <button id="decPlus" class="ghost">+</button>
+      </div>
+      <div class="row">
+        <button id="decPass" class="ghost">Pass</button>
+        <button id="decBid">Bid</button>
+      </div>`;
+    let v=y.need;
+    el("decMinus").onclick=()=>{ v=Math.max(y.need,v-1); el("bidNum").textContent=v; };
+    el("decPlus").onclick=()=>{ v=Math.min(y.max,v+1); el("bidNum").textContent=v; };
+    el("decPass").onclick=()=>resumeAfterHuman("pass");
+    el("decBid").onclick=()=>resumeAfterHuman(v);
+  } else if(y.needInput==="trump"){
+    const counts=SUITS.map(s=>({s,n:y.hand.filter(c=>isTrump(c,s)).length}));
+    box.innerHTML = `<h3>${name} — pick trump</h3>
+      <div class="row">${counts.map(c=>`<button class="suitBtn" data-s="${c.s}">${SUIT_SYM[c.s]} ${c.s} (${c.n})</button>`).join("")}</div>`;
+    box.querySelectorAll(".suitBtn").forEach(b=>b.onclick=()=>resumeAfterHuman(b.dataset.s));
+  } else if(y.needInput==="foldchoice"){
+    box.innerHTML = `<h3>${name} — ${y.trumps.length} trump${y.trumps.length>1?"s":""} only</h3>
+      <div>${y.trumps.map(cardStr).join(" ")}</div>
+      <div class="row">
+        <button id="decFold">Pass to partner &amp; fold</button>
+        <button id="decKeep" class="ghost">Keep playing</button>
+      </div>`;
+    el("decFold").onclick=()=>resumeAfterHuman(true);
+    el("decKeep").onclick=()=>resumeAfterHuman(false);
+  } else if(y.needInput==="play"){
+    State.awaitingPlay={seat:y.seat,legal:y.legal};
+    renderHands(false);
+    box.innerHTML = `<h3>${name} — your turn</h3><div>Click a highlighted card to play it.</div>`;
   }
-  return true;
+  box.classList.add("show");
 }
+function hideDecision(){ el("decision").classList.remove("show"); }
+
+// ---- step / auto: drive the generator one yielded item at a time ----
+function ensureGen(){ if(!State.gen && !State.gameOver){ State.gen=playHand(State.dealer,State.gameScore); } }
 function step(){
-  if(State.gameOver && State.i>=State.events.length){ stopAuto(); return; }
-  if(!ensureEvents()) { stopAuto(); return; }
-  const e=State.events[State.i++];
-  applyEvent(e);
+  if(State.paused) return;
+  for(;;){
+    if(State.gameOver && !State.gen){ stopAuto(); return; }
+    ensureGen();
+    if(!State.gen){ stopAuto(); return; }
+    const r=State.gen.next(State.resumeValue);
+    State.resumeValue=undefined;
+    if(r.done){ State.gen=null; continue; } // hand finished — chain straight into the next one
+    const y=r.value;
+    if(y.needInput){ State.paused=true; showDecision(y); return; }
+    applyEvent(y); State.lastEvent=y; return;
+  }
+}
+function resumeAfterHuman(value){
+  State.resumeValue=value; State.paused=false; State.awaitingPlay=null;
+  hideDecision();
+  if(State.auto) tick(); else step();
 }
 function startAuto(){ State.auto=true; el("autoBtn").textContent="Pause ❚❚"; tick(); }
 function stopAuto(){ State.auto=false; el("autoBtn").textContent="Auto ▶"; clearTimeout(State.timer); }
 function tick(){
-  if(!State.auto) return;
+  if(!State.auto || State.paused) return;
   step();
+  if(State.paused) return;
   let d=baseDelay();
-  const last=State.events[State.i-1];
+  const last=State.lastEvent;
   if(last){ if(last.type==="trickEnd"||last.type==="trump"||last.type==="deal2"||last.type==="settle") d*=1.5;
             if(last.type==="handResult") d*=2.4; if(last.type==="play"&&last.buried) d*=0.4; }
-  if(State.gameOver && State.i>=State.events.length){ stopAuto(); return; }
+  if(State.gameOver && !State.gen){ stopAuto(); return; }
   State.timer=setTimeout(tick,d);
 }
 
 function newGame(){
   stopAuto();
   State.dealer=Math.floor(Math.random()*4); State.gameScore=[0,0];
-  State.events=[]; State.i=0; State.gameOver=false; State.trick=[];
+  State.gen=null; State.resumeValue=undefined; State.lastEvent=null; State.paused=false;
+  State.gameOver=false; State.trick=[]; State.awaitingPlay=null;
   State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1;
   State.folded=[false,false,false,false];
+  State.revealed = State.human.some(Boolean) ? State.human.slice() : [true,true,true,true];
+  hideDecision();
   renderAll(false); ticker("New game — press <b>Step ▸</b> or <b>Auto ▶</b> to begin.");
   el("banner").classList.remove("show");
 }
 
-el("newBtn").onclick=newGame;
+// ---- setup sheet: choose which seats are human ----
+let setupHuman=[false,false,false,false];
+let setupNames=["","","",""];
+const SEAT_POS={0:"South",1:"West",2:"North",3:"East"};
+
+function buildSeatRows(){
+  const wrap=el("seatRows"); wrap.innerHTML="";
+  DEFAULT_PLAYERS.forEach((dp,s)=>{
+    const row=document.createElement("div");
+    row.className="seatRow"+(setupHuman[s]?" human":"");
+    row.innerHTML =
+      `<div class="disc" style="width:34px;height:34px;background:radial-gradient(circle at 38% 32%,#fff,${dp.color})">${dp.name[0]}</div>`+
+      `<div class="who"><b>${dp.name}</b><small>${SEAT_POS[s]} &middot; ${dp.tag}</small></div>`+
+      `<input class="nameInput" placeholder="Your name" value="${setupNames[s]}">`+
+      `<button class="toggle${setupHuman[s]?" on":""}" type="button">${setupHuman[s]?"You":"AI"}</button>`;
+    wrap.appendChild(row);
+    const btn=row.querySelector(".toggle"), inp=row.querySelector(".nameInput");
+    btn.onclick=()=>{
+      setupHuman[s]=!setupHuman[s];
+      btn.classList.toggle("on",setupHuman[s]);
+      btn.textContent=setupHuman[s]?"You":"AI";
+      row.classList.toggle("human",setupHuman[s]);
+    };
+    inp.oninput=()=>{ setupNames[s]=inp.value; };
+  });
+}
+function openSetup(){ stopAuto(); buildSeatRows(); el("setupOverlay").classList.add("show"); }
+function closeSetup(){ el("setupOverlay").classList.remove("show"); }
+function applySetupSelections(){
+  const humansInSeatOrder=setupHuman.map((v,i)=>v?i:-1).filter(i=>i>=0);
+  State.human=setupHuman.slice();
+  for(let s=0;s<4;s++){
+    if(setupHuman[s]){
+      const idx=humansInSeatOrder.indexOf(s);
+      const custom=setupNames[s].trim();
+      PLAYERS[s].name = custom || (humansInSeatOrder.length>1 ? `Player ${idx+1}` : "You");
+      PLAYERS[s].tag = "Human";
+    } else {
+      PLAYERS[s].name = DEFAULT_PLAYERS[s].name;
+      PLAYERS[s].tag = DEFAULT_PLAYERS[s].tag;
+    }
+  }
+}
+
+el("newBtn").onclick=openSetup;
 el("stepBtn").onclick=()=>{ stopAuto(); step(); };
 el("autoBtn").onclick=()=>{ State.auto?stopAuto():startAuto(); };
+el("startBtn").onclick=()=>{
+  applySetupSelections(); closeSetup(); newGame(); startAuto();
+};
 
-newGame();
-// kick off automatically at a gentle pace
-setTimeout(()=>{ if(!State.auto) startAuto(); }, 600);
+openSetup();
 </script>
 </body>
 </html>
