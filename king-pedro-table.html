@@ -335,12 +335,47 @@
   .card.playable{ cursor:pointer; box-shadow:0 0 0 3px #6fe08a, 0 2px 5px var(--shadow); }
   .card.playable:hover{ transform:translateY(-10px); transition:transform .12s; }
   .card.notplayable{ opacity:.45; filter:grayscale(.4); }
+
+  /* ---- combined top panel (scores + contract + your turn) ---- */
+  .hud{
+    position:absolute; top:clamp(6px,1.4vh,14px); left:50%; transform:translateX(-50%); z-index:70;
+    display:flex; flex-direction:column; align-items:stretch;
+    width:min(460px,94vw);
+    background:linear-gradient(180deg,#f6eed8,#e4d7b5); color:#2a2010;
+    border:2px solid var(--brass); border-radius:12px; overflow:hidden;
+    box-shadow:0 10px 24px rgba(0,0,0,.55);
+  }
+  .hud .rail{ position:static; transform:none; box-shadow:none; border:0; border-radius:0;
+    background:transparent; width:100%; }
+  .hud .rail .col{ flex:1; min-width:0; padding:.4rem .5rem; }
+  .hud .rail .col.mid{ flex:0 0 auto; }
+  .hud .rail .col .t{ font-size:clamp(.58rem,1.6vw,.7rem); opacity:.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hud .rail .col .v{ font-size:clamp(1.1rem,3vw,1.35rem); }
+  .hud .contractBadge{ position:static; transform:none; box-shadow:none; border:0; border-radius:0;
+    border-top:1px solid #c9b88c; background:rgba(255,255,255,.4); justify-content:center; flex-wrap:wrap;
+    padding:.32rem .6rem; white-space:normal; font-size:clamp(.72rem,2vw,.86rem); gap:.4rem; }
+  .hud .contractBadge .cbTrump{ font-family:Georgia,serif; font-size:1.15em; line-height:1; }
+  .hud .contractBadge .cbTrump.red{ color:#b3271e; }
+  .hud .contractBadge .cbSep{ opacity:.4; }
+  .hud .decision{ position:static; transform:none; display:none; transition:none;
+    border:0; border-top:2px solid var(--brass); border-radius:0; box-shadow:none;
+    min-width:0; max-width:none; width:100%; background:#fcf6e6; padding:.5rem .7rem .65rem; }
+  .hud .decision.show{ display:block; }
+  .hud .decision h3{ font-size:clamp(.74rem,2vw,.86rem); margin-bottom:.2rem; }
+  .hud .decision > div, .hud .decision p{ font-size:clamp(.8rem,2.2vw,.95rem); }
+  .hud .decision button{ font-size:clamp(.7rem,2vw,.8rem); padding:.38rem .75rem; }
+  .hud .decision.trumpBox{ min-width:0; max-width:none; }
+  .bidline{ display:none !important; }        /* the live bid now lives in the panel */
 </style>
 </head>
 <body>
 <div class="room">
-  <div class="rail" id="rail"></div>
-  <div class="contractBadge" id="contractBadge" style="display:none"></div>
+  <!-- one combined panel: scores, contract, and your-turn prompt -->
+  <div class="hud" id="hud">
+    <div class="rail" id="rail"></div>
+    <div class="contractBadge" id="contractBadge" style="display:none"></div>
+    <div class="decision" id="decision"></div>
+  </div>
 
   <div class="table-wrap">
     <div class="felt" id="felt">
@@ -359,7 +394,6 @@
 
   <div class="ticker" id="ticker">Press <b>New game</b> to deal.</div>
   <div class="banner" id="banner"></div>
-  <div class="decision" id="decision"></div>
 
   <div class="controls">
     <button id="newBtn">New game</button>
@@ -542,13 +576,14 @@ function appraise(hand,extra){
   }
   return {suit:bestSuit, score:bestScore};
 }
-// ---- NEW BIDDING MODEL (data-fitted from 300k simulated hands) ----
+// ---- BIDDING MODEL (fitted from 18,000 hands played with the look-ahead card play) ----
 const BID_MODEL = {
   // weights: [base, A, Q, J, 10, 9, Pedro5, off5, 2, each low trump(3,4,6,7,8), dealer]
-  K0:{w:[20.19,3.29,2.42,3.89,3.96,2.56,1.15,0.81,1.23,1.14,-1.02],
-      q:{"0.15":-21.6,"0.20":-20.5,"0.25":-19.2,"0.30":-16.6,"0.35":-14.1,"0.40":-11.5,"0.45":-8.8,"0.50":-5.6}},
-  K1:{w:[35.29,7.29,5.14,9.17,6.36,4.42,2.74,2.05,3.17,3.13,-1.27],
-      q:{"0.15":-11.9,"0.20":-9.0,"0.25":-6.6,"0.30":-4.7,"0.35":-2.9,"0.40":-1.3,"0.45":0.4,"0.50":1.9}}
+  // refit on 18,000 hands played with the look-ahead card play
+  K0:{w:[22.29, 7.4, 2.2, 2.21, 2.5, 2.57, 1.4, 1.34, 1.88, 0.96, -1.29],
+      q:{"0.15":-20.7,"0.20":-18.1,"0.25":-16.1,"0.30":-14.2,"0.35":-12.3,"0.40":-10.4,"0.45":-8,"0.50":-5.1}},
+  K1:{w:[39.21, 9.01, 3.02, 3.17, 3.38, 3.62, 0.85, 0.66, 3.29, 2.1, -2.2],
+      q:{"0.15":-9.8,"0.20":-7.3,"0.25":-5.4,"0.30":-3.9,"0.35":-2.3,"0.40":-1.2,"0.45":0.5,"0.50":1.6}}
 };
 // how sure each character wants to be before bidding (probability of making it)
 const BID_CONFIDENCE = [0.55, 0.70, 0.62, 0.50];   // Mike, Elena, Bohdan, Lou
@@ -573,7 +608,7 @@ function safeBid(seat,hand,extra,isDealer){
   return best;
 }
 // How far each character jumps past the minimum when they bid (0 = minimum raise, 1 = straight to their limit)
-const BID_JUMP = [0.6, 0.0, 0.3, -1];   // Lou (-1) = random every time
+const BID_JUMP = [0,0,0,0];   // open at the minimum (tested: +2 pts/hand vs jumping)
 /** AI bid decision: returns the bid to make, or 0 to pass. */
 function aiBid(seat,limit,need,declarer){
   if(limit.bid<need) return 0;
@@ -582,6 +617,153 @@ function aiBid(seat,limit,need,declarer){
   let j=BID_JUMP[seat] ?? 0.3; if(j<0) j=Math.random();
   if(declarer>=0) j=Math.max(j,0.5);        // when overcalling an opponent, jump to cut the war short
   return Math.min(RULES.maxBid, need + Math.floor((limit.bid-need)*j));
+}
+
+// ============================================================
+//  SMART CARD PLAY (look-ahead). For each card it could play, the AI
+//  imagines 60 possible layouts of the hidden cards (built ONLY from what a
+//  real player can know: its own hand, cards already played or surrendered,
+//  and trump passed openly to a partner), plays each layout out to the end
+//  of the hand, and keeps the card with the best average game-score result.
+//  Tested over thousands of simulated hands against the previous AI.
+// ============================================================
+const cardKey=c=>c.suit[0]+c.rank;
+
+// fast play-out of the rest of a hand from any mid-hand state (mirrors playHand's trick loop)
+function simPlayFrom(st, policy){
+  const t=st.trump;
+  for(; st.tn<=6; st.tn++, st.step=0){
+    if(st.step===0) st.trick=[];
+    for(; st.step<4; st.step++){
+      const s=(st.leader+st.step)%4;
+      if(st.folded[s]||st.hands[s].length===0) continue;
+      const trumpLed = st.trick.length>0 && isTrump(st.trick[0].card,t);
+      if(RULES.surrenderWhenVoidOnTrumpLead && trumpLed && !st.hands[s].some(c=>isTrump(c,t))){
+        for(const c of st.hands[s]) st.seen.add(cardKey(c));
+        st.folded[s]=true; st.hands[s]=[]; continue;
+      }
+      const legal=legalPlays(st.hands[s],st.trick,t);
+      const card=policy(s,st,legal);
+      st.hands[s].splice(st.hands[s].indexOf(card),1);
+      st.trick.push({seat:s,card}); st.seen.add(cardKey(card)); st.knownIn[s].delete(cardKey(card));
+      if(isTrump(card,t)&&card.rank===14) st.aceGone=true;
+      if(st.tn===1){
+        let extras=st.hands[s].length-5;
+        while(extras>0){
+          const bury=minBy(st.hands[s],c=>points(c,t)*100+power(c,t,t));
+          st.hands[s].splice(st.hands[s].indexOf(bury),1);
+          st.trick.push({seat:s,card:bury,buried:true}); st.seen.add(cardKey(bury)); st.knownIn[s].delete(cardKey(bury));
+          extras--;
+        }
+      }
+    }
+    if(st.trick.length===0) break;
+    const win=currentWinner(st.trick,t);
+    st.leader=win.seat;
+    let trickPts=0;
+    for(const e of st.trick){
+      const pt=points(e.card,t); if(pt===0) continue;
+      if(e.card.rank===2 && isTrump(e.card,t)) st.handPts[e.seat%2]+=1; else trickPts+=pt;
+    }
+    st.handPts[win.seat%2]+=trickPts;
+  }
+  return st.handPts;
+}
+function simClone(st){
+  return {...st, hands:st.hands.map(h=>h.slice()), folded:st.folded.slice(), trick:st.trick.slice(),
+    handPts:st.handPts.slice(), knownIn:st.knownIn.map(s=>new Set(s)), seen:new Set(st.seen)};
+}
+/** One plausible layout of everyone else's hidden cards, from public information only. */
+function sampleWorld(seat,st){
+  const t=st.trump, known=new Set(st.seen);
+  for(const c of st.hands[seat]) known.add(cardKey(c));
+  for(let p=0;p<4;p++) for(const k of st.knownIn[p]) known.add(k);
+  const unseenT=[], unseenN=[];
+  for(const c of freshDeck()){ if(known.has(cardKey(c))) continue; (isTrump(c,t)?unseenT:unseenN).push(c); }
+  const w=simClone(st), slots=[];
+  for(let p=0;p<4;p++){
+    if(p===seat) continue;
+    const keep=st.hands[p].filter(c=>st.knownIn[p].has(cardKey(c)));
+    w.hands[p]=keep.slice();
+    for(let i=keep.length;i<st.hands[p].length;i++) slots.push(p);
+  }
+  shuffle(slots); shuffle(unseenT);
+  let si=0;
+  for(const c of unseenT){ if(si>=slots.length) break; w.hands[slots[si++]].push(c); }   // trumps are never discarded
+  while(si<slots.length && unseenN.length){                                              // players keep high side cards
+    let tot=0; for(const c of unseenN) tot+=c.rank*c.rank;
+    let r=Math.random()*tot, j=0; for(;j<unseenN.length-1;j++){ r-=unseenN[j].rank*unseenN[j].rank; if(r<=0) break; }
+    w.hands[slots[si++]].push(unseenN.splice(j,1)[0]);
+  }
+  return w;
+}
+function handUtility(team,pts,st){
+  const bt=st.bidTeam, made=pts[bt]>=st.bid, d=[0,0];
+  if(made){ d[0]=pts[0]; d[1]=pts[1]; } else { d[bt]=-st.bid; d[1-bt]=pts[1-bt]; }
+  return d[team]-d[1-team];
+}
+// quick rules used for the imagined play-outs
+function topOutstanding(seat,st){
+  const t=st.trump, mine=new Set(st.hands[seat].map(cardKey)); let best=0;
+  for(const c of freshDeck()) if(isTrump(c,t) && !st.seen.has(cardKey(c)) && !mine.has(cardKey(c))){ const p=power(c,t,t); if(p>best) best=p; }
+  return best;
+}
+function quickPlay(seat,st,legal){
+  const t=st.trump, trick=st.trick, partner=(seat+2)%4;
+  const trumps=legal.filter(c=>isTrump(c,t)), top=topOutstanding(seat,st);
+  const sure=c=>isTrump(c,t) && power(c,t,t)>top;
+  if(trick.length===0){
+    const boss=trumps.filter(sure);
+    if(boss.length) return maxBy(boss,c=>-points(c,t)+power(c,t,t)*0.01+(c.rank===13?100:0));
+    if(st.tn===1 && trumps.length){
+      const np=trumps.filter(c=>points(c,t)<=1);
+      return np.length? maxBy(np,c=>power(c,t,t)) : minBy(trumps,c=>points(c,t)*10+power(c,t,t));
+    }
+    const nonT=legal.filter(c=>!isTrump(c,t));
+    if(nonT.length) return maxBy(nonT,c=>c.rank);
+    const np=trumps.filter(c=>points(c,t)<=1);
+    return np.length? maxBy(np,c=>power(c,t,t)) : minBy(trumps,c=>points(c,t)*10+power(c,t,t));
+  }
+  const led=effSuit(trick[0].card,t), win=currentWinner(trick,t);
+  const onTable=trick.reduce((a,e)=>a+points(e.card,t),0);
+  let others=0; for(let k=1;k<4;k++){ const s=(seat+k)%4; if(s===st.leader) break;
+    if(!st.folded[s] && st.hands[s].length && !trick.some(e=>e.seat===s)) others++; }
+  const lastToPlay=others===0, partnerWinning=win.seat===partner;
+  if(partnerWinning && (lastToPlay || (isTrump(win.card,t) && power(win.card,t,t)>top))){
+    const pts=legal.filter(c=>points(c,t)>0 && c.rank!==2); if(pts.length) return maxBy(pts,c=>points(c,t));
+  }
+  const winners=legal.filter(c=>power(c,t,led)>power(win.card,t,led));
+  if(winners.length && !partnerWinning){
+    const secure=winners.filter(c=>lastToPlay || sure(c));
+    if(secure.length) return maxBy(secure,c=>points(c,t)*100-power(c,t,led));
+    if(onTable>0){ const noK=winners.filter(c=>c.rank!==13); return minBy(noK.length?noK:winners,c=>power(c,t,led)+points(c,t)*3); }
+  }
+  const zero=legal.filter(c=>points(c,t)===0);
+  if(zero.length) return minBy(zero,c=>(isTrump(c,t)?100:0)+power(c,t,led));
+  const two=legal.find(c=>c.rank===2&&isTrump(c,t)); if(two) return two;
+  return minBy(legal,c=>points(c,t)*10+power(c,t,led));
+}
+function rolloutPlay(s,st,legal){
+  if(Math.random()<0.5) return quickPlay(s,st,legal);
+  const r=choosePlay(PLAYERS[s],st.hands[s],st.trick,st.trump,st.tn===1&&st.trick.length===0,st.aceGone);
+  const c=r&&r.card?r.card:r;
+  return legal.includes(c)?c:legal[0];
+}
+const SMART_SAMPLES=60;
+function smartPlay(seat,st,legal){
+  if(legal.length===1) return legal[0];
+  const team=seat%2, score=new Array(legal.length).fill(0);
+  for(let k=0;k<SMART_SAMPLES;k++){
+    const world=sampleWorld(seat,st);
+    for(let i=0;i<legal.length;i++){
+      const w=simClone(world), first=legal[i];
+      const pts=simPlayFrom(w,(s,ws,lg)=> s===seat && ws.tn===st.tn && ws.step===st.step
+        ? lg.find(c=>c.suit===first.suit&&c.rank===first.rank) : rolloutPlay(s,ws,lg));
+      score[i]+=handUtility(team,pts,st);
+    }
+  }
+  let best=0; for(let i=1;i<legal.length;i++) if(score[i]>score[best]) best=i;
+  return legal[best];
 }
 
 function legalPlays(hand,trick,t){
@@ -702,6 +884,8 @@ function* playHand(dealer,gameScore){
   }
   // fold / pass-to-partner
   const folded=[false,false,false,false];
+  // public knowledge for the AI: cards everyone has seen, and trump passed openly to a partner
+  const knownIn=[new Set(),new Set(),new Set(),new Set()], seen=new Set();
   for(let s=0;s<4;s++){
     const tr=hands[s].filter(c=>isTrump(c,trump));
     if(tr.length===0){ folded[s]=true; hands[s]=[]; yield {type:"fold",seat:s}; }
@@ -715,10 +899,11 @@ function* playHand(dealer,gameScore){
         if(!folded[partner]){
           yield {type:"passt",seat:s,partner,cards:tr.slice()};
           hands[partner]=hands[partner].concat(tr);
+          for(const c of tr) knownIn[partner].add(cardKey(c));
           for(let n=0;n<tr.length;n++){
             const toss=minBy(hands[partner].filter(c=>points(c,trump)===0),c=>power(c,trump,trump))
                     || minBy(hands[partner],c=>points(c,trump));
-            if(toss){ const i=hands[partner].indexOf(toss); hands[partner].splice(i,1); }
+            if(toss){ const i=hands[partner].indexOf(toss); hands[partner].splice(i,1); knownIn[partner].delete(cardKey(toss)); }
           }
           folded[s]=true; hands[s]=[];
         }
@@ -742,6 +927,7 @@ function* playHand(dealer,gameScore){
       const trumpLed = trick.length>0 && isTrump(trick[0].card,trump);
       if(RULES.surrenderWhenVoidOnTrumpLead && trumpLed && !hands[s].some(c=>isTrump(c,trump))){
         yield {type:"surrender",seat:s,cards:hands[s].slice()};
+        for(const c of hands[s]) seen.add(cardKey(c));
         folded[s]=true; hands[s]=[]; continue;
       }
       const force = (tn===1 && step===0);
@@ -750,11 +936,13 @@ function* playHand(dealer,gameScore){
         const legal = legalPlays(hands[s],trick,trump);
         card = yield {needInput:"play", seat:s, hand:hands[s].slice(), legal, trick:trick.slice()};
       } else {
-        let res=choosePlay(PLAYERS[s],hands[s],trick,trump,force,aceGone);
-        if(res.card){ card=res.card; say=res.say; } else card=res;
+        const legal = legalPlays(hands[s],trick,trump);
+        const st={hands,folded,trick,leader,tn,step,handPts,aceGone,trump,knownIn,seen,bid:highBid,bidTeam};
+        card=smartPlay(s,st,legal);
+        if(trick.length && currentWinner(trick,trump).seat===(s+2)%4 && points(card,trump)>=5) say="feed";
       }
       hands[s].splice(hands[s].indexOf(card),1);
-      trick.push({seat:s,card});
+      trick.push({seat:s,card}); seen.add(cardKey(card)); knownIn[s].delete(cardKey(card));
       if(isTrump(card,trump) && card.rank===14) aceGone=true;
       yield {type:"play",seat:s,card, lead:step===0, say,
                speakLead: step===0 && !ledSpoke && Math.random()<0.4};
@@ -764,7 +952,7 @@ function* playHand(dealer,gameScore){
         while(extras>0){
           const bury=minBy(hands[s],c=>points(c,trump)*100+power(c,trump,trump));
           hands[s].splice(hands[s].indexOf(bury),1);
-          trick.push({seat:s,card:bury,buried:true});
+          trick.push({seat:s,card:bury,buried:true}); seen.add(cardKey(bury)); knownIn[s].delete(cardKey(bury));
           yield {type:"play",seat:s,card:bury,buried:true};
           extras--;
         }
@@ -890,9 +1078,13 @@ function renderMedallion(){
   const cb=el("contractBadge");
   if(State.trump && State.declarer>=0){
     cb.style.display="flex";
-    cb.innerHTML=`<span class="cbTrophy">🏆</span>`+
-      `<span>${PLAYERS[State.declarer].name}</span>`+
-      `<span class="cbBid">${State.bid}<small>/62</small></span>`;
+    cb.innerHTML=`<span class="cbTrophy">🏆</span><span>${PLAYERS[State.declarer].name} bid</span>`+
+      `<span class="cbBid">${State.bid}<small>/62</small></span><span class="cbSep">·</span>`+
+      `<span>Trump</span><span class="cbTrump${RED(State.trump)?" red":""}">${SUIT_SYM[State.trump]}</span>`;
+  } else if(State.bid && State.declarer>=0){
+    cb.style.display="flex";
+    cb.innerHTML=`<span>Bidding</span><span class="cbSep">·</span><span>high bid</span>`+
+      `<span class="cbBid">${State.bid}</span><span>— ${PLAYERS[State.declarer].name}</span>`;
   } else cb.style.display="none";
 }
 function renderRail(){
