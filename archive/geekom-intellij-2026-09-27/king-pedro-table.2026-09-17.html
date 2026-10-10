@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>King Pedro — Card Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --felt:#0c5132; --felt-hi:#147a48; --felt-lo:#062a1a;
+    --rail:#3a2417; --rail-hi:#5a3a22; --brass:#c9a24b; --brass-hi:#f0d488;
+    --ivory:#f7f3e8; --ink:#1c1c1c; --pip-red:#b3271e;
+    --parch:#efe6cf; --parch-line:#cdbf9a;
+    --team0:#d9b24a; --team1:#7fb2e6;
+    --shadow:rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    color:var(--ivory);
+    background:#1a120b;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .room{
+    position:relative; width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(120% 120% at 50% 30%, #241710 0%, #120c07 70%, #0a0703 100%);
+    padding:clamp(8px,2vw,24px);
+  }
+
+  /* ---- the table ---- */
+  .table-wrap{
+    position:relative;
+    width:min(96vw, calc(96vh * 1.45));
+    aspect-ratio:1.45/1;
+    border-radius:46% / 50%;
+    padding:clamp(10px,2.2vw,26px);
+    background:
+      linear-gradient(160deg,var(--rail-hi),var(--rail) 55%,#2a190f);
+    box-shadow:0 26px 60px rgba(0,0,0,.6), inset 0 2px 3px rgba(255,220,160,.18);
+  }
+  .felt{
+    position:relative; width:100%; height:100%;
+    border-radius:45% / 50%;
+    background:
+      radial-gradient(60% 60% at 50% 42%, var(--felt-hi), var(--felt) 55%, var(--felt-lo) 100%);
+    box-shadow:inset 0 0 60px rgba(0,0,0,.55), inset 0 0 0 2px rgba(201,162,75,.35);
+    overflow:visible;
+  }
+  .felt::after{ /* brass inlay ring */
+    content:""; position:absolute; inset:6% 5%;
+    border-radius:45% / 50%;
+    border:1.5px solid rgba(201,162,75,.28);
+    pointer-events:none;
+  }
+
+  /* ---- center: trump medallion + trick ---- */
+  .center{
+    position:absolute; left:50%; top:46%; transform:translate(-50%,-50%);
+    display:flex; flex-direction:column; align-items:center; gap:.4rem;
+    pointer-events:none;
+  }
+  .medallion{
+    width:clamp(64px,9vw,104px); height:clamp(64px,9vw,104px); border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 38% 32%, var(--brass-hi), var(--brass) 58%, #8a6a26 100%);
+    color:#2a1d07; box-shadow:0 6px 16px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.6);
+    border:2px solid #7c5e22;
+    font-family:Cinzel,serif; text-align:center; line-height:1;
+  }
+  .medallion .lbl{font-size:.5rem; letter-spacing:.12em; text-transform:uppercase; opacity:.75}
+  .medallion .suit{font-size:clamp(1.6rem,3.4vw,2.4rem); font-family:Georgia,serif; margin-top:2px}
+  .medallion.none .suit{font-size:.8rem; opacity:.6}
+  .bidline{
+    position:absolute; left:3%; top:20%; transform:translateY(-50%);
+    font-family:Cinzel,serif; font-size:clamp(.5rem,1.05vw,.64rem);
+    background:rgba(6,30,18,.78); padding:.16rem .55rem; border-radius:999px;
+    border:1px solid rgba(201,162,75,.4); color:var(--brass-hi); white-space:nowrap;
+    max-width:34%; overflow:hidden; text-overflow:ellipsis; z-index:5;
+  }
+  .contractBadge{
+    position:absolute; top:clamp(50px,9vh,74px); left:50%; transform:translateX(-50%);
+    display:none; align-items:center; gap:.45rem; z-index:40;
+    background:linear-gradient(180deg,#efe6cf,#ddd0ad); border:1px solid #b39f72;
+    border-radius:999px; padding:.3rem .8rem; box-shadow:0 6px 14px rgba(0,0,0,.4);
+    font-family:Cinzel,serif; color:#33291a; font-size:clamp(.64rem,1.7vw,.82rem); white-space:nowrap;
+  }
+  .contractBadge .cbTrophy{ font-size:1em; }
+  .contractBadge .cbBid{ font-weight:700; color:#8a6a14; }
+  .contractBadge .cbBid small{ font-weight:400; opacity:.7; margin-left:2px; }
+  .trick{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:42%; height:42%; pointer-events:none;
+  }
+  .trick .pc{ position:absolute; transform:translate(-50%,-50%) scale(.5); opacity:0; }
+  .trick .pc.in{ animation:dropIn .28s ease-out forwards; }
+  @keyframes dropIn{ to{ transform:translate(-50%,-50%) scale(1); opacity:1 } }
+
+  /* ---- seats ---- */
+  .seat{ position:absolute; display:flex; flex-direction:column; align-items:center; gap:.3rem; }
+  .seat.south{ left:50%; bottom:1%; transform:translateX(-50%); }
+  .seat.north{ left:50%; top:1%; transform:translateX(-50%); }
+  .seat.west { left:1.5%; top:50%; transform:translateY(-50%); }
+  .seat.east { right:1.5%; top:50%; transform:translateY(-50%); }
+
+  .plate{
+    display:flex; align-items:center; gap:.5rem;
+    background:linear-gradient(180deg,#1c130b,#0d0905);
+    border:1px solid rgba(201,162,75,.45); border-radius:999px;
+    padding:.25rem .7rem .25rem .3rem; box-shadow:0 4px 10px rgba(0,0,0,.4);
+    position:relative;
+  }
+  .disc{
+    width:clamp(30px,4vw,42px); height:clamp(30px,4vw,42px); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:Cinzel,serif; font-weight:700; font-size:clamp(.8rem,1.8vw,1.05rem);
+    color:#10100c; flex:none; box-shadow:inset 0 1px 2px rgba(255,255,255,.5);
+  }
+  .nm{ font-family:Cinzel,serif; font-size:clamp(.6rem,1.4vw,.82rem); letter-spacing:.03em; }
+  .nm small{ display:block; font-family:Georgia,serif; font-weight:400;
+    font-size:.62em; opacity:.6; letter-spacing:.02em; }
+  .chip{ position:absolute; top:-7px; right:-7px; display:flex; gap:3px }
+  .badge{ width:18px; height:18px; border-radius:50%; font-size:.6rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,.5);
+    font-family:Cinzel,serif; }
+  .badge.deal{ background:#e7ddc4; color:#3a2a10; }
+  .badge.decl{ background:var(--brass); color:#2a1d07; }
+  .seat.out .plate{ opacity:.45; filter:grayscale(.5); }
+
+  .hand{ display:flex; justify-content:center; align-items:center; min-height:1px; }
+  .hand.h-row{ }
+  .seat.west .hand,.seat.east .hand{ }
+
+  /* ---- cards ---- */
+  .card{
+    --w:clamp(42px,9vw,64px);
+    width:var(--w); height:calc(var(--w)*1.42);
+    border-radius:calc(var(--w)*.1);
+    background:linear-gradient(160deg,#fffefb,var(--ivory));
+    color:var(--ink); position:relative; flex:none;
+    box-shadow:0 2px 5px var(--shadow);
+    font-family:Georgia,serif; user-select:none;
+    border:1px solid rgba(0,0,0,.12);
+  }
+  .card.red{ color:var(--pip-red); }
+  .card .idx{ position:absolute; left:6%; top:3%; line-height:.92; text-align:center;
+    font-weight:700; font-size:calc(var(--w)*.28); }
+  .card .idx .s{ display:block; font-size:calc(var(--w)*.26); }
+  .card .mid{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:calc(var(--w)*.62); }
+  .card.face .mid{ font-family:Cinzel,serif; font-weight:700; font-size:calc(var(--w)*.5); }
+  .card .br{ position:absolute; right:6%; bottom:3%; transform:rotate(180deg);
+    line-height:.92; text-align:center; font-weight:700; font-size:calc(var(--w)*.28); }
+  .card .br .s{ display:block; font-size:calc(var(--w)*.26); }
+  .card.trump{ box-shadow:0 0 0 2px var(--brass), 0 2px 6px var(--shadow); }
+  .card.trump::after{ content:""; position:absolute; inset:0; border-radius:inherit;
+    box-shadow:inset 0 0 8px rgba(201,162,75,.55); pointer-events:none; }
+  .card.counter .idx::after{ content:"●"; display:block; font-size:calc(var(--w)*.16);
+    color:var(--brass); margin-top:1px; }
+  .card.dim{ opacity:.4; }
+  .card.back{ background:
+      repeating-linear-gradient(45deg,#7a1f1f 0 6px,#641818 6px 12px);
+    border:2px solid var(--ivory); }
+  .card.deal-in{ animation:dealIn .3s ease-out backwards; }
+  @keyframes dealIn{ from{ transform:translateY(-14px) scale(.7); opacity:0 } }
+
+  /* fanned hands overlap */
+  .hand .card + .card{ margin-left:calc(var(--w) * -0.52); }
+  .seat.west .hand,.seat.east .hand{ flex-direction:row; }
+
+  /* ---- when a human is seated: shrink every OTHER hand so yours gets the
+     room. Only card BACKS get this treatment via the mobile media query too,
+     since a shrunk face-down back loses nothing — it's just a rectangle. ---- */
+  body.hasHuman .seat:not(.mine) .card{ --w:clamp(22px,4.5vw,34px) !important; }
+
+  /* ---- phone / portrait: taller table + noticeably bigger cards ---- */
+  @media (max-aspect-ratio: 1/1){
+    .table-wrap{ width:min(97vw, 50vh); aspect-ratio:0.78/1; }
+    .felt{ border-radius:20% / 12%; }
+    .felt::after{ border-radius:20% / 12%; }
+    .card{ --w:clamp(52px,15vw,84px); }
+    body.hasHuman .seat:not(.mine) .card{ --w:clamp(26px,6vw,38px) !important; }
+    .seat.west{ left:0.5%; } .seat.east{ right:0.5%; }
+    .medallion{ width:clamp(56px,11vw,80px); height:clamp(56px,11vw,80px); }
+  }
+
+  /* ---- speech bubbles ---- */
+  .bubble{
+    position:absolute; max-width:clamp(120px,20vw,210px);
+    background:var(--parch); color:#2a2113; border-radius:12px;
+    padding:.4rem .6rem; font-family:Georgia,serif; font-size:clamp(.6rem,1.3vw,.78rem);
+    line-height:1.25; box-shadow:0 6px 16px rgba(0,0,0,.5);
+    border:1px solid var(--parch-line); opacity:0; transform:translateY(6px) scale(.96);
+    transition:opacity .2s, transform .2s; z-index:30; pointer-events:none;
+  }
+  .bubble.show{ opacity:1; transform:translateY(0) scale(1); }
+  .bubble::before{ content:""; position:absolute; width:0;height:0; }
+  .seat.south .bubble{ bottom:104%; left:50%; transform-origin:bottom; }
+  .seat.north .bubble{ top:104%; left:50%; }
+  .seat.west  .bubble{ left:104%; top:0; }
+  .seat.east  .bubble{ right:104%; top:0; text-align:right; }
+  .seat.south .bubble{ transform:translateX(-50%) translateY(6px) scale(.96); }
+  .seat.south .bubble.show{ transform:translateX(-50%) translateY(0) scale(1); }
+  .seat.north .bubble{ transform:translateX(-50%) translateY(-6px) scale(.96); }
+  .seat.north .bubble.show{ transform:translateX(-50%) translateY(0) scale(1); }
+
+  /* ---- top score rail ---- */
+  .rail{
+    position:absolute; top:clamp(6px,1.6vh,16px); left:50%; transform:translateX(-50%);
+    display:flex; align-items:stretch; gap:0; z-index:40;
+    background:linear-gradient(180deg,#efe6cf,#ddd0ad);
+    border:1px solid #b39f72; border-radius:10px; overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,.5); color:#33291a;
+  }
+  .rail .col{ padding:.35rem .8rem; text-align:center; min-width:104px; }
+  .rail .col + .col{ border-left:1px solid #c3b388; }
+  .rail .col .t{ font-family:Cinzel,serif; font-size:.62rem; letter-spacing:.05em;
+    text-transform:uppercase; opacity:.7; }
+  .rail .col .v{ font-family:Cinzel,serif; font-weight:700; font-size:1.15rem; }
+  .rail .col.mid{ background:rgba(255,255,255,.35); min-width:auto; display:flex;
+    align-items:center; }
+  .rail .col.t0 .v{ color:#8a6a14 }
+  .rail .col.t1 .v{ color:#2f5d8f }
+  .target{ font-family:Georgia,serif; font-size:.6rem; opacity:.6; }
+
+  /* ---- bottom controls ---- */
+  .controls{
+    position:absolute; bottom:clamp(6px,1.6vh,16px); left:50%; transform:translateX(-50%);
+    display:flex; align-items:center; gap:.5rem; z-index:40; flex-wrap:wrap; justify-content:center;
+    background:rgba(8,18,12,.66); padding:.45rem .6rem; border-radius:12px;
+    border:1px solid rgba(201,162,75,.35); backdrop-filter:blur(3px);
+  }
+  button{
+    font-family:Cinzel,serif; font-size:.74rem; letter-spacing:.03em;
+    color:#1d1408; background:linear-gradient(180deg,var(--brass-hi),var(--brass));
+    border:1px solid #8a6a26; border-radius:8px; padding:.42rem .8rem; cursor:pointer;
+    box-shadow:0 2px 5px rgba(0,0,0,.4); transition:filter .15s, transform .05s;
+  }
+  button:hover{ filter:brightness(1.07); }
+  button:active{ transform:translateY(1px); }
+  button:disabled{ opacity:.4; cursor:default; filter:none; }
+  button.ghost{ background:transparent; color:var(--brass-hi); border-color:rgba(201,162,75,.5); }
+  .controls label{ font-family:Georgia,serif; font-size:.7rem; color:var(--ivory); opacity:.85;
+    display:flex; align-items:center; gap:.35rem; }
+  input[type=range]{ accent-color:var(--brass); width:90px; }
+  :focus-visible{ outline:2px solid var(--brass-hi); outline-offset:2px; }
+
+  /* ---- log line / banner ---- */
+  .ticker{
+    position:absolute; left:50%; bottom:clamp(58px,9vh,84px); transform:translateX(-50%);
+    font-family:Georgia,serif; font-size:clamp(.66rem,1.5vw,.86rem); color:#f3ead0;
+    background:rgba(6,28,16,.66); padding:.3rem .9rem; border-radius:999px;
+    border:1px solid rgba(201,162,75,.3); max-width:80vw; text-align:center; z-index:35;
+  }
+  .banner{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.9);
+    z-index:60; background:linear-gradient(180deg,#fbf4e1,#e9dcbb); color:#2a2010;
+    border:2px solid var(--brass); border-radius:16px; padding:1.1rem 1.6rem; text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.6); opacity:0; pointer-events:none; transition:opacity .3s, transform .3s;
+    font-family:Cinzel,serif;
+  }
+  .banner.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .banner h2{ font-size:1.2rem; margin-bottom:.2rem; }
+  .banner p{ font-family:Georgia,serif; font-size:.82rem; }
+
+  @media (max-width:640px){
+    .rail .col{ min-width:84px; padding:.3rem .5rem; }
+    .nm small{ display:none; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .card.deal-in,.trick .pc.in{ animation:none !important; opacity:1 !important; transform:translate(-50%,-50%) scale(1) !important; }
+    .bubble{ transition:opacity .12s; }
+  }
+
+  /* ---- setup sheet ---- */
+  .overlay{ position:absolute; inset:0; background:rgba(0,0,0,.72); z-index:80;
+    display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none;
+    transition:opacity .25s; }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+  .sheet{ background:linear-gradient(180deg,#fbf4e1,#e9dcbb); color:#2a2010;
+    border:2px solid var(--brass); border-radius:16px; padding:1.3rem 1.5rem;
+    max-width:min(92vw,460px); width:460px; box-shadow:0 20px 60px rgba(0,0,0,.6);
+    font-family:Georgia,serif; }
+  .sheet h2{ font-family:Cinzel,serif; font-size:1.05rem; margin-bottom:.7rem; text-align:center; }
+  .seatRow{ display:flex; align-items:center; gap:.55rem; padding:.4rem 0; border-bottom:1px solid rgba(0,0,0,.08); }
+  .seatRow:last-child{ border-bottom:none; }
+  .seatRow .who{ flex:1; font-size:.8rem; min-width:0; }
+  .seatRow .who b{ font-family:Cinzel,serif; display:block; font-size:.84rem; }
+  .seatRow .who small{ opacity:.65; }
+  .seatRow .toggle{ font-size:.68rem; padding:.32rem .6rem; min-width:44px; }
+  .seatRow .toggle.on{ background:linear-gradient(180deg,#8fd39a,#5fae72); border-color:#3f7a4d; color:#0c2410; }
+  .nameInput{ width:92px; font-family:Georgia,serif; font-size:.72rem; padding:.3rem .4rem;
+    border-radius:6px; border:1px solid #b39f72; background:#fffdf6; display:none; }
+  .seatRow.human .nameInput{ display:inline-block; }
+  .sheet .hint{ font-size:.68rem; opacity:.7; text-align:center; margin:.7rem 0 .9rem; }
+  .sheet .go{ width:100%; font-size:.86rem; padding:.55rem; }
+
+  /* ---- human decision panel ---- */
+  .decision{
+    position:absolute; left:50%; top:clamp(84px,14vh,124px); transform:translateX(-50%) translateY(-140%);
+    z-index:70; background:linear-gradient(180deg,#fbf4e1,#e9dcbb); color:#2a2010;
+    border:2px solid var(--brass); border-radius:12px; padding:.45rem .6rem; text-align:center;
+    box-shadow:0 12px 28px rgba(0,0,0,.5); font-family:Georgia,serif; min-width:190px;
+    max-width:78vw; transition:transform .25s; pointer-events:none;
+  }
+  .decision.show{ transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  .decision h3{ font-family:Cinzel,serif; font-size:.68rem; margin-bottom:.28rem; }
+  .decision p{ font-size:.66rem; }
+  .decision b{ color:#8a6a14; }
+  .decision .bidStatus{ font-size:.6rem; opacity:.75; margin-top:.25rem; }
+  .decision .row{ display:flex; gap:.3rem; justify-content:center; flex-wrap:wrap; margin-top:.35rem; }
+  .decision .bidNum{ font-family:Cinzel,serif; font-size:1rem; min-width:1.7em; display:inline-block; }
+  .decision button.suitBtn{ min-width:58px; }
+  .decision button{ font-size:.62rem; padding:.28rem .55rem; }
+  .decision button.ghost{ color:#3a2b12; border-color:rgba(58,43,18,.45); background:rgba(255,255,255,.3); }
+  .decision button.ghost:disabled{ color:#3a2b12; opacity:.35; }
+  /* trump picker gets its own larger, easier-to-tap sizing on phone */
+  .decision.trumpBox{ min-width:260px; max-width:88vw; padding:.75rem 1rem; }
+  .decision.trumpBox h3{ font-size:.9rem; margin-bottom:.5rem; }
+  .decision.trumpBox .row{ gap:.5rem; margin-top:.5rem; }
+  .decision.trumpBox button.suitBtn{ min-width:132px; font-size:.9rem; padding:.6rem 1rem; }
+  @media (max-aspect-ratio: 1/1){
+    .decision.trumpBox{ top:clamp(74px,13vh,110px); }
+    .decision.trumpBox button.suitBtn{ min-width:41vw; font-size:1rem; padding:.7rem 1rem; }
+  }
+
+  .card.playable{ cursor:pointer; box-shadow:0 0 0 3px #6fe08a, 0 2px 5px var(--shadow); }
+  .card.playable:hover{ transform:translateY(-10px); transition:transform .12s; }
+  .card.notplayable{ opacity:.45; filter:grayscale(.4); }
+</style>
+</head>
+<body>
+<div class="room">
+  <div class="rail" id="rail"></div>
+  <div class="contractBadge" id="contractBadge" style="display:none"></div>
+
+  <div class="table-wrap">
+    <div class="felt" id="felt">
+      <div class="center">
+        <div class="medallion none" id="medallion"><span class="lbl">Trump</span><span class="suit">—</span></div>
+      </div>
+      <div class="bidline" id="bidline" style="display:none"></div>
+      <div class="trick" id="trick"></div>
+
+      <div class="seat south" data-seat="0"><div class="bubble" id="b0"></div><div class="plate" id="p0"></div><div class="hand" id="h0"></div></div>
+      <div class="seat west"  data-seat="1"><div class="bubble" id="b1"></div><div class="plate" id="p1"></div><div class="hand" id="h1"></div></div>
+      <div class="seat north" data-seat="2"><div class="bubble" id="b2"></div><div class="plate" id="p2"></div><div class="hand" id="h2"></div></div>
+      <div class="seat east"  data-seat="3"><div class="bubble" id="b3"></div><div class="plate" id="p3"></div><div class="hand" id="h3"></div></div>
+    </div>
+  </div>
+
+  <div class="ticker" id="ticker">Press <b>New game</b> to deal.</div>
+  <div class="banner" id="banner"></div>
+  <div class="decision" id="decision"></div>
+
+  <div class="controls">
+    <button id="newBtn">New game</button>
+    <button id="stepBtn" class="ghost">Step ▸</button>
+    <button id="autoBtn">Auto ▶</button>
+    <label>Speed <input type="range" id="speed" min="1" max="10" value="6"></label>
+  </div>
+
+  <div class="overlay" id="modeOverlay">
+    <div class="sheet" style="text-align:center">
+      <h2>How are you playing?</h2>
+      <p class="hint" style="margin-top:0">Partnerships are fixed: South + North vs. West + East. Any seat not taken by a person is played by the table's AI.</p>
+      <button class="go" id="modeLocalBtn">Play on this device</button>
+      <button class="go ghost" id="modeOnlineBtn" style="margin-top:.5rem">Play online with others</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="setupOverlay">
+    <div class="sheet">
+      <h2>Who's playing?</h2>
+      <div id="seatRows"></div>
+      <p class="hint">With 2+ humans on this device, hands stay hidden between turns — pass the device when prompted.</p>
+      <button class="go" id="startBtn">Start game</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="onlineOverlay">
+    <div class="sheet" style="text-align:center">
+      <div id="onlineJoinStage">
+        <h2>Play online</h2>
+        <button class="go" id="createRoomBtn">Create a new game</button>
+        <p class="hint">— or join one already started —</p>
+        <input id="joinCodeInput" maxlength="4" placeholder="CODE"
+          style="width:100%;text-transform:uppercase;text-align:center;font-family:'Cinzel',serif;
+                 font-size:1.15rem;letter-spacing:.15em;padding:.5rem;margin-bottom:.6rem;
+                 border-radius:8px;border:1px solid #b39f72;background:#fffdf6;color:#2a2010">
+        <button class="go ghost" id="joinRoomBtn">Join game</button>
+        <p class="hint" id="onlineError" style="color:#a33;display:none"></p>
+      </div>
+      <div id="onlineLobbyStage" style="display:none">
+        <h2>Room <span id="lobbyCode"></span></h2>
+        <p class="hint" style="margin-top:0">Share this code — everyone joins at the same page and clicks "Join game."</p>
+        <div id="lobbySeatRows"></div>
+        <button class="go" id="lobbyStartBtn" style="display:none">Start game</button>
+        <p class="hint" id="lobbyWait" style="display:none">Waiting for the host to start…</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="revealGate">
+    <div class="sheet" style="text-align:center">
+      <h2 id="revealWho">Pass the device</h2>
+      <p class="hint">Make sure no one else can see the screen, then reveal your hand.</p>
+      <button class="go" id="revealBtn">Show my hand</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   KING PEDRO — Ukrainian-Canadian rules, four automated players
+   Rules engine ported from KingPedroCore.kt, then replayed with
+   animation on the table. All four seats are AI.
+   ============================================================ */
+
+// ---- house rules (match the Kotlin build) ----
+const RULES = { mustFollowSuit:false, surrenderWhenVoidOnTrumpLead:true, winningScore:200, minBid:30, maxBid:62 };
+
+// ---- model ----
+const SUITS = ["hearts","diamonds","clubs","spades"];
+const SUIT_SYM = {hearts:"♥",diamonds:"♦",clubs:"♣",spades:"♠"};
+const RED = s => s==="hearts"||s==="diamonds";
+const sameColor = (a,b)=>RED(a)===RED(b);
+const RANK_SYM = {2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"10",11:"J",12:"Q",13:"K",14:"A"};
+
+function isTrump(c,t){ return c.suit===t || (c.rank===5 && c.suit!==t && sameColor(c.suit,t)); }
+function effSuit(c,t){ return isTrump(c,t)? t : c.suit; }
+function points(c,t){
+  if(!isTrump(c,t)) return 0;
+  switch(c.rank){ case 13:return 30; case 10:return 10; case 9:return 9; case 5:return 5;
+    case 14:case 11:case 2:return 1; default:return 0; }
+}
+function power(c,t,led){
+  if(isTrump(c,t)){
+    let r;
+    if(c.rank===5 && c.suit===t) r=5;
+    else if(c.rank===5) r=4;
+    else if(c.rank<=4) r=c.rank-1;
+    else r=c.rank;
+    return 200+r;
+  }
+  return c.suit===led ? c.rank : 0;
+}
+function freshDeck(){ const d=[]; for(const s of SUITS) for(let r=2;r<=14;r++) d.push({suit:s,rank:r}); return d; }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const cardStr = c => RANK_SYM[c.rank]+SUIT_SYM[c.suit];
+
+// ---- personalities & vocabulary ----
+const VOICES = {
+  0:{ bid:["Step aside — {0}. This hand is MINE.","{0}. I smell blood in the water.","Crank it to {0}."],
+      pass:["Garbage hand. Pass.","Pass — but don't get comfortable."],
+      stuck:["Stuck at 30? I'll make it look easy."],
+      trump:["Trump is {0}. Hide your Pedros.","{0}. Now we go to war."],
+      lead:["Eat this.","Bleed out those trumps."],
+      win:["Exactly as planned.","Hand over those points."],
+      feed:["Take it, partner — payday.","Feeding you the goods."],
+      fold:["I'm out. Carry us, partner."],
+      passt:["Take my trump, partner: {0}."],
+      made:["Contract MADE. Pay up."],
+      set:["Unbelievable. UNBELIEVABLE."],
+      big:["THIRTY points out the door?!"],
+      gg:["200! Read it and weep!"] },
+  1:{ bid:["Expected value supports {0}.","{0}. The numbers rarely lie.","Distribution favours {0}."],
+      pass:["Insufficient trump density. Pass.","Variance too high. I pass."],
+      stuck:["Dealer's burden. Survivable at 30."],
+      trump:["Declaring {0} — optimal.","{0}. The data is conclusive."],
+      lead:["Initiating extraction.","Thinning the trump population."],
+      win:["As modelled.","Trick secured."],
+      feed:["Transferring assets to my partner."],
+      fold:["Folding. Marginal contribution: zero."],
+      passt:["Reallocating {0} to my partner."],
+      made:["Hypothesis confirmed. QED."],
+      set:["An outlier. We regress next hand."],
+      big:["A 30-point swing. Catastrophic."],
+      gg:["200 points. The proof is complete."] },
+  2:{ bid:["Davai! {0}!","{0}, like baba taught me!","Slava kartam! {0}!"],
+      pass:["Ni, ni — pass.","Pass. Cards sadder than January in Mundare."],
+      stuck:["Stuck with 30? We survived worse winters!"],
+      trump:["Trump is {0}! Strong like ox!","{0}! Dobre, dobre!"],
+      lead:["Hop! Out comes the big one!","Davai — follow if you can!"],
+      win:["Ha! Clean like grandfather's scythe!","Dyakuyu! I take this home!"],
+      feed:["For you, partner! Fresh and warm!"],
+      fold:["I sit this one out. Even oxen rest."],
+      passt:["Here, partner — {0}! Like perogies from baba."],
+      made:["We made it! Holubtsi for everyone!"],
+      set:["Oy... set like cabbage in October."],
+      big:["The KING! Thirty points — what a harvest!"],
+      gg:["200! Bring out the horilka!"] },
+  3:{ bid:["{0}! Let it RIDE!","Feeling spicy — {0}!","{0}? Sure. YOLO."],
+      pass:["Pass... vibes are off.","Saving my luck. Pass."],
+      stuck:["Stuck at 30?! Fortune loves a cornered gambler!"],
+      trump:["Trump is {0}! Spin the wheel!","{0}!! I flipped a coin."],
+      lead:["Surprise! Didn't see THAT coming!","Chaos card, activate!"],
+      win:["HA! Didn't even mean to win that!","Mine mine mine!"],
+      feed:["Jackpot delivery for my partner!"],
+      fold:["Folding! Even I know when to walk."],
+      passt:["Sliding you my chip, partner: {0}."],
+      made:["WINNER WINNER! Contract dinner!"],
+      set:["The wheel giveth, the wheel yeeteth away."],
+      big:["THIRTY POINTS — somebody's crying tonight!"],
+      gg:["200!! CASH ME OUT!"] }
+};
+const PLAYERS = [
+  {seat:0,name:"Iron Mike",  tag:"Aggressive", color:"#d9b24a", aggr:3, chaos:1},
+  {seat:1,name:"Prof. Elena",tag:"Cautious",   color:"#7fb2e6", aggr:-2,chaos:0},
+  {seat:2,name:"Bohdan",     tag:"Chaotic",    color:"#e0a85a", aggr:1, chaos:2},
+  {seat:3,name:"Lucky Lou",  tag:"Gambler",    color:"#9ad6a0", aggr:2, chaos:5},
+];
+const TEAM_NAME = t => t===0 ? `${PLAYERS[0].name} / ${PLAYERS[2].name}` : `${PLAYERS[1].name} / ${PLAYERS[3].name}`;
+const DEFAULT_PLAYERS = PLAYERS.map(p=>({...p}));
+function speak(seat,mood,arg){
+  const pool = VOICES[seat][mood] || ["..."];
+  let s = pool[Math.floor(Math.random()*pool.length)];
+  if(arg!==undefined) s = s.replace("{0}",arg);
+  return s;
+}
+
+// ---- AI ----
+function appraise(hand,extra){
+  const cards = extra ? hand.concat([extra]) : hand;
+  let bestSuit="hearts", bestScore=-1;
+  for(const s of SUITS){
+    let sc=0;
+    for(const c of cards) if(isTrump(c,s)){
+      sc += c.rank===14?7 : c.rank===13?9 : c.rank===12?5 : c.rank===11?4 :
+            c.rank===10?4 : c.rank===9?4 : c.rank===5?5 : 2;
+    }
+    if(sc>bestScore){ bestScore=sc; bestSuit=s; }
+  }
+  return {suit:bestSuit, score:bestScore};
+}
+function legalPlays(hand,trick,t){
+  if(trick.length===0) return hand.slice();
+  const led = effSuit(trick[0].card,t);
+  const trumpLed = led===t;
+  const follows = hand.filter(c=>effSuit(c,t)===led);
+  if(RULES.mustFollowSuit) return follows.length? follows : hand.slice();
+  if(trumpLed) return follows.length? follows : hand.slice();
+  return hand.slice(); // non-trump led -> anything
+}
+function currentWinner(trick,t){
+  const led = effSuit(trick[0].card,t);
+  let best=trick[0];
+  for(const e of trick) if(power(e.card,t,led) > power(best.card,t,led)) best=e;
+  return best;
+}
+function choosePlay(p,hand,trick,t,forceTrumpLead,aceGone){
+  const legal = legalPlays(hand,trick,t);
+  const partner=(p.seat+2)%4;
+  if(trick.length===0){
+    const trumps=legal.filter(c=>isTrump(c,t));
+    // Never lead a bare King of trump (30 pts) unless you also hold the Ace,
+    // or the Ace has already appeared in play from anyone — lead low instead
+    // to flush it out first; once it's gone, the King leads safely.
+    const hasAce = trumps.some(c=>c.rank===14);
+    const safeTrumps = (hasAce||aceGone) ? trumps : trumps.filter(c=>c.rank!==13);
+    if(forceTrumpLead && trumps.length) return maxBy(safeTrumps.length?safeTrumps:trumps,c=>power(c,t,t));
+    if(safeTrumps.length && p.aggr>0) return maxBy(safeTrumps,c=>power(c,t,t));
+    if(trumps.length && p.chaos>=4) return trumps[Math.floor(Math.random()*trumps.length)];
+    return minBy(legal,c=>points(c,t)*100+c.rank);
+  }
+  const led=effSuit(trick[0].card,t);
+  const win=currentWinner(trick,t);
+  const onTable=trick.reduce((a,e)=>a+points(e.card,t),0);
+  const last=trick.length===3, partnerWinning=win.seat===partner;
+  if(last && partnerWinning){
+    const feed=legal.filter(c=>c.rank===5&&isTrump(c,t)).sort((a,b)=>points(b,t)-points(a,t))[0];
+    if(feed) return {card:feed,say:"feed"};
+  }
+  const winners=legal.filter(c=>power(c,t,led)>power(win.card,t,led));
+  if(winners.length && (onTable>0 || !partnerWinning)){
+    const cheap=winners.filter(c=>c.rank!==13 && !(c.rank===5&&isTrump(c,t)));
+    const pick=minBy(cheap.length?cheap:winners,c=>power(c,t,led));
+    if(onTable>0) return pick;
+    const freeWin=minBy(cheap.filter(c=>!isTrump(c,t)),c=>power(c,t,led));
+    if(freeWin) return freeWin;
+  }
+  const safe=legal.filter(c=>points(c,t)===0);
+  const pool=safe.length?safe:(legal.filter(c=>c.rank!==13).length?legal.filter(c=>c.rank!==13):legal);
+  return minBy(pool,c=>power(c,t,led)+points(c,t)*50);
+}
+function wantsPass(hand,t,aggr,chaos,isDeclarer){
+  if(isDeclarer) return false;
+  const n=hand.filter(c=>isTrump(c,t)).length;
+  if(n<1||n>2) return false;
+  return aggr + Math.floor(Math.random()*(chaos+1)) < 2;
+}
+const maxBy=(a,f)=>a.reduce((b,c)=>f(c)>f(b)?c:b,a[0]);
+const minBy=(a,f)=>a.length?a.reduce((b,c)=>f(c)<f(b)?c:b,a[0]):null;
+const handSort=h=>h.slice().sort((a,b)=>SUITS.indexOf(a.suit)*20+a.rank-(SUITS.indexOf(b.suit)*20+b.rank));
+
+// ---- play a hand, yielding one event at a time; yields {needInput:...} and
+//      pauses (via .next(answer)) whenever a HUMAN seat must decide something ----
+function* playHand(dealer,gameScore){
+  const hands=[[],[],[],[]];
+  const deck=shuffle(freshDeck());
+  let idx=0;
+  for(let r=0;r<3;r++) for(let o=1;o<=4;o++){ const s=(dealer+o)%4; for(let k=0;k<3;k++) hands[s].push(deck[idx++]); }
+  const stub=deck.slice(idx); // 16
+  const peeked=stub[stub.length-1];
+  yield {type:"deal",hands:hands.map(handSort),dealer,peeked};
+
+  // bidding
+  let highBid=0, declarer=-1; const passed=[false,false,false,false];
+  let turn=(dealer+1)%4, acts=0;
+  while(passed.filter(Boolean).length<3 && highBid<RULES.maxBid && acts<16){
+    if(!passed[turn] && turn!==declarer){
+      const need=Math.max(RULES.minBid,highBid+1);
+      if(State.human[turn]){
+        const answer = yield {needInput:"bid", seat:turn, need, max:RULES.maxBid, highBid, declarer, passed:passed.slice()};
+        if(answer==="pass"){ passed[turn]=true; yield {type:"pass",seat:turn}; }
+        else { highBid=Math.max(need,Math.min(RULES.maxBid,answer|0)); declarer=turn; yield {type:"bid",seat:turn,bid:highBid}; }
+      } else {
+        const p=PLAYERS[turn];
+        const a=appraise(hands[turn], turn===dealer?peeked:null);
+        const swing=p.chaos>0?(Math.floor(Math.random()*(2*p.chaos+1))-p.chaos):0;
+        const want=Math.max(0,Math.min(RULES.maxBid,26+a.score+p.aggr+swing));
+        if(want>=need){ highBid=Math.min(want,RULES.maxBid); declarer=turn; yield {type:"bid",seat:turn,bid:highBid}; }
+        else { passed[turn]=true; yield {type:"pass",seat:turn}; }
+      }
+    }
+    turn=(turn+1)%4; acts++;
+  }
+  if(declarer===-1){ declarer=dealer; highBid=RULES.minBid; yield {type:"stuck",seat:dealer,bid:highBid}; }
+  const bidTeam=declarer%2;
+
+  let trump;
+  if(State.human[declarer]){
+    const handForChoice = (declarer===dealer ? hands[declarer].concat([peeked]) : hands[declarer]).slice();
+    trump = yield {needInput:"trump", seat:declarer, hand:handForChoice};
+  } else {
+    trump = appraise(hands[declarer], declarer===dealer?peeked:null).suit;
+  }
+  yield {type:"trump",seat:declarer,trump,bid:highBid,bidTeam};
+
+  // second deal: 4-card packets, dealer gets bottom 4
+  let si=0;
+  for(let o=1;o<=3;o++){ const s=(dealer+o)%4; for(let k=0;k<4;k++) hands[s].push(stub[si++]); }
+  for(let k=0;k<4;k++) hands[dealer].push(stub[si++]);
+  yield {type:"deal2",hands:hands.map(handSort)};
+
+  // discard: keep ALL trumps, fill to 6 with best non-trumps (mechanical — same for AI & human)
+  for(let s=0;s<4;s++){
+    const tr=hands[s].filter(c=>isTrump(c,trump));
+    const nt=hands[s].filter(c=>!isTrump(c,trump)).sort((a,b)=>b.rank-a.rank);
+    let nh=tr.slice(); const room=6-nh.length; if(room>0) nh=nh.concat(nt.slice(0,room));
+    hands[s]=nh;
+  }
+  // fold / pass-to-partner
+  const folded=[false,false,false,false];
+  for(let s=0;s<4;s++){
+    const tr=hands[s].filter(c=>isTrump(c,trump));
+    if(tr.length===0){ folded[s]=true; hands[s]=[]; yield {type:"fold",seat:s}; }
+    else {
+      let doPass;
+      if(s===declarer || tr.length>2){ doPass=false; }
+      else if(State.human[s]){ doPass = yield {needInput:"foldchoice", seat:s, trumps:tr.slice()}; }
+      else { doPass = wantsPass(hands[s],trump,PLAYERS[s].aggr,PLAYERS[s].chaos,s===declarer); }
+      if(doPass){
+        const partner=(s+2)%4;
+        if(!folded[partner]){
+          yield {type:"passt",seat:s,partner,cards:tr.slice()};
+          hands[partner]=hands[partner].concat(tr);
+          for(let n=0;n<tr.length;n++){
+            const toss=minBy(hands[partner].filter(c=>points(c,trump)===0),c=>power(c,trump,trump))
+                    || minBy(hands[partner],c=>points(c,trump));
+            if(toss){ const i=hands[partner].indexOf(toss); hands[partner].splice(i,1); }
+          }
+          folded[s]=true; hands[s]=[];
+        }
+      }
+    }
+  }
+  yield {type:"settle",hands:hands.map(h=>handSort(h)),folded:folded.slice(),trump};
+
+  // play 6 tricks
+  const handPts=[0,0];
+  let leader=declarer;
+  let aceGone=false;   // flips true the moment anyone plays the Ace of trump
+  for(let tn=1;tn<=6;tn++){
+    yield {type:"trickStart",num:tn,leader};
+    const trick=[];
+    let ledSpoke=false;
+    for(let step=0;step<4;step++){
+      const s=(leader+step)%4;
+      if(folded[s]||hands[s].length===0) continue;
+      // surrender: trump led + void of trump (forced, no decision either way)
+      const trumpLed = trick.length>0 && isTrump(trick[0].card,trump);
+      if(RULES.surrenderWhenVoidOnTrumpLead && trumpLed && !hands[s].some(c=>isTrump(c,trump))){
+        yield {type:"surrender",seat:s,cards:hands[s].slice()};
+        folded[s]=true; hands[s]=[]; continue;
+      }
+      const force = (tn===1 && step===0);
+      let card,say=null;
+      if(State.human[s]){
+        const legal = legalPlays(hands[s],trick,trump);
+        card = yield {needInput:"play", seat:s, hand:hands[s].slice(), legal, trick:trick.slice()};
+      } else {
+        let res=choosePlay(PLAYERS[s],hands[s],trick,trump,force,aceGone);
+        if(res.card){ card=res.card; say=res.say; } else card=res;
+      }
+      hands[s].splice(hands[s].indexOf(card),1);
+      trick.push({seat:s,card});
+      if(isTrump(card,trump) && card.rank===14) aceGone=true;
+      yield {type:"play",seat:s,card, lead:step===0, say,
+               speakLead: step===0 && !ledSpoke && Math.random()<0.4};
+      // overload: trick 1 shed extras to reach 5 (mechanical for everyone)
+      if(tn===1){
+        let extras=hands[s].length-5;
+        while(extras>0){
+          const bury=minBy(hands[s],c=>points(c,trump)*100+power(c,trump,trump));
+          hands[s].splice(hands[s].indexOf(bury),1);
+          trick.push({seat:s,card:bury,buried:true});
+          yield {type:"play",seat:s,card:bury,buried:true};
+          extras--;
+        }
+      }
+    }
+    if(trick.length===0) break;
+    const win=currentWinner(trick,trump);
+    leader=win.seat;
+    let trickPts=0;
+    for(const e of trick){
+      const pt=points(e.card,trump); if(pt===0) continue;
+      if(e.card.rank===2 && isTrump(e.card,trump)) handPts[e.seat%2]+=1;
+      else trickPts+=pt;
+    }
+    handPts[win.seat%2]+=trickPts;
+    yield {type:"trickEnd",winner:win.seat,winCard:win.card,points:trickPts,captured:handPts.slice()};
+  }
+
+  // score
+  const made = handPts[bidTeam] >= highBid;
+  const newScore=gameScore.slice();
+  if(made){ newScore[0]+=handPts[0]; newScore[1]+=handPts[1]; }
+  else { newScore[bidTeam]-=highBid; newScore[1-bidTeam]+=handPts[1-bidTeam]; }
+  const won = made && newScore[bidTeam]>=RULES.winningScore;
+  yield {type:"handResult",captured:handPts.slice(),made,bidTeam,bid:highBid,gameScore:newScore,won,declarer};
+}
+
+/* ============================================================
+   RENDER / PLAYBACK
+   ============================================================ */
+const el = id => document.getElementById(id);
+const SERVER_URL = "https://king-pedro-online.king-pedro-server.workers.dev";
+const State = {
+  dealer:0, gameScore:[0,0], gen:null, lastEvent:null, resumeValue:undefined, paused:false,
+  human:[false,false,false,false], awaitingPlay:null, passAndPlay:false, revealedSeat:null,
+  hands:[[],[],[],[]], revealed:[true,true,true,true], folded:[false,false,false,false],
+  trump:null, bid:null, declarer:-1, dealer_now:0, trick:[], auto:false, timer:null, gameOver:false,
+  onlineMode:false, mySeat:-1, isHost:false, roomCode:"", ws:null
+};
+
+function cardEl(c,trump,opts={}){
+  const d=document.createElement("div");
+  d.className="card"+(RED(c.suit)?" red":"");
+  if(c.rank>=11) d.classList.add("face");
+  if(trump && isTrump(c,trump)){ d.classList.add("trump"); if(points(c,trump)>0) d.classList.add("counter"); }
+  if(opts.dim) d.classList.add("dim");
+  if(opts.dealIn) d.classList.add("deal-in");
+  const sym=SUIT_SYM[c.suit], rk=RANK_SYM[c.rank];
+  d.innerHTML = `<div class="idx">${rk}<span class="s">${sym}</span></div>`+
+                `<div class="mid">${c.rank>=11?rk:sym}</div>`+
+                `<div class="br">${rk}<span class="s">${sym}</span></div>`;
+  if(opts.dealIn) d.style.animationDelay=(opts.delay||0)+"ms";
+  return d;
+}
+function backEl(){ const d=document.createElement("div"); d.className="card back"; return d; }
+
+/** Which seat visually renders where. The human's own seat always maps to
+ *  slot 0 (south/bottom), their partner to slot 2 (north/top), so "you" and
+ *  your partner are always in the same physical spot regardless of which
+ *  seat number you were actually dealt. Falls back to identity (seat0=south)
+ *  when nobody's human, so AI-only spectating still shows Iron Mike at south. */
+function humanSeat(){
+  const i = State.human ? State.human.indexOf(true) : -1;
+  return i>=0 ? i : 0;
+}
+function visSlot(seat){ return (seat - humanSeat() + 4) % 4; }
+
+function renderPlates(){
+  const hasHuman = State.human.some(Boolean);
+  document.body.classList.toggle("hasHuman", hasHuman);
+  PLAYERS.forEach(p=>{
+    const plate=el("p"+visSlot(p.seat));
+    const isDealer = p.seat===State.dealer_now;
+    const isDecl = p.seat===State.declarer;
+    plate.innerHTML =
+      `<div class="disc" style="background:radial-gradient(circle at 38% 32%, #fff, ${p.color})">${p.name[0]}</div>`+
+      `<div class="nm">${p.name}<small>${p.tag} · ${TEAM_NAME(p.seat%2)}</small></div>`+
+      `<div class="chip">${isDealer?'<span class="badge deal" title="Dealer">D</span>':''}${isDecl?'<span class="badge decl" title="Declarer">★</span>':''}</div>`;
+    const seatEl = el("h"+visSlot(p.seat)).parentElement;
+    seatEl.classList.toggle("out",State.folded[p.seat]);
+    seatEl.classList.toggle("mine", !!State.human[p.seat]);
+  });
+}
+function renderHands(dealIn){
+  PLAYERS.forEach(p=>{
+    const h=el("h"+visSlot(p.seat)); h.innerHTML="";
+    const cards=State.hands[p.seat]||[];
+    const aw = (State.awaitingPlay && State.awaitingPlay.seat===p.seat) ? State.awaitingPlay.legal : null;
+    cards.forEach((c,k)=>{
+      const node = State.revealed[p.seat] ? cardEl(c,State.trump,{dealIn,delay:k*45}) : backEl();
+      if(aw){
+        const isLegal = aw.some(lc=>lc.suit===c.suit&&lc.rank===c.rank);
+        if(isLegal){ node.classList.add("playable"); node.onclick=()=>resumeAfterHuman(c); }
+        else node.classList.add("notplayable");
+      }
+      h.appendChild(node);
+    });
+  });
+}
+function renderTrick(){
+  const wrap=el("trick"); wrap.innerHTML="";
+  // place each played card near its seat, offset toward center
+  const pos={0:[50,86],1:[14,50],2:[50,14],3:[86,50]};
+  State.trick.forEach((e)=>{
+    const node=cardEl(e.card,State.trump,{dim:e.buried});
+    node.classList.add("pc","in");
+    const [x,y]=pos[visSlot(e.seat)];
+    node.style.left=x+"%"; node.style.top=y+"%";
+    wrap.appendChild(node);
+  });
+}
+function renderMedallion(){
+  const m=el("medallion");
+  if(State.trump){ m.className="medallion"; m.querySelector(".suit").textContent=SUIT_SYM[State.trump]; }
+  else { m.className="medallion none"; m.querySelector(".suit").textContent="—"; }
+  const bl=el("bidline");
+  // Live "bid and pass" line — only while bidding is actually in progress.
+  // Once trump is named the contract is locked, so this goes away...
+  if(State.bid && State.declarer>=0 && !State.trump){ bl.style.display="block";
+    bl.textContent=`${PLAYERS[State.declarer].name} · ${State.bid} of 62`; }
+  else bl.style.display="none";
+  // ...replaced by a persistent badge: who won the bid, and for how many points.
+  const cb=el("contractBadge");
+  if(State.trump && State.declarer>=0){
+    cb.style.display="flex";
+    cb.innerHTML=`<span class="cbTrophy">🏆</span>`+
+      `<span>${PLAYERS[State.declarer].name}</span>`+
+      `<span class="cbBid">${State.bid}<small>/62</small></span>`;
+  } else cb.style.display="none";
+}
+function renderRail(){
+  el("rail").innerHTML =
+    `<div class="col t0"><div class="t">${TEAM_NAME(0)}</div><div class="v">${State.gameScore[0]}</div></div>`+
+    `<div class="col mid"><span class="target">to ${RULES.winningScore}</span></div>`+
+    `<div class="col t1"><div class="t">${TEAM_NAME(1)}</div><div class="v">${State.gameScore[1]}</div></div>`;
+}
+function renderAll(dealIn){ renderPlates(); renderHands(dealIn); renderTrick(); renderMedallion(); renderRail(); }
+
+let bubbleTimers={};
+function bubble(seat,text){
+  const b=el("b"+visSlot(seat)); b.textContent=text; b.classList.add("show");
+  clearTimeout(bubbleTimers[seat]);
+  bubbleTimers[seat]=setTimeout(()=>b.classList.remove("show"), Math.max(1400, baseDelay()*2.2));
+}
+function ticker(t){ el("ticker").innerHTML=t; }
+function banner(title,sub){ const b=el("banner"); b.innerHTML=`<h2>${title}</h2><p>${sub}</p>`; b.classList.add("show");
+  setTimeout(()=>b.classList.remove("show"), Math.max(1800,baseDelay()*3)); }
+
+function baseDelay(){ const s=+el("speed").value; return 1150 - s*100; } // 1050..150ms
+
+// ---- human seats get factual text instead of AI personality banter ----
+function simpleText(mood,arg){
+  switch(mood){
+    case "bid": return `Bid ${arg}`;
+    case "pass": return `Pass`;
+    case "stuck": return `Stuck at ${arg}`;
+    case "trump": return `Trump: ${arg}`;
+    case "feed": return `For you, partner!`;
+    case "lead": return `Leading.`;
+    case "fold": return `Folding.`;
+    case "passt": return `Passing ${arg} to partner.`;
+    case "win": return `Got it!`;
+    case "big": return `Big points!`;
+    case "made": return `Made it!`;
+    case "set": return `Set...`;
+    case "gg": return `GG!`;
+    default: return "";
+  }
+}
+function actionSpeak(seat,mood,arg){ return State.human[seat] ? simpleText(mood,arg) : speak(seat,mood,arg); }
+
+// ---- consume one event ----
+function applyEvent(e){
+  switch(e.type){
+    case "deal": {
+      State.dealer_now=e.dealer; State.declarer=-1; State.trump=null; State.bid=null;
+      State.folded=[false,false,false,false]; State.revealedSeat=null;
+      if(State.onlineMode){ State.revealed=[false,false,false,false]; State.revealed[State.mySeat]=true; }
+      else if(State.passAndPlay) State.revealed=[false,false,false,false];
+      else State.revealed = State.human.some(Boolean) ? State.human.slice() : [true,true,true,true];
+      State.hands=e.hands.map(h=>h.slice()); State.trick=[]; State.awaitingPlay=null;
+      renderAll(true);
+      const showPeek = State.onlineMode ? (e.peeked!=null) : (!State.passAndPlay && (State.human[e.dealer] || !State.human.some(Boolean)));
+      ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each${showPeek?` and peeks the bottom card <b>${cardStr(e.peeked)}</b>`:` and quietly peeks the bottom card`}.`);
+      break; }
+    case "bid": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"bid",e.bid));
+      ticker(`${PLAYERS[e.seat].name} bids <b>${e.bid}</b>.`); renderMedallion(); renderPlates(); break;
+    case "pass": bubble(e.seat,actionSpeak(e.seat,"pass")); ticker(`${PLAYERS[e.seat].name} passes.`); break;
+    case "stuck": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"stuck"));
+      ticker(`No one bid — ${PLAYERS[e.seat].name} is stuck at <b>${e.bid}</b>.`); renderMedallion(); renderPlates(); break;
+    case "trump":
+      State.trump=e.trump; State.bid=e.bid; State.declarer=e.seat;
+      bubble(e.seat,actionSpeak(e.seat,"trump",SUIT_SYM[e.trump]+" "+e.trump));
+      ticker(`Trump is <b>${SUIT_SYM[e.trump]} ${e.trump}</b>. ${PLAYERS[e.seat].name} needs ${e.bid}.`);
+      renderAll(false); break;
+    case "deal2":
+      State.hands=e.hands.map(h=>h.slice()); renderHands(true);
+      ticker(`Second deal — four more each from the stub. Dealer takes the bottom four.`); break;
+    case "settle":
+      State.hands=e.hands.map(h=>h.slice()); State.folded=e.folded.slice(); renderAll(false);
+      ticker(`Hands trimmed to six (all trumps kept).`); break;
+    case "fold": State.folded[e.seat]=true; State.hands[e.seat]=[]; bubble(e.seat,actionSpeak(e.seat,"fold"));
+      ticker(`${PLAYERS[e.seat].name} has no trump — folds.`); renderAll(false); break;
+    case "passt":
+      bubble(e.seat,actionSpeak(e.seat,"passt",e.cards.map(cardStr).join(" ")));
+      ticker(`${PLAYERS[e.seat].name} passes ${e.cards.map(cardStr).join(" ")} to ${PLAYERS[e.partner].name}, then folds.`);
+      break;
+    case "trickStart": State.trick=[]; State.awaitingPlay=null; renderTrick();
+      ticker(`Trick ${e.num} — ${PLAYERS[e.leader].name} leads.`); break;
+    case "play":
+      State.trick.push({seat:e.seat,card:e.card,buried:e.buried});
+      State.awaitingPlay=null;
+      // remove the played card from the seat's displayed hand
+      { const h=State.hands[e.seat]; const i=h.findIndex(c=>c.suit===e.card.suit&&c.rank===e.card.rank); if(i>=0) h.splice(i,1); }
+      renderHands(false); renderTrick();
+      if(e.say==="feed") bubble(e.seat,actionSpeak(e.seat,"feed"));
+      else if(e.speakLead) bubble(e.seat,actionSpeak(e.seat,"lead"));
+      if(!e.buried) ticker(`${PLAYERS[e.seat].name} plays <b>${cardStr(e.card)}</b>${points(e.card,State.trump)?` (${points(e.card,State.trump)} pts)`:""}.`);
+      break;
+    case "surrender":
+      State.folded[e.seat]=true; State.hands[e.seat]=[]; bubble(e.seat,actionSpeak(e.seat,"fold"));
+      ticker(`${PLAYERS[e.seat].name} is out of trump — surrenders to the junk pile.`); renderAll(false); break;
+    case "trickEnd":
+      bubble(e.winner,actionSpeak(e.winner,"win"));
+      if(e.points>=30) bubble((e.winner+1)%4, actionSpeak((e.winner+1)%4,"big"));
+      ticker(`${PLAYERS[e.winner].name} takes trick — +${e.points} to ${TEAM_NAME(e.winner%2)}.`);
+      setTimeout(()=>{ State.trick=[]; renderTrick(); }, baseDelay()*0.6);
+      break;
+    case "handResult":
+      State.gameScore=e.gameScore.slice(); renderRail();
+      if(e.made){ bubble(e.declarer,actionSpeak(e.declarer,"made"));
+        banner(`${TEAM_NAME(e.bidTeam)} made ${e.bid}`,`Captured ${e.captured[0]}–${e.captured[1]}. Score ${State.gameScore[0]}–${State.gameScore[1]}.`); }
+      else { bubble(e.declarer,actionSpeak(e.declarer,"set"));
+        banner(`${TEAM_NAME(e.bidTeam)} set!`,`Back ${e.bid}. Score ${State.gameScore[0]}–${State.gameScore[1]}.`); }
+      if(e.won){ State.gameOver=true; setTimeout(()=>{
+        bubble(e.declarer,actionSpeak(e.declarer,"gg"));
+        banner(`🏆 ${TEAM_NAME(e.bidTeam)} win!`,`${State.gameScore[e.bidTeam]} points — first past ${RULES.winningScore} on a made bid.`);
+      }, baseDelay()); }
+      State.dealer=(State.dealer+1)%4;
+      break;
+  }
+}
+
+// ---- human decision panel (gated behind a "pass the device" reveal when 2+ humans share this screen) ----
+function showDecision(y){
+  if(State.onlineMode) return renderDecisionBody(y); // each player already only sees their own screen
+  if(State.passAndPlay && State.revealedSeat!==y.seat){
+    el("revealWho").textContent=`Pass the device to ${PLAYERS[y.seat].name}`;
+    el("revealGate").classList.add("show");
+    el("revealBtn").onclick=()=>{
+      el("revealGate").classList.remove("show");
+      State.revealedSeat=y.seat;
+      State.revealed=[false,false,false,false]; State.revealed[y.seat]=true;
+      renderHands(false);
+      renderDecisionBody(y);
+    };
+    return;
+  }
+  renderDecisionBody(y);
+}
+function renderDecisionBody(y){
+  const box=el("decision");
+  box.classList.toggle("trumpBox", y.needInput==="trump");
+  const name=PLAYERS[y.seat].name;
+  if(y.needInput==="bid"){
+    const bidderName = y.declarer>=0 ? PLAYERS[y.declarer].name : null;
+    const statusLine = PLAYERS.map((p,s)=>{
+      if(s===y.seat || s===y.declarer) return null;
+      if(y.passed && y.passed[s]) return `${p.name}: pass`;
+      return null;
+    }).filter(Boolean).join(" &middot; ");
+    box.innerHTML = `<h3>${name} — your bid</h3>
+      <div>${bidderName? `High bid <b>${y.highBid}</b> by <b>${bidderName}</b>` : "No bids yet"} &middot; need ${y.need} (max ${y.max})</div>
+      ${statusLine? `<div class="bidStatus">${statusLine}</div>` : ""}
+      <div class="row">
+        <button id="decMinus" class="ghost">−</button>
+        <span class="bidNum" id="bidNum">${y.need}</span>
+        <button id="decPlus" class="ghost">+</button>
+      </div>
+      <div class="row">
+        <button id="decPass" class="ghost">Pass</button>
+        <button id="decBid">Bid</button>
+      </div>`;
+    let v=y.need;
+    el("decMinus").onclick=()=>{ v=Math.max(y.need,v-1); el("bidNum").textContent=v; };
+    el("decPlus").onclick=()=>{ v=Math.min(y.max,v+1); el("bidNum").textContent=v; };
+    el("decPass").onclick=()=>resumeAfterHuman("pass");
+    el("decBid").onclick=()=>resumeAfterHuman(v);
+  } else if(y.needInput==="trump"){
+    const counts=SUITS.map(s=>({s,n:y.hand.filter(c=>isTrump(c,s)).length}));
+    box.innerHTML = `<h3>${name} — pick trump</h3>
+      <div class="row">${counts.map(c=>`<button class="suitBtn" data-s="${c.s}">${SUIT_SYM[c.s]} ${c.s} (${c.n})</button>`).join("")}</div>`;
+    box.querySelectorAll(".suitBtn").forEach(b=>b.onclick=()=>resumeAfterHuman(b.dataset.s));
+  } else if(y.needInput==="foldchoice"){
+    box.innerHTML = `<h3>${name} — ${y.trumps.length} trump${y.trumps.length>1?"s":""} only</h3>
+      <div>${y.trumps.map(cardStr).join(" ")}</div>
+      <div class="row">
+        <button id="decFold">Pass to partner &amp; fold</button>
+        <button id="decKeep" class="ghost">Keep playing</button>
+      </div>`;
+    el("decFold").onclick=()=>resumeAfterHuman(true);
+    el("decKeep").onclick=()=>resumeAfterHuman(false);
+  } else if(y.needInput==="play"){
+    State.awaitingPlay={seat:y.seat,legal:y.legal};
+    renderHands(false);
+    box.innerHTML = `<h3>${name} — your turn</h3><div>Click a highlighted card to play it.</div>`;
+  }
+  box.classList.add("show");
+}
+function hideDecision(){ el("decision").classList.remove("show"); }
+
+// ---- step / auto: drive the generator one yielded item at a time ----
+function ensureGen(){ if(!State.gen && !State.gameOver){ State.gen=playHand(State.dealer,State.gameScore); } }
+function step(){
+  if(State.onlineMode || State.paused) return; // online games are driven entirely by server messages
+  for(;;){
+    if(State.gameOver && !State.gen){ stopAuto(); return; }
+    ensureGen();
+    if(!State.gen){ stopAuto(); return; }
+    const r=State.gen.next(State.resumeValue);
+    State.resumeValue=undefined;
+    if(r.done){ State.gen=null; continue; } // hand finished — chain straight into the next one
+    const y=r.value;
+    if(y.needInput){ State.paused=true; showDecision(y); return; }
+    applyEvent(y); State.lastEvent=y; return;
+  }
+}
+function resumeAfterHuman(value){
+  State.awaitingPlay=null;
+  hideDecision();
+  if(State.onlineMode){
+    if(State.ws && State.ws.readyState===1) State.ws.send(JSON.stringify({type:"answer", value}));
+    return;
+  }
+  State.resumeValue=value; State.paused=false;
+  if(State.passAndPlay){
+    State.revealedSeat=null; State.revealed=[false,false,false,false]; renderHands(false);
+  }
+  if(State.auto) tick(); else step();
+}
+function startAuto(){ State.auto=true; el("autoBtn").textContent="Pause ❚❚"; tick(); }
+function stopAuto(){ State.auto=false; el("autoBtn").textContent="Auto ▶"; clearTimeout(State.timer); }
+function tick(){
+  if(!State.auto || State.paused) return;
+  step();
+  if(State.paused) return;
+  let d=baseDelay();
+  const last=State.lastEvent;
+  if(last){ if(last.type==="trickEnd"||last.type==="trump"||last.type==="deal2"||last.type==="settle") d*=1.5;
+            if(last.type==="handResult") d*=2.4; if(last.type==="play"&&last.buried) d*=0.4; }
+  if(State.gameOver && !State.gen){ stopAuto(); return; }
+  State.timer=setTimeout(tick,d);
+}
+
+function newGame(){
+  stopAuto();
+  State.dealer=Math.floor(Math.random()*4); State.gameScore=[0,0];
+  State.gen=null; State.resumeValue=undefined; State.lastEvent=null; State.paused=false;
+  State.gameOver=false; State.trick=[]; State.awaitingPlay=null; State.revealedSeat=null;
+  State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1;
+  State.folded=[false,false,false,false];
+  State.revealed = State.passAndPlay ? [false,false,false,false]
+    : (State.human.some(Boolean) ? State.human.slice() : [true,true,true,true]);
+  hideDecision(); el("revealGate").classList.remove("show");
+  renderAll(false); ticker("New game — press <b>Step ▸</b> or <b>Auto ▶</b> to begin.");
+  el("banner").classList.remove("show");
+}
+
+// ---- setup sheet: choose which seats are human ----
+let setupHuman=[false,false,false,false];
+let setupNames=["","","",""];
+let myName="";
+const SEAT_POS={0:"South",1:"West",2:"North",3:"East"};
+
+function buildSeatRows(){
+  const wrap=el("seatRows"); wrap.innerHTML="";
+  DEFAULT_PLAYERS.forEach((dp,s)=>{
+    const row=document.createElement("div");
+    row.className="seatRow"+(setupHuman[s]?" human":"");
+    row.innerHTML =
+      `<div class="disc" style="width:34px;height:34px;background:radial-gradient(circle at 38% 32%,#fff,${dp.color})">${dp.name[0]}</div>`+
+      `<div class="who"><b>${dp.name}</b><small>${SEAT_POS[s]} &middot; ${dp.tag}</small></div>`+
+      `<input class="nameInput" placeholder="Your name" value="${setupNames[s]}">`+
+      `<button class="toggle${setupHuman[s]?" on":""}" type="button">${setupHuman[s]?"You":"AI"}</button>`;
+    wrap.appendChild(row);
+    const btn=row.querySelector(".toggle"), inp=row.querySelector(".nameInput");
+    btn.onclick=()=>{
+      setupHuman[s]=!setupHuman[s];
+      btn.classList.toggle("on",setupHuman[s]);
+      btn.textContent=setupHuman[s]?"You":"AI";
+      row.classList.toggle("human",setupHuman[s]);
+      if(setupHuman[s] && !setupNames[s]) { setupNames[s]=myName; inp.value=myName; }
+    };
+    inp.oninput=()=>{ setupNames[s]=inp.value; if(setupHuman[s]) myName=inp.value; };
+  });
+}
+/** Every time "New game" opens setup, default to a random seat as "You" so
+ *  partnerships rotate hand to hand — Randy's own partner (seat+2) changes
+ *  along with it. Manually toggling a different seat in this screen still
+ *  overrides it for that game. */
+function openSetup(){
+  stopAuto();
+  const r = Math.floor(Math.random()*4);
+  setupHuman=[false,false,false,false]; setupHuman[r]=true;
+  setupNames=["","","",""]; setupNames[r]=myName;
+  buildSeatRows();
+  el("setupOverlay").classList.add("show");
+}
+function closeSetup(){ el("setupOverlay").classList.remove("show"); }
+function applySetupSelections(){
+  const humansInSeatOrder=setupHuman.map((v,i)=>v?i:-1).filter(i=>i>=0);
+  State.human=setupHuman.slice();
+  State.passAndPlay = humansInSeatOrder.length>=2;
+  for(let s=0;s<4;s++){
+    if(setupHuman[s]){
+      const idx=humansInSeatOrder.indexOf(s);
+      const custom=setupNames[s].trim();
+      PLAYERS[s].name = custom || (humansInSeatOrder.length>1 ? `Player ${idx+1}` : "You");
+      PLAYERS[s].tag = "Human";
+    } else {
+      PLAYERS[s].name = DEFAULT_PLAYERS[s].name;
+      PLAYERS[s].tag = DEFAULT_PLAYERS[s].tag;
+    }
+  }
+}
+
+// ---- online mode: connect to the Cloudflare Worker room server ----
+function wsUrlFor(code){ return SERVER_URL.replace(/^http/,"ws") + "/room/" + code; }
+
+function connectToRoom(code, asHost){
+  State.roomCode=code;
+  const ws = new WebSocket(wsUrlFor(code));
+  State.ws=ws;
+  ws.onopen=()=>{ showLobbyStage(); el("lobbyCode").textContent=code; };
+  ws.onmessage=(ev)=>{
+    let msg; try{ msg=JSON.parse(ev.data); } catch { return; }
+    if(msg.type==="welcome"){ State.isHost=msg.isHost; }
+    else if(msg.type==="roster"){
+      State.isHost=msg.isHost; State.mySeat=msg.yourSeat;
+      State.human = msg.roster.map(r=>r.claimed);
+      msg.roster.forEach(r=>{ PLAYERS[r.seat].name=r.name; PLAYERS[r.seat].tag=r.tag; });
+      renderLobbyRoster(msg.roster, msg.isHost);
+      if(msg.started){ State.onlineMode=true; closeOnline(); beginOnlineGame(); }
+    }
+    else if(msg.type==="event"){ applyEvent(msg.event); }
+    else if(msg.type==="needInput"){ showDecision(msg); }
+    else if(msg.type==="error"){ ticker(`<b>Server:</b> ${msg.message}`); }
+  };
+  ws.onclose=()=>{ if(!State.onlineMode) { el("onlineError").style.display="block"; el("onlineError").textContent="Connection lost. Try again."; } };
+  ws.onerror=()=>{};
+}
+function renderLobbyRoster(roster, isHost){
+  const wrap=el("lobbySeatRows"); wrap.innerHTML="";
+  roster.forEach(r=>{
+    const row=document.createElement("div");
+    row.className="seatRow"+(r.claimed?" human":"");
+    const mine = r.seat===State.mySeat;
+    row.innerHTML =
+      `<div class="who"><b>${SEAT_POS[r.seat]}</b><small>${r.claimed? r.name+(mine?" (you)":"") : "open — AI plays if empty"}</small></div>`+
+      (mine ? `<button class="toggle on" type="button">Leave</button>`
+            : (r.claimed ? `<button class="toggle" type="button" disabled>Taken</button>`
+                         : `<button class="toggle" type="button">Sit here</button>`));
+    wrap.appendChild(row);
+    const btn=row.querySelector("button");
+    if(!btn.disabled){
+      btn.onclick=()=>{
+        if(mine) State.ws.send(JSON.stringify({type:"releaseSeat", seat:r.seat}));
+        else {
+          const nm=(prompt("Your name?","")||"").trim();
+          State.ws.send(JSON.stringify({type:"claimSeat", seat:r.seat, name:nm}));
+        }
+      };
+    }
+  });
+  el("lobbyStartBtn").style.display = isHost ? "inline-block" : "none";
+  el("lobbyWait").style.display = isHost ? "none" : "block";
+}
+function showLobbyStage(){ el("onlineJoinStage").style.display="none"; el("onlineLobbyStage").style.display="block"; }
+function closeOnline(){ el("onlineOverlay").classList.remove("show"); }
+function setLocalControlsVisible(v){
+  const d = v ? "" : "none";
+  el("stepBtn").style.display=d; el("autoBtn").style.display=d;
+  document.querySelectorAll(".controls label").forEach(l=>l.style.display=d);
+}
+function beginOnlineGame(){
+  State.gameOver=false; State.dealer=0; State.gameScore=[0,0]; State.trick=[];
+  State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1;
+  State.folded=[false,false,false,false]; hideDecision(); el("revealGate").classList.remove("show");
+  setLocalControlsVisible(false);
+  renderAll(false); ticker("Online game starting…"); el("banner").classList.remove("show");
+}
+async function createRoom(){
+  el("onlineError").style.display="none";
+  try{
+    const res = await fetch(SERVER_URL + "/api/new-room");
+    const data = await res.json();
+    connectToRoom(data.code, true);
+  } catch(err){
+    el("onlineError").style.display="block";
+    el("onlineError").textContent="Couldn't reach the server. Check your connection and try again.";
+  }
+}
+function joinRoom(){
+  const code=(el("joinCodeInput").value||"").trim().toUpperCase();
+  el("onlineError").style.display="none";
+  if(code.length!==4){ el("onlineError").style.display="block"; el("onlineError").textContent="Enter the 4-letter room code."; return; }
+  connectToRoom(code, false);
+}
+
+// ---- mode select (top-level entry point) ----
+function openModeSelect(){
+  stopAuto();
+  if(State.ws){ try{State.ws.close();}catch{} State.ws=null; }
+  State.onlineMode=false; State.mySeat=-1; State.isHost=false;
+  setLocalControlsVisible(true);
+  el("onlineJoinStage").style.display="block"; el("onlineLobbyStage").style.display="none";
+  el("joinCodeInput").value=""; el("onlineError").style.display="none";
+  el("modeOverlay").classList.add("show");
+}
+el("modeLocalBtn").onclick=()=>{ el("modeOverlay").classList.remove("show"); openSetup(); };
+el("modeOnlineBtn").onclick=()=>{ el("modeOverlay").classList.remove("show"); el("onlineOverlay").classList.add("show"); };
+el("createRoomBtn").onclick=createRoom;
+el("joinRoomBtn").onclick=joinRoom;
+
+el("newBtn").onclick=openModeSelect;
+el("stepBtn").onclick=()=>{ stopAuto(); step(); };
+el("autoBtn").onclick=()=>{ State.auto?stopAuto():startAuto(); };
+el("startBtn").onclick=()=>{
+  applySetupSelections(); closeSetup(); newGame(); startAuto();
+};
+el("lobbyStartBtn").onclick=()=>{ if(State.ws) State.ws.send(JSON.stringify({type:"startGame"})); };
+
+openModeSelect();
+</script>
+</body>
+</html>
