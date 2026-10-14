@@ -18,3 +18,4 @@ King Pedro (Ukrainian-Canadian 4-player partnership card game) with AI opponents
 
 ## Reference
 - LLM token/prompt-caching cost notes: `.claude/skills/token-caching/SKILL.md` (loaded on demand via the `token-caching` skill).
+- MCP server install notes (Context7, Chrome DevTools, DBHub, Serena, shadcn): `.claude/skills/mcp-toolbox/SKILL.md` (`mcp-toolbox` skill).
