@@ -274,6 +274,7 @@ export class GameRoom {
 
     const handPts = [0, 0];
     let leader = declarer;
+    let aceGone = false; // flips true the moment anyone plays the Ace of trump
     for (let tn = 1; tn <= 6; tn++) {
       this.broadcastEvent({ type: "trickStart", num: tn, leader });
       const trick = [];
@@ -294,12 +295,13 @@ export class GameRoom {
           const found = hands[s].find((c) => c.suit === card.suit && c.rank === card.rank);
           card = found || legal[0];
         } else {
-          let res = choosePlay(this.seatMeta[s], hands[s], trick, trump, force);
+          let res = choosePlay(this.seatMeta[s], hands[s], trick, trump, force, aceGone);
           if (res.card) { card = res.card; say = res.say; } else card = res;
           await sleep(500);
         }
         hands[s].splice(hands[s].indexOf(card), 1);
         trick.push({ seat: s, card });
+        if (isTrump(card, trump) && card.rank === 14) aceGone = true;
         this.broadcastEvent({ type: "play", seat: s, card, lead: step === 0, say, speakLead: step === 0 && !ledSpoke && Math.random() < 0.4 });
         await sleep(250);
         if (tn === 1) {
@@ -308,6 +310,7 @@ export class GameRoom {
             const bury = minByLocal(hands[s], (c) => points(c, trump) * 100 + powerLocal(c, trump));
             hands[s].splice(hands[s].indexOf(bury), 1);
             trick.push({ seat: s, card: bury, buried: true });
+            if (isTrump(bury, trump) && bury.rank === 14) aceGone = true;
             this.broadcastEvent({ type: "play", seat: s, card: bury, buried: true });
             extras--;
           }

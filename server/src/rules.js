@@ -66,13 +66,18 @@ export function currentWinner(trick,t){
 const maxBy=(a,f)=>a.reduce((b,c)=>f(c)>f(b)?c:b,a[0]);
 const minBy=(a,f)=>a.length?a.reduce((b,c)=>f(c)<f(b)?c:b,a[0]):null;
 export { maxBy, minBy };
-export function choosePlay(p,hand,trick,t,forceTrumpLead){
+export function choosePlay(p,hand,trick,t,forceTrumpLead,aceGone){
   const legal = legalPlays(hand,trick,t);
   const partner=(p.seat+2)%4;
   if(trick.length===0){
     const trumps=legal.filter(c=>isTrump(c,t));
-    if(forceTrumpLead && trumps.length) return maxBy(trumps,c=>power(c,t,t));
-    if(trumps.length && p.aggr>0) return maxBy(trumps,c=>power(c,t,t));
+    // Never lead a bare King of trump (30 pts) unless you also hold the Ace,
+    // or the Ace has already appeared in play from anyone — lead low instead
+    // to flush it out first; once it's gone, the King leads safely.
+    const hasAce = trumps.some(c=>c.rank===14);
+    const safeTrumps = (hasAce||aceGone) ? trumps : trumps.filter(c=>c.rank!==13);
+    if(forceTrumpLead && trumps.length) return maxBy(safeTrumps.length?safeTrumps:trumps,c=>power(c,t,t));
+    if(safeTrumps.length && p.aggr>0) return maxBy(safeTrumps,c=>power(c,t,t));
     if(trumps.length && p.chaos>=4) return trumps[Math.floor(Math.random()*trumps.length)];
     return minBy(legal,c=>points(c,t)*100+c.rank);
   }
