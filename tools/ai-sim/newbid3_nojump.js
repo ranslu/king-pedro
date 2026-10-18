@@ -8,7 +8,7 @@ const BID_MODEL = {
       q:{"0.15":-9.8,"0.20":-7.3,"0.25":-5.4,"0.30":-3.9,"0.35":-2.3,"0.40":-1.2,"0.45":0.5,"0.50":1.6}}
 };
 // how sure each character wants to be before bidding (probability of making it)
-const BID_CONFIDENCE = [0.55, 0.70, 0.62, 0.50];   // Mike, Elena, Bohdan, Lou
+const BID_CONFIDENCE = [0.55, 0.70, 0.62, 0.50];   // Joe, Grace, Jean, Steve
 function bidFeatures(cards,s,isDealer){
   const T=cards.filter(c=>isTrump(c,s)), has=r=>T.some(c=>c.rank===r&&c.suit===s)?1:0;
   return {K:has(13), x:[1,has(14),has(12),has(11),has(10),has(9),has(5),
@@ -30,7 +30,7 @@ function safeBid(seat,hand,extra,isDealer){
   return best;
 }
 // How far each character jumps past the minimum when they bid (0 = minimum raise, 1 = straight to their limit)
-const BID_JUMP = [0,0,0,0];   // Lou (-1) = random every time
+const BID_JUMP = [0,0,0,0];   // Steve (-1) = random every time
 /** AI bid decision: returns the bid to make, or 0 to pass. */
 function aiBid(seat,limit,need,declarer){
   if(limit.bid<need) return 0;

@@ -548,10 +548,10 @@ const VOICES = {
       gg:["200!! CASH ME OUT!"] }
 };
 const PLAYERS = [
-  {seat:0,name:"Iron Mike",  tag:"Aggressive", color:"#d9b24a", aggr:3, chaos:1},
-  {seat:1,name:"Prof. Elena",tag:"Cautious",   color:"#7fb2e6", aggr:-2,chaos:0},
-  {seat:2,name:"Bohdan",     tag:"Chaotic",    color:"#e0a85a", aggr:1, chaos:2},
-  {seat:3,name:"Lucky Lou",  tag:"Gambler",    color:"#9ad6a0", aggr:2, chaos:5},
+  {seat:0,name:"Joe",        tag:"Aggressive", color:"#d9b24a", aggr:3, chaos:1},
+  {seat:1,name:"Grace",      tag:"Cautious",   color:"#7fb2e6", aggr:-2,chaos:0},
+  {seat:2,name:"Jean",       tag:"Chaotic",    color:"#e0a85a", aggr:1, chaos:2},
+  {seat:3,name:"Steve",      tag:"Gambler",    color:"#9ad6a0", aggr:2, chaos:5},
 ];
 const TEAM_NAME = t => t===0 ? `${PLAYERS[0].name} / ${PLAYERS[2].name}` : `${PLAYERS[1].name} / ${PLAYERS[3].name}`;
 const DEFAULT_PLAYERS = PLAYERS.map(p=>({...p}));
@@ -586,7 +586,7 @@ const BID_MODEL = {
       q:{"0.15":-9.8,"0.20":-7.3,"0.25":-5.4,"0.30":-3.9,"0.35":-2.3,"0.40":-1.2,"0.45":0.5,"0.50":1.6}}
 };
 // how sure each character wants to be before bidding (probability of making it)
-const BID_CONFIDENCE = [0.55, 0.70, 0.62, 0.50];   // Mike, Elena, Bohdan, Lou
+const BID_CONFIDENCE = [0.55, 0.70, 0.62, 0.50];   // Joe, Grace, Jean, Steve
 function bidFeatures(cards,s,isDealer){
   const T=cards.filter(c=>isTrump(c,s)), has=r=>T.some(c=>c.rank===r&&c.suit===s)?1:0;
   return {K:has(13), x:[1,has(14),has(12),has(11),has(10),has(9),has(5),
@@ -1013,7 +1013,7 @@ function backEl(){ const d=document.createElement("div"); d.className="card back
  *  slot 0 (south/bottom), their partner to slot 2 (north/top), so "you" and
  *  your partner are always in the same physical spot regardless of which
  *  seat number you were actually dealt. Falls back to identity (seat0=south)
- *  when nobody's human, so AI-only spectating still shows Iron Mike at south. */
+ *  when nobody's human, so AI-only spectating still shows Joe at south. */
 function humanSeat(){
   const i = State.human ? State.human.indexOf(true) : -1;
   return i>=0 ? i : 0;

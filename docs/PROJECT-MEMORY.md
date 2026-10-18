@@ -9,11 +9,11 @@ Source of truth for code is the repo; this file records intent and decisions.
 - Targets: browser table UI (single-file HTML), Kotlin core, Android scaffolding, Google Play.
 
 ## Characters (seat / style)
-- Iron Mike - aggressive, South / seat 0
-- Prof. Elena - cautious, West / seat 1
-- Bohdan - prairie flavour, North / seat 2
-- Lucky Lou - chaos, East / seat 3
-- Teams: Mike + Bohdan = Team 0; Elena + Lou = Team 1
+- Joe - aggressive, South / seat 0
+- Grace - cautious, West / seat 1
+- Jean - prairie flavour, North / seat 2
+- Steve - chaos, East / seat 3
+- Teams: Joe + Jean = Team 0; Grace + Steve = Team 1
 - 14 bark trigger categories per character; tribute-character template for family photos.
 - Character files (characters.json, CharacterProfile.kt, BarkLibrary.kt, CharacterVoiceEngine.kt, CharacterSelectScreen.kt, character-select.html) are in Google Drive: King-Pedro/Assets.
 

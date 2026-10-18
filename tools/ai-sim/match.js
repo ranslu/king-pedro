@@ -1,6 +1,6 @@
 "use strict";
 // Duplicate match: every deal is played twice with the SAME cards and contract —
-// once with policy A on team 0 (Mike/Bohdan), once with A on team 1 (Elena/Lou).
+// once with policy A on team 0 (Joe/Jean), once with A on team 1 (Grace/Steve).
 // Luck cancels out; what's left is the skill difference.
 const fs=require('fs'); const E=require('./engine.js');
 const nb=new Function('isTrump','SUITS','PLAYERS','RULES',

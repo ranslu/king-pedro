@@ -263,7 +263,7 @@ object Voices {
 // turns that into "highest bid I make with at least X% confidence".
 // ---------------------------------------------------------------------------
 object BidModel {
-    /** Chance of making the bid each character wants: Mike, Elena, Bohdan, Lou. */
+    /** Chance of making the bid each character wants: Joe, Grace, Jean, Steve. */
     val CONFIDENCE = listOf(0.62, 0.75, 0.68, 0.55)
     /** How far past the minimum each character jumps (−1 = random). */
     val JUMP = listOf(0.6, 0.0, 0.3, -1.0)
@@ -528,16 +528,16 @@ class KingPedroEngine(seed: Long? = null) {
     private val playerMemory = PlayerMemory("king-pedro-memory")
 
     val players = listOf(
-        AIPlayer(0, "Iron Mike", Voices.IRON_MIKE, aggression = 3, chaos = 1, playerMemory),
-        AIPlayer(1, "Prof. Elena", Voices.PROF_ELENA, aggression = -2, chaos = 0, playerMemory),
-        AIPlayer(2, "Bohdan", Voices.BOHDAN, aggression = 1, chaos = 2, playerMemory),
-        AIPlayer(3, "Lucky Lou", Voices.LUCKY_LOU, aggression = 2, chaos = 5, playerMemory)
+        AIPlayer(0, "Joe", Voices.IRON_MIKE, aggression = 3, chaos = 1, playerMemory),
+        AIPlayer(1, "Grace", Voices.PROF_ELENA, aggression = -2, chaos = 0, playerMemory),
+        AIPlayer(2, "Jean", Voices.BOHDAN, aggression = 1, chaos = 2, playerMemory),
+        AIPlayer(3, "Steve", Voices.LUCKY_LOU, aggression = 2, chaos = 5, playerMemory)
     )
-    val gameScore = intArrayOf(0, 0)        // Team 0 = Mike+Bohdan, Team 1 = Elena+Lou
+    val gameScore = intArrayOf(0, 0)        // Team 0 = Joe+Jean, Team 1 = Grace+Steve
     var dealer = rng.nextInt(4)             // first dealer chosen at random; passes left each hand
     val handLogs = mutableListOf<HandLog>() // every hand played, kept for post-game review
 
-    fun teamName(t: Int) = if (t == 0) "Team Mike/Bohdan" else "Team Elena/Lou"
+    fun teamName(t: Int) = if (t == 0) "Team Joe/Jean" else "Team Grace/Steve"
 
     /** Reveal a hand: every player's cards + trick-by-trick sequence, bid vs actual. */
     fun review(handNumber: Int) {
