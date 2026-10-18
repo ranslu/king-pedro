@@ -1,5 +1,5 @@
 # Deploys the multiplayer server (server/) to Cloudflare whenever server code
-# lands on master. Needs repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
+# lands on master. Needs repo secret CLOUDFLARE_API_TOKEN.
 # Run it by hand from the Actions tab with "Run workflow".
 name: Deploy server
 
@@ -17,5 +17,5 @@ jobs:
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: bde850cba97016ca70abc5a9a41cfe1f
           workingDirectory: server
