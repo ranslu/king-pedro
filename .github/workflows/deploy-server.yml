@@ -1,0 +1,21 @@
+# Deploys the multiplayer server (server/) to Cloudflare whenever server code
+# lands on master. Needs repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
+# Run it by hand from the Actions tab with "Run workflow".
+name: Deploy server
+
+on:
+  push:
+    branches: [master]
+    paths: ["server/**"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: server
