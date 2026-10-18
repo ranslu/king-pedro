@@ -19,3 +19,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: bde850cba97016ca70abc5a9a41cfe1f
           workingDirectory: server
+          wranglerVersion: "4"
