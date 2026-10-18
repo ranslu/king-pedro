@@ -1,6 +1,6 @@
 import {
   RULES, DEFAULT_PLAYERS, isTrump, points, legalPlays, currentWinner,
-  appraise, choosePlay, wantsPass, freshDeck, shuffle, handSort,
+  safeBid, aiBid, choosePlay, wantsPass, freshDeck, shuffle, handSort,
 } from "./rules.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -200,6 +200,7 @@ export class GameRoom {
     let highBid = 0, declarer = -1;
     const passed = [false, false, false, false];
     let turn = (dealer + 1) % 4, acts = 0;
+    const aiLimit = [null, null, null, null]; // each AI seat's highest safe bid (+ best suit), decided once per hand
     while (passed.filter(Boolean).length < 3 && highBid < RULES.maxBid && acts < 16) {
       if (!passed[turn] && turn !== declarer) {
         const need = Math.max(RULES.minBid, highBid + 1);
@@ -208,11 +209,9 @@ export class GameRoom {
           if (answer === "pass") { passed[turn] = true; this.broadcastEvent({ type: "pass", seat: turn }); }
           else { highBid = Math.max(need, Math.min(RULES.maxBid, answer | 0)); declarer = turn; this.broadcastEvent({ type: "bid", seat: turn, bid: highBid }); }
         } else {
-          const p = this.seatMeta[turn];
-          const a = appraise(hands[turn], turn === dealer ? peeked : null);
-          const swing = p.chaos > 0 ? Math.floor(Math.random() * (2 * p.chaos + 1)) - p.chaos : 0;
-          const want = Math.max(0, Math.min(RULES.maxBid, 26 + a.score + p.aggr + swing));
-          if (want >= need) { highBid = Math.min(want, RULES.maxBid); declarer = turn; this.broadcastEvent({ type: "bid", seat: turn, bid: highBid }); }
+          if (!aiLimit[turn]) aiLimit[turn] = safeBid(this.seatMeta[turn], hands[turn], turn === dealer ? peeked : null, turn === dealer);
+          const b = aiBid(turn, aiLimit[turn], need, declarer);
+          if (b) { highBid = b; declarer = turn; this.broadcastEvent({ type: "bid", seat: turn, bid: highBid }); }
           else { passed[turn] = true; this.broadcastEvent({ type: "pass", seat: turn }); }
           await sleep(450);
         }
@@ -227,7 +226,7 @@ export class GameRoom {
       const handForChoice = (declarer === dealer ? hands[declarer].concat([peeked]) : hands[declarer]).slice();
       trump = await this.needInput(declarer, { needInput: "trump", seat: declarer, hand: handForChoice });
     } else {
-      trump = appraise(hands[declarer], declarer === dealer ? peeked : null).suit;
+      trump = (aiLimit[declarer] || safeBid(this.seatMeta[declarer], hands[declarer], declarer === dealer ? peeked : null, declarer === dealer)).suit;
       await sleep(450);
     }
     this.broadcastEvent({ type: "trump", seat: declarer, trump, bid: highBid, bidTeam });
