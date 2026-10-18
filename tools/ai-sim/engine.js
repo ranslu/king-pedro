@@ -44,10 +44,10 @@ function currentWinner(trick,t){
 }
 
 const PLAYERS = [
-  {seat:0,name:"Iron Mike",  aggr:3, chaos:1},
-  {seat:1,name:"Prof. Elena",aggr:-2,chaos:0},
-  {seat:2,name:"Bohdan",     aggr:1, chaos:2},
-  {seat:3,name:"Lucky Lou",  aggr:2, chaos:5},
+  {seat:0,name:"Joe",        aggr:3, chaos:1},
+  {seat:1,name:"Grace",      aggr:-2,chaos:0},
+  {seat:2,name:"Jean",       aggr:1, chaos:2},
+  {seat:3,name:"Steve",      aggr:2, chaos:5},
 ];
 
 // ---------------- the table's CURRENT card-play AI (verbatim logic) ----------------
