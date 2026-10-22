@@ -41,3 +41,10 @@ Source of truth for code is the repo; this file records intent and decisions.
 - Checkout: C:\Users\rslus\king-pedro. Desktop shortcut points at king-pedro-table.html using assets/king-pedro.ico.
 - archive/geekom-intellij-2026-09-27/ holds the older IntelliJ-project copies of the Kotlin sources (package com.example.kingpedro, MemoryCard naming) and the 2026-09-17 table snapshot. Repo root KingPedroCore.kt / PlayerMemory.kt are the newer synced versions.
 - Default branch is master. GitHub Pages serves docs/ at https://ranslu.github.io/king-pedro/.
+
+## Deploy & tooling (2026-10)
+- Server auto-deploys from GitHub Actions (`Deploy server` workflow, Wrangler 4) on merges to master that touch `server/`. Needs repo secret `CLOUDFLARE_API_TOKEN` (Edit Cloudflare Workers template); Cloudflare account ID `bde850cba97016ca70abc5a9a41cfe1f` is in the workflow. Worker: `king-pedro-online`.
+- Online server AI now matches the table: bare-King-of-trump rule and the fitted bidding model (PRs #4, #5).
+- Geekom desktop/Start shortcut "King Pedro" opens https://ranslu.github.io/king-pedro/ (Target: `C:\Windows\explorer.exe https://ranslu.github.io/king-pedro/`). The old `King-Pedro_2\King-Pedro\KingPedro-Launcher.bat` copy is not synced with GitHub.
+- Claude Code mods in `.claude/skills/`: `savvy-progress` (`/progress`, live turn tracker), `file-tree` (`/files`, project tree marking files read/edited), `replay-theater` (`/replay`, step through the session's tool calls). `lotto-ready` lives in ranslu/lotto-oracle.
+
