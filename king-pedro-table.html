@@ -333,8 +333,8 @@
   /* trump picker uses the same docked box; suit buttons stack to stay compact */
   .decision.trumpBox{ width:260px; max-width:calc(100vw - 32px); padding:.65rem .8rem; }
   .decision.trumpBox h3{ font-size:.86rem; margin-bottom:.45rem; }
-  .decision.trumpBox .row{ flex-direction:column; gap:.4rem; margin-top:.4rem; }
-  .decision.trumpBox button.suitBtn{ min-width:0; width:100%; font-size:.86rem; padding:.5rem .8rem; }
+  .decision.trumpBox .row{ display:grid; grid-template-columns:1fr 1fr; gap:.3rem; margin-top:.3rem; }
+  .decision.trumpBox button.suitBtn{ min-width:0; width:100%; font-size:.78rem; padding:.34rem .4rem; white-space:nowrap; }
 
   .card.playable{ cursor:pointer; box-shadow:0 0 0 3px #6fe08a, 0 2px 5px var(--shadow); }
   .card.playable:hover{ transform:translateY(-10px); transition:transform .12s; }
@@ -364,7 +364,11 @@
   /* on phones, dock to the bottom edge (full width) instead of a corner; the hand sits above the reserved bottom strip, so it stays clear */
   @media (max-width:600px){
     .decision{ left:8px; right:8px; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); top:auto; width:auto; max-width:none; }
-    .decision.trumpBox{ width:auto; max-width:none; }
+    .decision.trumpBox{ left:50%; right:auto; width:min(300px,calc(100vw - 32px)); transform:translate(-50%,12px);
+      /* float over the empty felt just above the player's hand instead of covering it */
+      bottom:calc(32vh + env(safe-area-inset-bottom, 0px)); padding:.4rem .6rem; }
+    .decision.trumpBox.show{ transform:translate(-50%,0); }
+    .decision.trumpBox h3{ font-size:.74rem; margin-bottom:.15rem; }
   }
   .bidline{ display:none !important; }        /* the live bid now lives in the panel */
 </style>
