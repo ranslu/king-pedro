@@ -32,7 +32,7 @@
       radial-gradient(120% 120% at 50% 30%, #241710 0%, #120c07 70%, #0a0703 100%);
     padding:clamp(8px,2vw,24px);
     /* keep the table (and your hand) clear of the message line + buttons at the bottom */
-    padding-bottom:clamp(96px,14vh,130px);
+    padding-bottom:calc(clamp(96px,14vh,130px) + env(safe-area-inset-bottom, 0px));
   }
 
   /* ---- the table ---- */
@@ -182,13 +182,20 @@
 
   /* ---- phone / portrait: taller table + noticeably bigger cards ---- */
   @media (max-aspect-ratio: 1/1){
-    .table-wrap{ width:min(97vw, 50vh); aspect-ratio:0.78/1; }
+    .table-wrap{ width:min(97vw, 50vh); aspect-ratio:0.72/1; }
     .felt{ border-radius:20% / 12%; }
     .felt::after{ border-radius:20% / 12%; }
     .card{ --w:clamp(52px,15vw,84px); }
     body.hasHuman .seat:not(.mine) .card{ --w:clamp(26px,6vw,38px) !important; }
     .seat.west{ left:0.5%; } .seat.east{ right:0.5%; }
     .medallion{ width:clamp(56px,11vw,80px); height:clamp(56px,11vw,80px); }
+    /* push table below HUD; compact controls to 1 row */
+    .room{ padding-top:clamp(96px,13vh,112px); padding-bottom:calc(clamp(76px,10.5vh,92px) + env(safe-area-inset-bottom, 0px)); }
+    .controls{ flex-wrap:nowrap; gap:.3rem; padding:.28rem .4rem; }
+    .controls button{ font-size:.62rem; padding:.26rem .5rem; }
+    .controls label{ font-size:.58rem; gap:.2rem; }
+    input[type=range]{ width:60px; }
+    .ticker{ bottom:calc(clamp(45px,6.8vh,57px) + env(safe-area-inset-bottom, 0px)); }
   }
 
   /* ---- speech bubbles ---- */
@@ -232,7 +239,7 @@
 
   /* ---- bottom controls ---- */
   .controls{
-    position:absolute; bottom:clamp(6px,1.6vh,16px); left:50%; transform:translateX(-50%);
+    position:absolute; bottom:calc(clamp(6px,1.6vh,16px) + env(safe-area-inset-bottom, 0px)); left:50%; transform:translateX(-50%);
     display:flex; align-items:center; gap:.5rem; z-index:40; flex-wrap:wrap; justify-content:center;
     background:rgba(8,18,12,.66); padding:.45rem .6rem; border-radius:12px;
     border:1px solid rgba(201,162,75,.35); backdrop-filter:blur(3px);
@@ -254,7 +261,7 @@
 
   /* ---- log line / banner ---- */
   .ticker{
-    position:absolute; left:50%; bottom:clamp(58px,9vh,84px); transform:translateX(-50%);
+    position:absolute; left:50%; bottom:calc(clamp(58px,9vh,84px) + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%);
     font-family:Georgia,serif; font-size:clamp(.66rem,1.5vw,.86rem); color:#f3ead0;
     background:rgba(6,28,16,.66); padding:.3rem .9rem; border-radius:999px;
     border:1px solid rgba(201,162,75,.3); max-width:80vw; text-align:center; z-index:35;
@@ -356,7 +363,7 @@
   .hud .contractBadge .cbSep{ opacity:.4; }
   /* on phones, dock to the bottom edge (full width) instead of a corner; the hand sits above the reserved bottom strip, so it stays clear */
   @media (max-width:600px){
-    .decision{ left:8px; right:8px; bottom:8px; top:auto; width:auto; max-width:none; }
+    .decision{ left:8px; right:8px; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); top:auto; width:auto; max-width:none; }
     .decision.trumpBox{ width:auto; max-width:none; }
   }
   .bidline{ display:none !important; }        /* the live bid now lives in the panel */
