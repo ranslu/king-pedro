@@ -1,0 +1,132 @@
+{
+  "_comment": "King Pedro character roster. Add new characters (including family tribute characters) here — no code changes needed. Ukrainian phrases only, never Polish.",
+  "characters": [
+    {
+      "id": "iron_mike",
+      "name": "Iron Mike",
+      "seatDefault": "south",
+      "portrait": "assets/portraits/iron_mike.png",
+      "attitudeTag": "Aggressive",
+      "bioShort": "Bids high, unafraid to gamble for the sweep.",
+      "skillStars": 4,
+      "behaviorProfile": { "bidAggression": 0.85, "riskTolerance": 0.75, "renegeAvoidance": 0.9, "bluffiness": 0.4 },
+      "voice": { "locale": "en-US", "pitch": 0.8, "speechRate": 1.05 },
+      "barks": {
+        "game_start_intro": ["Alright, deal 'em. I'm not here to lose.", "Let's see what you've got.", "Sit down, this won't take long.", "Cards on the table, no mercy today."],
+        "bid_high": ["I'll take that hand and run with it.", "Bidding big. Somebody's got to.", "No guts, no glory — I'm in."],
+        "bid_low_or_pass": ["Fine, pass it along. My turn's coming.", "Not this hand. Watch and learn."],
+        "win_trick": ["That's how it's done.", "Mine.", "Too easy.", "Keep 'em coming."],
+        "lose_trick": ["Lucky break.", "Enjoy it while it lasts.", "Noted."],
+        "renege_or_penalty": ["...that wasn't supposed to happen.", "Fine, fine, my mistake."],
+        "big_score_gain": ["Now we're talking.", "That's the sweep right there."],
+        "big_score_loss": ["Doesn't change a thing.", "We'll take it back."],
+        "taunt_human": ["You call that a bid?", "Careful, you're playing with grown-ups now."],
+        "partner_praise": ["Good read, partner.", "Now that's teamwork."],
+        "partner_scold": ["Come on, I needed that trump.", "We'll talk about that hand later."],
+        "idle_too_long": ["Anytime today.", "It's not getting easier the longer you wait."],
+        "game_win": ["Never in doubt.", "That's a wrap."],
+        "game_loss": ["Rematch. Now.", "That doesn't happen twice."]
+      }
+    },
+    {
+      "id": "prof_elena",
+      "name": "Prof. Elena",
+      "seatDefault": "west",
+      "portrait": "assets/portraits/prof_elena.png",
+      "attitudeTag": "Calculating",
+      "bioShort": "Plays the odds. Rarely bids without doing the math first.",
+      "skillStars": 5,
+      "behaviorProfile": { "bidAggression": 0.45, "riskTolerance": 0.25, "renegeAvoidance": 1.0, "bluffiness": 0.15 },
+      "voice": { "locale": "en-US", "pitch": 1.15, "speechRate": 1.0 },
+      "barks": {
+        "game_start_intro": ["Let's begin. I've already considered the odds.", "A fair deal, statistically speaking.", "I do enjoy a well-played hand."],
+        "bid_high": ["The math supports this bid.", "Calculated, not reckless."],
+        "bid_low_or_pass": ["The odds favored caution here.", "Passing. Patience has value."],
+        "win_trick": ["As expected.", "The probabilities were favorable.", "Precisely."],
+        "lose_trick": ["An acceptable variance.", "Noted for the next hand."],
+        "renege_or_penalty": ["An error. I'll recalibrate.", "That was... imprecise of me."],
+        "big_score_gain": ["The strategy is working.", "Exactly as modeled."],
+        "big_score_loss": ["A statistical outlier. It will correct.", "This changes the calculation, not the plan."],
+        "taunt_human": ["That finesse was... optimistic.", "Interesting choice. Not the one I'd model."],
+        "partner_praise": ["Well reasoned, partner.", "That was the correct play."],
+        "partner_scold": ["The odds did not favor that lead.", "We'll review that decision later."],
+        "idle_too_long": ["Take your time — but not too much of it.", "Every second changes the probabilities slightly."],
+        "game_win": ["The model predicted this outcome.", "A satisfying result."],
+        "game_loss": ["I'll need to revise my assumptions.", "An unlikely but valid outcome."]
+      }
+    },
+    {
+      "id": "bohdan",
+      "name": "Bohdan",
+      "seatDefault": "north",
+      "portrait": "assets/portraits/bohdan.png",
+      "attitudeTag": "Steady",
+      "bioShort": "Prairie-raised, slow to rattle, quick with a proverb.",
+      "skillStars": 3,
+      "behaviorProfile": { "bidAggression": 0.5, "riskTolerance": 0.4, "renegeAvoidance": 0.85, "bluffiness": 0.2 },
+      "voice": { "locale": "en-US", "pitch": 0.95, "speechRate": 0.9 },
+      "barks": {
+        "game_start_intro": ["Сідай, sit, sit. Good hand comes to those who wait.", "Ah, cards. Just like back home on the farm table.", "Deal them out — no rush, no rush."],
+        "bid_high": ["This one's worth the risk, I think.", "Alright, I'll bid it — молодець, don't let me down."],
+        "bid_low_or_pass": ["Not this hand. Next one, maybe.", "Pass. Patience feeds the harvest."],
+        "win_trick": ["Ha! Slava Bohu.", "There we go, just like that.", "Not bad, not bad at all."],
+        "lose_trick": ["Eh, can't win them all.", "Next hand, next hand."],
+        "renege_or_penalty": ["Oops — moment please, my mistake.", "Old hands, sometimes they slip."],
+        "big_score_gain": ["Now that's a good harvest.", "Slava Bohu, look at that."],
+        "big_score_loss": ["Rough season. We'll come back stronger.", "Every storm passes."],
+        "taunt_human": ["Bold move, my friend. Bold.", "You've got some spirit in you, I see."],
+        "partner_praise": ["Молодець, well played partner.", "Good instincts there."],
+        "partner_scold": ["Ah, partner — we'll talk about that trump later.", "That one stung a little."],
+        "idle_too_long": ["No rush, but the field won't wait forever.", "Take your time, friend."],
+        "game_win": ["Slava Bohu! Good game, good game.", "That's a hand to remember."],
+        "game_loss": ["Well played, well played. Next time.", "Onward — there's always next season."]
+      }
+    },
+    {
+      "id": "lucky_lou",
+      "name": "Lucky Lou",
+      "seatDefault": "east",
+      "portrait": "assets/portraits/lucky_lou.png",
+      "attitudeTag": "Wild",
+      "bioShort": "Plays on instinct and nerve. Unpredictable by design.",
+      "skillStars": 3,
+      "behaviorProfile": { "bidAggression": 0.7, "riskTolerance": 0.95, "renegeAvoidance": 0.6, "bluffiness": 0.8 },
+      "voice": { "locale": "en-US", "pitch": 1.3, "speechRate": 1.2 },
+      "barks": {
+        "game_start_intro": ["Ooh, feeling lucky today!", "Deal me in, deal me in!", "Let's shake things up!"],
+        "bid_high": ["Why not?! Big bid, big thrill!", "Going for it — no guts no glory, baby!"],
+        "bid_low_or_pass": ["Eh, this one's not it. Next!", "Passing... for now."],
+        "win_trick": ["YES! Called it!", "Ha HA! Love it!", "That's the stuff!"],
+        "lose_trick": ["Oof — okay, didn't see that coming.", "Ehh, worth the gamble!"],
+        "renege_or_penalty": ["Whoops! My bad, my bad.", "Okay that was NOT the plan."],
+        "big_score_gain": ["JACKPOT!", "Now THAT'S what I'm talking about!"],
+        "big_score_loss": ["Ouch. Okay. Comeback time.", "That's fine, that's fine, I'm fine."],
+        "taunt_human": ["Ooh, spicy play!", "You're trouble, I like it!"],
+        "partner_praise": ["PARTNER OF THE YEAR right there!", "That was WILD, love it!"],
+        "partner_scold": ["Aw come on, what was that?!", "We'll figure it out, we'll figure it out!"],
+        "idle_too_long": ["C'mon c'mon c'mon, the suspense is killing me!", "Any day now!"],
+        "game_win": ["WOOO! That's how you do it!", "Undefeated, baby!"],
+        "game_loss": ["Rematch! Right now! I mean it!", "That's just fuel for next time."]
+      }
+    }
+  ],
+  "tributeCharacterTemplate": {
+    "_comment": "Copy this block to add a tribute character honoring a family member. Fill in details based on their real personality/mannerisms. Keep barks respectful and warm — this is a memorial feature, not a joke character.",
+    "id": "REPLACE_WITH_ID",
+    "name": "REPLACE_WITH_NAME",
+    "seatDefault": "south",
+    "portrait": "assets/portraits/REPLACE_WITH_ID.png",
+    "attitudeTag": "REPLACE — e.g. Warm, Wise, Mischievous",
+    "bioShort": "A short line describing them, written with care.",
+    "skillStars": 3,
+    "isTribute": true,
+    "behaviorProfile": { "bidAggression": 0.5, "riskTolerance": 0.5, "renegeAvoidance": 0.8, "bluffiness": 0.2 },
+    "voice": { "locale": "en-US", "pitch": 1.0, "speechRate": 1.0 },
+    "barks": {
+      "game_start_intro": ["..."], "bid_high": ["..."], "bid_low_or_pass": ["..."], "win_trick": ["..."],
+      "lose_trick": ["..."], "renege_or_penalty": ["..."], "big_score_gain": ["..."], "big_score_loss": ["..."],
+      "taunt_human": ["..."], "partner_praise": ["..."], "partner_scold": ["..."], "idle_too_long": ["..."],
+      "game_win": ["..."], "game_loss": ["..."]
+    }
+  }
+}
