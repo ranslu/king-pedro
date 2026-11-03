@@ -10,6 +10,12 @@ const ID_RE = /^[A-Za-z0-9_-]{8,64}$/;
 const MAX_REPORT = 64 * 1024;      // bytes
 const MAX_GAME = 1024 * 1024;      // bytes
 
+async function sha256(s) {
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+const strip = ({ _tokenHash, ...rest }) => rest;   // never hand the token hash back out
+
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
@@ -29,15 +35,23 @@ export class Archive {
       let item;
       try { item = JSON.parse(text); } catch { return json({ error: "not JSON" }, 400); }
       if (!item || typeof item !== "object" || !ID_RE.test(String(item.id || ""))) return json({ error: "missing or bad id" }, 400);
+      // Each record carries a random write token chosen by the device that created it.
+      // Only its hash is stored, and an existing record can only be overwritten with the same token.
+      const token = typeof item.writeToken === "string" ? item.writeToken : "";
+      if (token.length < 16 || token.length > 128) return json({ error: "missing write token" }, 400);
+      delete item.writeToken;
+      const tokenHash = await sha256(token);
       const key = `${kind}:${item.id}`;
       const prev = await this.storage.get(key);
-      await this.storage.put(key, { ...item, receivedAt: prev?.receivedAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
+      if (prev && prev._tokenHash !== tokenHash) return json({ error: "id already taken" }, 409);
+      await this.storage.put(key, { ...item, _tokenHash: tokenHash,
+        receivedAt: prev?.receivedAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
       return json({ ok: true, id: item.id });
     }
 
     if (request.method === "GET" && path === "/reports") {
       const all = await this.storage.list({ prefix: "report:" });
-      return json([...all.values()].sort((a, b) => String(a.at).localeCompare(String(b.at))));
+      return json([...all.values()].map(strip).sort((a, b) => String(a.at).localeCompare(String(b.at))));
     }
 
     if (request.method === "GET" && path === "/games") {
@@ -52,7 +66,7 @@ export class Archive {
     const m = path.match(/^\/game\/([A-Za-z0-9_-]{8,64})$/);
     if (request.method === "GET" && m) {
       const g = await this.storage.get(`game:${m[1]}`);
-      return g ? json(g) : json({ error: "not found" }, 404);
+      return g ? json(strip(g)) : json({ error: "not found" }, 404);
     }
 
     return json({ error: "not found" }, 404);
