@@ -1358,6 +1358,7 @@ function tick(){
 //  they're saved. Anything not yet confirmed by the server stays on this
 //  device and is re-sent the next time the game opens.
 // ============================================================
+const esc = v => String(v==null?"":v).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2)).replace(/[^A-Za-z0-9_-]/g,"");
 const Sync = {
   PENDING:"kp_games_pending",
@@ -1376,6 +1377,7 @@ const Sync = {
     }
   },
   sendGame(g){
+    if(!g.writeToken) g.writeToken=newId()+newId();
     const stamp=g.updatedAt;
     this.post("game", g).then(ok=>{
       if(!ok) return;
@@ -1384,6 +1386,7 @@ const Sync = {
     }).catch(()=>{});
   },
   sendReport(r){
+    if(!r.writeToken){ r.writeToken=newId()+newId(); const l=BadPlay.load(), x=l.find(q=>q.id===r.id); if(x){ x.writeToken=r.writeToken; BadPlay.store(l); } }
     return this.post("report", r).then(ok=>{
       if(!ok) return false;
       const list=BadPlay.load(), x=list.find(q=>q.id===r.id); if(x){ x.synced=true; BadPlay.store(list); }
@@ -1400,7 +1403,7 @@ const GameRec = {
   start(){ this.cur=null; },
   ensure(){
     if(this.cur) return this.cur;
-    this.cur={ id:newId(), v:1, startedAt:new Date().toISOString(), updatedAt:null, finished:false,
+    this.cur={ id:newId(), writeToken:newId()+newId(), v:1, startedAt:new Date().toISOString(), updatedAt:null, finished:false,
       mode: State.onlineMode ? "online" : "device", room: State.roomCode || null,
       players: PLAYERS.map(p=>p.name), humanSeats: State.human.slice(), hands:[], score:[0,0] };
     return this.cur;
@@ -1470,19 +1473,19 @@ const BadPlay = {
     if(!plays.length) h+=`<p class="bpNote">No cards played yet this hand. You can still describe a bad bid, trump call or pass below.</p>`;
     else {
       h+=`<h3>1. Which play was bad?</h3><div class="bpList">`+
-        plays.map(({p,i})=>`<button class="bpRow${i===this.sel?" sel":""}" data-i="${i}">Trick ${p.trick} · <b>${PLAYERS[p.seat].name}</b> played <b>${cardStr(p.card)}</b>${p.trickBefore.length?` (after ${p.trickBefore.map(t=>cardStr(t.card)).join(" ")})`:" (led)"}</button>`).join("")+
+        plays.map(({p,i})=>`<button class="bpRow${i===this.sel?" sel":""}" data-i="${i}">Trick ${p.trick} · <b>${esc(PLAYERS[p.seat].name)}</b> played <b>${cardStr(p.card)}</b>${p.trickBefore.length?` (after ${p.trickBefore.map(t=>cardStr(t.card)).join(" ")})`:" (led)"}</button>`).join("")+
         `</div>`;
     }
     if(this.sel>=0){
       const p=this.log.plays[this.sel];
-      h+=`<h3>2. Tap the card ${PLAYERS[p.seat].name} should have played</h3><div class="bpCards" id="bpCards"></div>
+      h+=`<h3>2. Tap the card ${esc(PLAYERS[p.seat].name)} should have played</h3><div class="bpCards" id="bpCards"></div>
           <p class="bpNote">Red = what was played. Green = your choice.</p>`;
     }
     h+=`<h3>${this.sel>=0?"3":plays.length?"2":"1"}. What was wrong, and what should have happened?</h3>
         <textarea id="bpWhy" placeholder="e.g. Partner was already winning — should have fed the Pedro instead of trumping."></textarea>
         <div class="bpBtns"><button id="bpSave">Save report</button><button class="ghost" id="bpCancel">Close</button></div>
         <h3>Saved reports (${saved.length})</h3>`+
-        (saved.length? saved.map((r,k)=>`<div class="bpSaved"><span>${r.synced?"✓":"⏳"} ${new Date(r.at).toLocaleString()} — ${r.summary}</span><button class="ghost" data-del="${k}">Delete</button></div>`).join("")
+        (saved.length? saved.map((r,k)=>`<div class="bpSaved"><span>${r.synced?"✓":"⏳"} ${new Date(r.at).toLocaleString()} — ${esc(r.summary)}</span><button class="ghost" data-del="${k}">Delete</button></div>`).join("")
           +`<div class="bpBtns"><button id="bpCopy">Copy all</button><button id="bpDownload">Download</button></div>`
           : `<p class="bpNote">None yet.</p>`)+`<p class="bpNote">✓ = safely on the server. ⏳ = on this device, will be sent automatically.</p>`;
     body.innerHTML=h;
@@ -1508,7 +1511,7 @@ const BadPlay = {
     const why=el("bpWhy").value.trim();
     const p=this.sel>=0?this.log.plays[this.sel]:null;
     if(!p && !why){ ticker("Pick the bad play or type what went wrong first."); return; }
-    const r={ v:1, id:newId(), gameId: GameRec.cur ? GameRec.cur.id : null, handNo: GameRec.cur ? GameRec.cur.hands.length : null,
+    const r={ v:1, id:newId(), writeToken:newId()+newId(), gameId: GameRec.cur ? GameRec.cur.id : null, handNo: GameRec.cur ? GameRec.cur.hands.length : null,
       synced:false, at:new Date().toISOString(), why,
       summary: p ? `Trick ${p.trick}: ${PLAYERS[p.seat].name} played ${cardStr(p.card)}${this.pick?`, should be ${cardStr(this.pick)}`:""}` : why.slice(0,60),
       player: p ? PLAYERS[p.seat].name : null, seat: p ? p.seat : null,
