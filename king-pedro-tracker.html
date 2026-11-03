@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>King Pedro — Trick Tracker</title>
+<style>
+  :root{
+    --linen:#f3ead6;
+    --linen-panel:#ece0c4;
+    --wood-dark:#2b1a10;
+    --wood:#4a2f1c;
+    --wood-mid:#6b4527;
+    --wood-light:#9c714a;
+    --ink:#2a1a10;
+    --red:#b8202f;
+    --red-deep:#8a1622;
+    --blue:#0057b7;
+    --blue-deep:#003d82;
+    --gold:#c69a3d;
+    --card-bg:#fffdf7;
+    --card-back:#7a2230;
+    --card-back-pattern:#a83348;
+    --shadow: 0 2px 6px rgba(43,26,16,.35);
+    --radius: 3px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --linen:#1c130c;
+      --linen-panel:#241a10;
+      --ink:#efe3cc;
+      --card-bg:#2d2013;
+      --wood-light:#c9a06c;
+    }
+  }
+  :root[data-theme="dark"]{
+    --linen:#1c130c;
+    --linen-panel:#241a10;
+    --ink:#efe3cc;
+    --card-bg:#2d2013;
+    --wood-light:#c9a06c;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--linen);
+    color:var(--ink);
+    font-family: "Georgia", "Iowan Old Style", serif;
+    min-height:100vh;
+    padding:14px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+
+  h1{
+    font-size:1.3rem;
+    margin:0 0 4px;
+    color:var(--wood-dark);
+    letter-spacing:.02em;
+    border-bottom:3px solid var(--gold);
+    padding-bottom:8px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  h1 .stitch{
+    font-size:.62rem;
+    font-weight:normal;
+    color:var(--red);
+    letter-spacing:.08em;
+  }
+  h2{
+    font-size:.95rem;
+    margin:0 0 10px;
+    color:var(--wood-mid);
+    font-weight:normal;
+  }
+  p.lede{font-size:.85rem;color:var(--wood-mid);margin:0 0 14px;}
+
+  .panel{
+    background:var(--linen-panel);
+    border:1px solid var(--wood-light);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:14px;
+    box-shadow: var(--shadow);
+  }
+
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+    border-radius:var(--radius);
+  }
+  button:focus-visible{outline:3px solid var(--blue);outline-offset:1px;}
+
+  .choice-btn{
+    background:var(--card-bg);
+    border:2px solid var(--wood-mid);
+    color:var(--ink);
+    padding:10px 14px;
+    font-size:1rem;
+    min-width:64px;
+  }
+  .choice-btn.selected{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:var(--wood-dark);
+    font-weight:bold;
+  }
+  .suit-btn{font-size:1.3rem;padding:8px 16px;}
+  .suit-red{color:var(--red);}
+  .suit-black{color:var(--ink);}
+  .choice-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+  .primary-btn{
+    background:var(--red);
+    color:#fff8ec;
+    padding:11px 20px;
+    font-size:1rem;
+    font-weight:bold;
+  }
+  .primary-btn:disabled{background:var(--wood-light);cursor:not-allowed;}
+  .secondary-btn{
+    background:transparent;
+    border:1px solid var(--wood-mid);
+    color:var(--wood-mid);
+    padding:8px 14px;
+    font-size:.85rem;
+  }
+  .secondary-btn.danger{color:var(--red-deep);border-color:var(--red-deep);}
+  .warn-btn{
+    background:var(--gold);
+    color:var(--wood-dark);
+    padding:11px 20px;
+    font-size:1rem;
+    font-weight:bold;
+    border:2px solid var(--red-deep);
+  }
+
+  .field-label{font-size:.8rem;color:var(--wood-mid);margin-bottom:6px;}
+  .num-input{
+    width:52px;padding:6px;font-family:inherit;font-size:.95rem;
+    border:1px solid var(--wood-mid);border-radius:var(--radius);
+    background:var(--card-bg);color:var(--ink);text-align:center;
+  }
+
+  /* --- deck / discard visuals --- */
+  .deck-area{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:28px;
+    margin:10px 0 16px;
+    flex-wrap:wrap;
+  }
+  .pile-block{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .pile-label{font-size:.72rem;color:var(--wood-mid);}
+  .pile-count{font-size:.78rem;color:var(--wood-dark);font-weight:bold;}
+
+  .deck-stack{position:relative;width:54px;height:76px;}
+  .deck-stack .cardback{
+    position:absolute;top:0;left:0;width:52px;height:74px;
+    background:var(--card-back);
+    border:2px solid var(--wood-dark);
+    border-radius:5px;
+    background-image:
+      repeating-linear-gradient(45deg, var(--card-back-pattern) 0, var(--card-back-pattern) 2px, transparent 2px, transparent 8px);
+    box-shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  .deck-stack .cardback:nth-child(1){top:4px;left:4px;}
+  .deck-stack .cardback:nth-child(2){top:2px;left:2px;}
+  .deck-stack .cardback:nth-child(3){top:0;left:0;}
+  .deck-stack.dealing .cardback:nth-child(3){animation:pulse .35s ease;}
+  @keyframes pulse{ 0%{transform:scale(1);} 40%{transform:scale(1.12) translateY(-3px);} 100%{transform:scale(1);} }
+
+  .discard-pile{position:relative;width:60px;height:76px;}
+  .discard-pile .cardback{
+    position:absolute;width:48px;height:68px;
+    background:var(--card-back);
+    border:2px solid var(--wood-dark);
+    border-radius:5px;
+    background-image:
+      repeating-linear-gradient(45deg, var(--card-back-pattern) 0, var(--card-back-pattern) 2px, transparent 2px, transparent 8px);
+    box-shadow:0 1px 3px rgba(0,0,0,.45);
+  }
+  .discard-pile .cardback:nth-child(1){top:6px; left:4px; transform:rotate(-8deg);}
+  .discard-pile .cardback:nth-child(2){top:2px; left:9px; transform:rotate(6deg);}
+  .discard-pile .cardback:nth-child(3){top:8px; left:11px; transform:rotate(-2deg);}
+  .discard-pile .cardback:nth-child(4){top:0px; left:5px; transform:rotate(11deg);}
+  .discard-pile .cardback:nth-child(5){top:5px; left:1px; transform:rotate(-13deg);}
+  .discard-pile.empty{opacity:.25;}
+
+  /* --- seat ring for dealing --- */
+  .seat-ring{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .seat-card{
+    background:var(--card-bg);
+    border:2px solid var(--wood-mid);
+    border-radius:var(--radius);
+    padding:10px;
+    text-align:center;
+    transition:box-shadow .2s, border-color .2s;
+  }
+  .seat-card.dealt-flash{
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px var(--blue) inset;
+  }
+  .seat-card .seat-name{font-size:.8rem;color:var(--wood-mid);}
+  .seat-card .seat-count{font-size:1.3rem;font-weight:bold;color:var(--wood-dark);}
+  .seat-card .seat-tag{font-size:.62rem;color:var(--red);display:block;height:12px;}
+
+  .status-line{font-size:.85rem;color:var(--wood-mid);text-align:center;margin-bottom:10px;min-height:18px;}
+
+  /* --- status bar / play --- */
+  .status-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    font-size:.85rem;
+    color:var(--wood-mid);
+  }
+  .turn-indicator{
+    font-size:1rem;
+    color:var(--wood-dark);
+    font-weight:bold;
+  }
+
+  .trick-slots{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .slot{
+    background:var(--card-bg);
+    border:1px dashed var(--wood-light);
+    border-radius:var(--radius);
+    min-height:64px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:6px 2px;
+    text-align:center;
+  }
+  .slot .seat-label{font-size:.62rem;color:var(--wood-mid);margin-bottom:4px;}
+  .slot .card-face{font-size:1.15rem;font-weight:bold;}
+  .slot .buried-note{font-size:.58rem;color:var(--wood-light);margin-top:2px;}
+  .slot.filled{border-style:solid;border-color:var(--wood-mid);}
+  .slot.active{border-color:var(--blue);border-style:solid;box-shadow:0 0 0 2px var(--blue) inset;}
+  .slot.excess{border-color:var(--red-deep);}
+
+  .excess-box{
+    border:2px dashed var(--red-deep);
+    border-radius:var(--radius);
+    padding:10px;
+    margin-bottom:12px;
+    background:var(--card-bg);
+  }
+  .excess-box .field-label{color:var(--red-deep);font-weight:bold;}
+
+  /* --- scoreboard --- */
+  .score-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  .score-table th, .score-table td{
+    padding:5px 6px;
+    text-align:center;
+    border-bottom:1px solid var(--wood-light);
+  }
+  .score-table th:first-child, .score-table td:first-child{text-align:left;}
+  .score-table th{color:var(--wood-mid);font-weight:normal;font-size:.75rem;}
+  .pt-got{color:var(--red);font-weight:bold;}
+  .pt-open{color:var(--wood-light);}
+
+  /* --- history --- */
+  #history{max-height:280px;overflow-y:auto;}
+  .trick-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 6px;
+    border-bottom:1px solid var(--wood-light);
+    font-size:.85rem;
+    gap:8px;
+  }
+  .trick-row:last-child{border-bottom:none;}
+  .trick-cards{color:var(--wood-mid);flex:1;}
+  .buried-tag{color:var(--wood-light);font-style:italic;}
+  .trick-winner{
+    font-size:.72rem;
+    padding:2px 8px;
+    border-radius:10px;
+    white-space:nowrap;
+  }
+  .win-you{background:var(--blue);color:#fff;}
+  .win-opp{background:var(--red);color:#fff;}
+  .pt-flag{
+    display:inline-block;
+    font-size:.62rem;
+    background:var(--gold);
+    color:var(--wood-dark);
+    border-radius:3px;
+    padding:0 4px;
+    margin-left:3px;
+  }
+  .empty-note{color:var(--wood-light);font-size:.85rem;font-style:italic;}
+
+  .actions{display:flex;justify-content:space-between;margin-top:12px;gap:8px;flex-wrap:wrap;}
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>King Pedro <span class="stitch">Trick Tracker</span></h1>
+
+  <!-- STEP 1: DEALER -->
+  <div id="dealerStep" class="panel">
+    <h2>Who's dealing this hand?</h2>
+    <div class="row" id="dealerRow">
+      <button class="choice-btn" data-seat="0">You</button>
+      <button class="choice-btn" data-seat="1">Opp. A</button>
+      <button class="choice-btn" data-seat="2">Partner</button>
+      <button class="choice-btn" data-seat="3">Opp. B</button>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <label class="field-label" style="margin:0;">Rounds of 3 before bidding
+        <input type="number" class="num-input" id="roundsBefore" value="2" min="1" max="5">
+      </label>
+      <label class="field-label" style="margin:0;">Rounds of 3 after bidding
+        <input type="number" class="num-input" id="roundsAfter" value="1" min="0" max="5">
+      </label>
+    </div>
+    <button class="primary-btn" id="dealerNextBtn" disabled style="margin-top:12px;">Begin Deal</button>
+  </div>
+
+  <!-- STEP 2: DEAL ROUND 1 -->
+  <div id="dealStep1" class="panel hidden">
+    <h2>Deal — clockwise, three at a time, starting left of the dealer</h2>
+    <div class="deck-area">
+      <div class="pile-block">
+        <div class="deck-stack" id="deckStack1"><div class="cardback"></div><div class="cardback"></div><div class="cardback"></div></div>
+        <div class="pile-label">Deck</div>
+        <div class="pile-count" id="deckCount1">52 left</div>
+      </div>
+    </div>
+    <div class="seat-ring" id="seatRing1"></div>
+    <div class="status-line" id="dealStatus1">Tap Deal to give each player their first cards.</div>
+    <button class="primary-btn" id="dealBtn1">Deal</button>
+    <button class="primary-btn hidden" id="toBiddingBtn">Hands dealt — go to bidding</button>
+  </div>
+
+  <!-- STEP 3: BIDDING (trump + who leads) -->
+  <div id="setup" class="panel hidden">
+    <h2>Bidding done — set trump and who leads the first trick</h2>
+    <div class="field-label">Trump suit</div>
+    <div class="row" id="trumpRow">
+      <button class="choice-btn suit-black" data-suit="S">♠ Spades</button>
+      <button class="choice-btn suit-red" data-suit="H">♥ Hearts</button>
+      <button class="choice-btn suit-red" data-suit="D">♦ Diamonds</button>
+      <button class="choice-btn suit-black" data-suit="C">♣ Clubs</button>
+    </div>
+    <div class="field-label">Who leads the first trick</div>
+    <div class="row" id="leaderRow">
+      <button class="choice-btn" data-seat="0">You</button>
+      <button class="choice-btn" data-seat="1">Opp. A</button>
+      <button class="choice-btn" data-seat="2">Partner</button>
+      <button class="choice-btn" data-seat="3">Opp. B</button>
+    </div>
+    <button class="primary-btn" id="startBtn" disabled>Continue to Second Deal</button>
+  </div>
+
+  <!-- STEP 4: DEAL ROUND 2 -->
+  <div id="dealStep2" class="panel hidden">
+    <h2>Second deal — clockwise, three at a time, starting with the dealer</h2>
+    <div class="deck-area">
+      <div class="pile-block">
+        <div class="deck-stack" id="deckStack2"><div class="cardback"></div><div class="cardback"></div><div class="cardback"></div></div>
+        <div class="pile-label">Deck</div>
+        <div class="pile-count" id="deckCount2">— left</div>
+      </div>
+      <div class="pile-block">
+        <div class="discard-pile empty" id="discardPile"></div>
+        <div class="pile-label">Discard / kitty</div>
+        <div class="pile-count" id="discardCount">0</div>
+      </div>
+    </div>
+    <div class="seat-ring" id="seatRing2"></div>
+    <div class="status-line" id="dealStatus2">Tap Deal to top hands up to full size, starting with the dealer.</div>
+    <button class="primary-btn" id="dealBtn2">Deal</button>
+    <button class="primary-btn hidden" id="toPlayBtn">Continue to Trump Pass</button>
+  </div>
+
+  <!-- STEP 5: TRUMP PASS -->
+  <div id="passStep" class="panel hidden">
+    <h2>Trump pass — before your partner leads a card</h2>
+    <p class="lede">A player holding one or two trump may pass all of them to their partner. The partner takes everything offered — there's no partial acceptance.</p>
+
+    <div class="field-label">Who is offering trump? (1 or 2 trump in hand)</div>
+    <div class="row" id="passOfferRow">
+      <button class="choice-btn" data-seat="0">You</button>
+      <button class="choice-btn" data-seat="1">Opp. A</button>
+      <button class="choice-btn" data-seat="2">Partner</button>
+      <button class="choice-btn" data-seat="3">Opp. B</button>
+    </div>
+    <div class="status-line" id="passReceiverLine"></div>
+
+    <div class="field-label">How many trump are being offered?</div>
+    <div class="row" id="passCountRow">
+      <button class="choice-btn" data-count="0">0 — none</button>
+      <button class="choice-btn" data-count="1">1</button>
+      <button class="choice-btn" data-count="2">2</button>
+    </div>
+
+    <div id="passCardPicker" class="hidden">
+      <div class="field-label">Which trump card(s)?</div>
+      <div class="row" id="passRankRow"></div>
+    </div>
+
+    <div id="excessBlock" class="excess-box hidden">
+      <div class="field-label">Does this pass push the partner over their trump limit?</div>
+      <div class="row" id="excessCountRow"></div>
+      <div id="excessCardPicker" class="hidden" style="margin-top:10px;">
+        <div class="field-label" style="color:var(--red-deep);">Which of the passed cards are the excess? (These get laid together into the first trick — only the highest of them can score a point.)</div>
+        <div class="row" id="excessRankRow"></div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:14px;">
+      <button class="secondary-btn" id="passSkipBtn">No pass this hand</button>
+      <button class="primary-btn" id="passConfirmBtn" disabled>Confirm Pass</button>
+    </div>
+    <button class="primary-btn hidden" id="toPlayFromPassBtn" style="margin-top:10px;">Continue to First Trick</button>
+  </div>
+
+  <!-- PLAY -->
+  <div id="play" class="hidden">
+    <div class="panel">
+      <div class="deck-area" style="margin:0 0 10px;gap:20px;">
+        <div class="pile-block">
+          <div class="discard-pile" id="discardPileMini"></div>
+          <div class="pile-label">Discard / kitty</div>
+          <div class="pile-count" id="discardCountMini">0</div>
+        </div>
+      </div>
+      <div class="status-bar">
+        <span id="trumpDisplay"></span>
+        <span id="trickNumDisplay"></span>
+      </div>
+      <div class="status-line" id="passSummaryLine" style="margin-bottom:0;"></div>
+      <div class="turn-indicator" id="turnIndicator"></div>
+
+      <div class="trick-slots" id="trickSlots"></div>
+
+      <div id="excessLayArea" class="excess-box hidden">
+        <div class="field-label">Forced: lay the excess trump into this trick now</div>
+        <div id="excessLayList" style="font-size:.95rem;margin-bottom:10px;"></div>
+        <button class="warn-btn" id="layExcessBtn">Lay Excess Trump</button>
+      </div>
+
+      <div id="entryArea">
+        <div class="field-label">Rank</div>
+        <div class="row" id="rankRow"></div>
+        <div class="field-label" style="margin-top:10px;">Suit</div>
+        <div class="row" id="suitRow"></div>
+      </div>
+
+      <div class="actions">
+        <button class="secondary-btn" id="undoCardBtn">Undo last card</button>
+        <button class="secondary-btn" id="undoTrickBtn">Undo last trick</button>
+        <button class="secondary-btn danger" id="newHandBtn">New hand</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Points banked this hand</h2>
+      <table class="score-table" id="scoreTable"></table>
+    </div>
+
+    <div class="panel">
+      <h2>Trick history — review what's already gone</h2>
+      <div id="history"><div class="empty-note">No tricks completed yet.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SUIT_SYMBOL = {S:'♠',H:'♥',D:'♦',C:'♣'};
+  const SUIT_COLOR = {S:'black',H:'red',D:'red',C:'black'};
+  const OFF_SUIT = {S:'C',C:'S',H:'D',D:'H'};
+  const RANKS = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+  const RANK_ORDER = {A:14,K:13,Q:12,J:11,'10':10,9:9,8:8,7:7,6:6,5:5,4:4,3:3,2:2};
+  const RANK_VALUE = {A:4,K:3,Q:2,J:1,'10':10}; // game points, all else 0
+  const SEAT_NAMES = ['You','Opp. A','Partner','Opp. B'];
+  const TEAM_OF_SEAT = [0,1,0,1]; // team 0 = you+partner, team1 = opponents
+  const DECK_SIZE = 52;
+
+  let state = null;
+
+  function freshState(){
+    return {
+      dealer: null,
+      roundsBefore: 2,
+      roundsAfter: 1,
+      dealPhase: 'dealer', // dealer -> deal1 -> bidding -> deal2 -> pass -> play
+      deckRemaining: DECK_SIZE,
+      handCounts: [0,0,0,0],
+      discardCount: 0,
+
+      // pass step
+      passOfferSeat: null,
+      passCount: null,
+      passCards: [],           // ranks offered (suit = trump)
+      passSummary: null,       // {fromSeat, toSeat, cards:[rank,...]} or {none:true}
+      excessCount: null,
+      excessCards: [],         // subset of passSummary.cards that are excess
+      excessPending: null,     // {seat, cards:[rank,...]} once confirmed, cleared after laid
+      excessLaidThisHand: false,
+
+      trump: null,
+      offSuit: null,
+      leader: null,
+      currentSeat: null,
+      trickNum: 1,
+      trick: [],                // array of {seat, rank, suit, buried?:true}
+      playedCards: new Set(),
+      history: [],
+      captured: {High:null, Low:null, Jack:null, Pedro:null, OffPedro:null},
+      gamePoints: {0:0, 1:0},
+      selectedRank: null
+    };
+  }
+
+  function save(){
+    try{ localStorage.setItem('kp-tracker-state', JSON.stringify(state, replacer)); }catch(e){}
+  }
+  function replacer(k,v){ if(v instanceof Set) return {__set:[...v]}; return v; }
+  function reviver(k,v){ if(v && v.__set) return new Set(v.__set); return v; }
+  function load(){
+    try{
+      const raw = localStorage.getItem('kp-tracker-state');
+      if(raw) return JSON.parse(raw, reviver);
+    }catch(e){}
+    return null;
+  }
+
+  state = load() || freshState();
+
+  // distinct seats that have played in the current trick (a seat may have >1 card entry
+  // when it's laying excess trump, so we count seats, not raw entries)
+  function seatsPlayedCount(){
+    return new Set(state.trick.map(c=>c.seat)).size;
+  }
+  function seatHasPlayed(seat){
+    return state.trick.some(c=>c.seat===seat);
+  }
+
+  // ---------- STEP 1: DEALER ----------
+  document.getElementById('dealerRow').addEventListener('click', e=>{
+    const btn = e.target.closest('.choice-btn'); if(!btn) return;
+    state.dealer = parseInt(btn.dataset.seat,10);
+    [...document.getElementById('dealerRow').children].forEach(b=>b.classList.toggle('selected', b===btn));
+    document.getElementById('dealerNextBtn').disabled = false;
+  });
+  document.getElementById('dealerNextBtn').addEventListener('click', ()=>{
+    state.roundsBefore = parseInt(document.getElementById('roundsBefore').value,10) || 2;
+    state.roundsAfter = parseInt(document.getElementById('roundsAfter').value,10) || 1;
+    state.dealPhase = 'deal1';
+    state.deckRemaining = DECK_SIZE;
+    state.handCounts = [0,0,0,0];
+    save();
+    render();
+  });
+
+  // ---------- STEP 2/4: DEALING ----------
+  function buildSeatRing(containerId){
+    const ring = document.getElementById(containerId);
+    ring.innerHTML = '';
+    for(let s=0;s<4;s++){
+      const div = document.createElement('div');
+      div.className = 'seat-card';
+      div.id = containerId+'-seat-'+s;
+      div.innerHTML = '<div class="seat-name">'+SEAT_NAMES[s]+'</div>' +
+        '<div class="seat-count" id="'+containerId+'-count-'+s+'">0</div>' +
+        '<div class="seat-tag" id="'+containerId+'-tag-'+s+'"></div>';
+      ring.appendChild(div);
+    }
+  }
+
+  function runDealSequence(startSeat, rounds, deckStackId, deckCountId, seatRingId, statusId, onDone){
+    const steps = [];
+    for(let r=0;r<rounds;r++){
+      for(let i=0;i<4;i++){
+        steps.push((startSeat + i) % 4);
+      }
+    }
+    let idx = 0;
+    function tick(){
+      if(idx >= steps.length){
+        document.getElementById(statusId).textContent = 'Deal complete.';
+        if(onDone) onDone();
+        return;
+      }
+      const seat = steps[idx];
+      const willTake = Math.min(3, state.deckRemaining);
+      state.deckRemaining -= willTake;
+      state.handCounts[seat] += willTake;
+      document.getElementById(deckCountId).textContent = state.deckRemaining + ' left';
+      document.getElementById(deckStackId).classList.add('dealing');
+      setTimeout(()=>document.getElementById(deckStackId).classList.remove('dealing'), 300);
+      const seatEl = document.getElementById(seatRingId+'-seat-'+seat);
+      const countEl = document.getElementById(seatRingId+'-count-'+seat);
+      countEl.textContent = state.handCounts[seat];
+      seatEl.classList.add('dealt-flash');
+      setTimeout(()=>seatEl.classList.remove('dealt-flash'), 280);
+      document.getElementById(statusId).textContent = 'Dealt 3 to ' + SEAT_NAMES[seat] + '…';
+      save();
+      idx++;
+      setTimeout(tick, 380);
+    }
+    tick();
+  }
+
+  document.getElementById('dealBtn1').addEventListener('click', ()=>{
+    document.getElementById('dealBtn1').disabled = true;
+    buildSeatRing('seatRing1');
+    for(let s=0;s<4;s++) document.getElementById('seatRing1-count-'+s).textContent = state.handCounts[s];
+    const startSeat = (state.dealer + 1) % 4; // left of dealer
+    runDealSequence(startSeat, state.roundsBefore, 'deckStack1', 'deckCount1', 'seatRing1', 'dealStatus1', ()=>{
+      document.getElementById('toBiddingBtn').classList.remove('hidden');
+    });
+  });
+  document.getElementById('toBiddingBtn').addEventListener('click', ()=>{
+    state.dealPhase = 'bidding';
+    save(); render();
+  });
+
+  document.getElementById('dealBtn2').addEventListener('click', ()=>{
+    document.getElementById('dealBtn2').disabled = true;
+    buildSeatRing('seatRing2');
+    for(let s=0;s<4;s++) document.getElementById('seatRing2-count-'+s).textContent = state.handCounts[s];
+    document.getElementById('deckCount2').textContent = state.deckRemaining + ' left';
+    const startSeat = state.dealer; // starts with the dealer
+    runDealSequence(startSeat, state.roundsAfter, 'deckStack2', 'deckCount2', 'seatRing2', 'dealStatus2', ()=>{
+      state.discardCount = state.deckRemaining;
+      renderDiscardPile();
+      document.getElementById('toPlayBtn').classList.remove('hidden');
+      save();
+    });
+  });
+  document.getElementById('toPlayBtn').addEventListener('click', ()=>{
+    state.dealPhase = 'pass';
+    save(); render();
+  });
+
+  // ---------- STEP 5: TRUMP PASS ----------
+  document.getElementById('passOfferRow').addEventListener('click', e=>{
+    const btn = e.target.closest('.choice-btn'); if(!btn) return;
+    state.passOfferSeat = parseInt(btn.dataset.seat,10);
+    state.passCount = null;
+    state.passCards = [];
+    state.excessCount = null;
+    state.excessCards = [];
+    [...document.getElementById('passOfferRow').children].forEach(b=>b.classList.toggle('selected', b===btn));
+    document.getElementById('passReceiverLine').textContent = 'Receiving partner: ' + SEAT_NAMES[(state.passOfferSeat+2)%4];
+    [...document.getElementById('passCountRow').children].forEach(b=>b.classList.remove('selected'));
+    document.getElementById('passCardPicker').classList.add('hidden');
+    document.getElementById('excessBlock').classList.add('hidden');
+    document.getElementById('passConfirmBtn').disabled = true;
+    save();
+  });
+  document.getElementById('passCountRow').addEventListener('click', e=>{
+    const btn = e.target.closest('.choice-btn'); if(!btn || state.passOfferSeat===null) return;
+    state.passCount = parseInt(btn.dataset.count,10);
+    state.passCards = [];
+    state.excessCount = null;
+    state.excessCards = [];
+    [...document.getElementById('passCountRow').children].forEach(b=>b.classList.toggle('selected', b===btn));
+    document.getElementById('excessBlock').classList.add('hidden');
+    if(state.passCount===0){
+      document.getElementById('passCardPicker').classList.add('hidden');
+      document.getElementById('passConfirmBtn').disabled = false;
+    } else {
+      buildPassRankRow();
+      document.getElementById('passCardPicker').classList.remove('hidden');
+      document.getElementById('passConfirmBtn').disabled = true;
+    }
+    save();
+  });
+  function buildPassRankRow(){
+    const row = document.getElementById('passRankRow');
+    row.innerHTML = '';
+    RANKS.forEach(r=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = r;
+      b.dataset.rank = r;
+      b.addEventListener('click', ()=>{
+        const i = state.passCards.indexOf(r);
+        if(i>=0){ state.passCards.splice(i,1); }
+        else if(state.passCards.length < state.passCount){ state.passCards.push(r); }
+        renderPassRankSelection();
+        checkPassCardsComplete();
+        save();
+      });
+      row.appendChild(b);
+    });
+  }
+  function renderPassRankSelection(){
+    [...document.getElementById('passRankRow').children].forEach(b=>{
+      b.classList.toggle('selected', state.passCards.includes(b.dataset.rank));
+    });
+  }
+  function checkPassCardsComplete(){
+    const complete = state.passCards.length === state.passCount;
+    document.getElementById('excessBlock').classList.toggle('hidden', !complete);
+    if(complete){ buildExcessCountRow(); }
+    document.getElementById('passConfirmBtn').disabled = true; // re-enabled once excess Q answered
+  }
+  function buildExcessCountRow(){
+    const row = document.getElementById('excessCountRow');
+    row.innerHTML = '';
+    for(let n=0; n<=state.passCards.length; n++){
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = n===0 ? '0 — no' : String(n);
+      b.dataset.n = n;
+      b.addEventListener('click', ()=>{
+        state.excessCount = n;
+        state.excessCards = [];
+        [...row.children].forEach(x=>x.classList.toggle('selected', x===b));
+        if(n===0){
+          document.getElementById('excessCardPicker').classList.add('hidden');
+          document.getElementById('passConfirmBtn').disabled = false;
+        } else {
+          buildExcessRankRow();
+          document.getElementById('excessCardPicker').classList.remove('hidden');
+          document.getElementById('passConfirmBtn').disabled = true;
+        }
+        save();
+      });
+      row.appendChild(b);
+    }
+  }
+  function buildExcessRankRow(){
+    const row = document.getElementById('excessRankRow');
+    row.innerHTML = '';
+    state.passCards.forEach(r=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = r;
+      b.dataset.rank = r;
+      b.addEventListener('click', ()=>{
+        const i = state.excessCards.indexOf(r);
+        if(i>=0){ state.excessCards.splice(i,1); }
+        else if(state.excessCards.length < state.excessCount){ state.excessCards.push(r); }
+        [...row.children].forEach(x=>x.classList.toggle('selected', state.excessCards.includes(x.dataset.rank)));
+        document.getElementById('passConfirmBtn').disabled = state.excessCards.length !== state.excessCount;
+        save();
+      });
+      row.appendChild(b);
+    });
+  }
+  document.getElementById('passConfirmBtn').addEventListener('click', ()=>{
+    const toSeat = (state.passOfferSeat+2)%4;
+    state.passSummary = {
+      fromSeat: state.passOfferSeat,
+      toSeat: toSeat,
+      cards: state.passCards.slice()
+    };
+    if(state.excessCount>0){
+      state.excessPending = { seat: toSeat, cards: state.excessCards.slice() };
+    }
+    document.getElementById('toPlayFromPassBtn').classList.remove('hidden');
+    save();
+  });
+  document.getElementById('passSkipBtn').addEventListener('click', ()=>{
+    state.passSummary = {none:true};
+    state.excessPending = null;
+    document.getElementById('toPlayFromPassBtn').classList.remove('hidden');
+    save();
+  });
+  document.getElementById('toPlayFromPassBtn').addEventListener('click', ()=>{
+    state.dealPhase = 'play';
+    state.currentSeat = state.leader;
+    save(); render();
+  });
+
+  function renderDiscardPile(){
+    [document.getElementById('discardPile'), document.getElementById('discardPileMini')].forEach(pileEl=>{
+      if(!pileEl) return;
+      pileEl.innerHTML = '';
+      const shown = Math.min(state.discardCount, 5);
+      for(let i=0;i<shown;i++){
+        const c = document.createElement('div');
+        c.className = 'cardback';
+        pileEl.appendChild(c);
+      }
+      pileEl.classList.toggle('empty', state.discardCount===0);
+    });
+    const cEl = document.getElementById('discardCount');
+    const cMini = document.getElementById('discardCountMini');
+    if(cEl) cEl.textContent = state.discardCount;
+    if(cMini) cMini.textContent = state.discardCount;
+  }
+
+  // ---------- STEP 3: BIDDING (trump + leader) ----------
+  document.getElementById('trumpRow').addEventListener('click', e=>{
+    const btn = e.target.closest('.choice-btn'); if(!btn) return;
+    state.trump = btn.dataset.suit;
+    state.offSuit = OFF_SUIT[state.trump];
+    [...document.getElementById('trumpRow').children].forEach(b=>b.classList.toggle('selected', b===btn));
+    updateStartBtn();
+  });
+  document.getElementById('leaderRow').addEventListener('click', e=>{
+    const btn = e.target.closest('.choice-btn'); if(!btn) return;
+    state.leader = parseInt(btn.dataset.seat,10);
+    [...document.getElementById('leaderRow').children].forEach(b=>b.classList.toggle('selected', b===btn));
+    updateStartBtn();
+  });
+  function updateStartBtn(){
+    document.getElementById('startBtn').disabled = !(state.trump && state.leader!==null && state.leader!==undefined);
+  }
+  document.getElementById('startBtn').addEventListener('click', ()=>{
+    state.dealPhase = 'deal2';
+    save(); render();
+  });
+
+  // ---------- PLAY (trick tracking) ----------
+  function buildRankRow(){
+    const rankRow = document.getElementById('rankRow');
+    rankRow.innerHTML = '';
+    RANKS.forEach(r=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = r;
+      b.dataset.rank = r;
+      b.addEventListener('click', ()=>selectRank(r));
+      rankRow.appendChild(b);
+    });
+    const suitRow = document.getElementById('suitRow');
+    suitRow.innerHTML = '';
+    ['S','H','D','C'].forEach(s=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn suit-btn ' + (SUIT_COLOR[s]==='red'?'suit-red':'suit-black');
+      b.textContent = SUIT_SYMBOL[s];
+      b.dataset.suit = s;
+      b.addEventListener('click', ()=>selectSuit(s));
+      suitRow.appendChild(b);
+    });
+  }
+
+  function pendingExcessForCurrentSeat(){
+    return state.excessPending && state.trickNum===1 && !state.excessLaidThisHand && state.currentSeat===state.excessPending.seat;
+  }
+
+  function selectRank(r){
+    if(seatsPlayedCount()>=4 || pendingExcessForCurrentSeat()) return;
+    state.selectedRank = r;
+    render();
+  }
+  function selectSuit(s){
+    if(!state.selectedRank || seatsPlayedCount()>=4 || pendingExcessForCurrentSeat()) return;
+    const key = state.selectedRank + '-' + s;
+    if(state.playedCards.has(key)) return;
+    state.trick.push({seat: state.currentSeat, rank: state.selectedRank, suit: s});
+    state.playedCards.add(key);
+    state.selectedRank = null;
+    advanceOrResolve();
+    save();
+    render();
+  }
+
+  document.getElementById('layExcessBtn').addEventListener('click', ()=>{
+    if(!pendingExcessForCurrentSeat()) return;
+    const cards = state.excessPending.cards.slice();
+    // sort so the highest rank is applied last / flagged as top (non-buried)
+    const sorted = cards.slice().sort((a,b)=>RANK_ORDER[a]-RANK_ORDER[b]); // ascending
+    sorted.forEach((r, idx)=>{
+      const isTop = idx === sorted.length-1;
+      state.trick.push({seat: state.currentSeat, rank: r, suit: state.trump, buried: !isTop});
+      state.playedCards.add(r+'-'+state.trump);
+    });
+    state.excessLaidThisHand = true;
+    state.excessPending = null;
+    advanceOrResolve();
+    save();
+    render();
+  });
+
+  function advanceOrResolve(){
+    if(seatsPlayedCount() < 4){
+      state.currentSeat = (state.currentSeat+1) % 4;
+    } else {
+      resolveTrick();
+    }
+  }
+
+  // the "effective" card for a seat's contribution to a trick: the highest-ranked
+  // non-buried-irrelevant card they played (for a normal play this is just their one card;
+  // for an excess lay, it's the top card — buried cards never win or score)
+  function effectiveCardForSeat(seat){
+    const cards = state.trick.filter(c=>c.seat===seat);
+    // prefer the one explicitly not buried; fall back to highest rank if none flagged
+    const nonBuried = cards.filter(c=>!c.buried);
+    const pool = nonBuried.length ? nonBuried : cards;
+    return pool.reduce((best,c)=> RANK_ORDER[c.rank]>RANK_ORDER[best.rank] ? c : best, pool[0]);
+  }
+
+  function resolveTrick(){
+    const seats = [...new Set(state.trick.map(c=>c.seat))];
+    const plays = seats.map(seat=>({seat, card: effectiveCardForSeat(seat)}));
+    const ledSuit = state.trick[0].suit; // first card physically led
+    let winner = plays[0];
+    plays.forEach(p=>{
+      const cIsTrump = p.card.suit===state.trump;
+      const wIsTrump = winner.card.suit===state.trump;
+      if(cIsTrump && !wIsTrump){ winner = p; }
+      else if(cIsTrump && wIsTrump){ if(RANK_ORDER[p.card.rank]>RANK_ORDER[winner.card.rank]) winner = p; }
+      else if(!cIsTrump && !wIsTrump && p.card.suit===ledSuit){ if(RANK_ORDER[p.card.rank]>RANK_ORDER[winner.card.rank]) winner = p; }
+    });
+    const winTeam = TEAM_OF_SEAT[winner.seat];
+
+    // Only each seat's EFFECTIVE (non-buried) card is eligible for point-card flags and
+    // game-point value. Buried excess cards never score, even if they're a 5/Jack/etc.
+    const flags = [];
+    let gamePts = 0;
+    plays.forEach(p=>{
+      const c = p.card;
+      if(c.suit===state.trump && c.rank==='A' && state.captured.High===null){ state.captured.High=winTeam; flags.push('High'); }
+      if(c.suit===state.trump && c.rank==='2' && state.captured.Low===null){ state.captured.Low=winTeam; flags.push('Low'); }
+      if(c.suit===state.trump && c.rank==='J' && state.captured.Jack===null){ state.captured.Jack=winTeam; flags.push('Jack'); }
+      if(c.suit===state.trump && c.rank==='5' && state.captured.Pedro===null){ state.captured.Pedro=winTeam; flags.push('Pedro'); }
+      if(c.suit===state.offSuit && c.rank==='5' && state.captured.OffPedro===null){ state.captured.OffPedro=winTeam; flags.push('Off-Pedro'); }
+      gamePts += (RANK_VALUE[c.rank]||0);
+    });
+    state.gamePoints[winTeam] += gamePts;
+
+    state.history.push({
+      num: state.trickNum,
+      cards: state.trick.map(c=>({...c})), // full record, buried cards included, for review
+      winnerSeat: winner.seat,
+      flags: flags,
+      gamePts: gamePts
+    });
+
+    state.trick = [];
+    state.trickNum += 1;
+    state.currentSeat = winner.seat;
+  }
+
+  function undoLastCard(){
+    if(state.trick.length===0) return;
+    const c = state.trick[state.trick.length-1];
+    if(c.buried!==undefined){
+      // this was an excess lay — undo the whole bundle for that seat together
+      const seat = c.seat;
+      while(state.trick.length && state.trick[state.trick.length-1].seat===seat && state.trick[state.trick.length-1].buried!==undefined){
+        const rc = state.trick.pop();
+        state.playedCards.delete(rc.rank+'-'+rc.suit);
+      }
+      state.currentSeat = seat;
+      state.excessLaidThisHand = false;
+      // note: excessPending was cleared when laid; re-derive from history isn't tracked,
+      // so re-laying requires re-confirming via New Hand if this undo is used after the fact.
+    } else {
+      state.trick.pop();
+      state.playedCards.delete(c.rank+'-'+c.suit);
+      state.currentSeat = c.seat;
+    }
+    state.selectedRank = null;
+    save(); render();
+  }
+
+  function undoLastTrick(){
+    if(state.history.length===0) return;
+    const last = state.history.pop();
+    state.trickNum = last.num;
+    last.flags.forEach(f=>{
+      const key = f==='Off-Pedro' ? 'OffPedro' : f;
+      state.captured[key] = null;
+    });
+    const winTeam = TEAM_OF_SEAT[last.winnerSeat];
+    state.gamePoints[winTeam] -= last.gamePts;
+    last.cards.forEach(c=> state.playedCards.delete(c.rank+'-'+c.suit));
+    state.trick = [];
+    state.currentSeat = last.cards[0].seat;
+    if(last.num===1){ state.excessLaidThisHand = false; }
+    save(); render();
+  }
+
+  document.getElementById('undoCardBtn').addEventListener('click', undoLastCard);
+  document.getElementById('undoTrickBtn').addEventListener('click', undoLastTrick);
+  document.getElementById('newHandBtn').addEventListener('click', ()=>{
+    if(!confirm('Start a new hand? This clears the current trick history.')) return;
+    state = freshState();
+    try{ localStorage.removeItem('kp-tracker-state'); }catch(e){}
+    document.getElementById('roundsBefore').value = 2;
+    document.getElementById('roundsAfter').value = 1;
+    [...document.getElementById('dealerRow').children].forEach(b=>b.classList.remove('selected'));
+    document.getElementById('dealerNextBtn').disabled = true;
+    [...document.getElementById('passOfferRow').children].forEach(b=>b.classList.remove('selected'));
+    [...document.getElementById('passCountRow').children].forEach(b=>b.classList.remove('selected'));
+    document.getElementById('passCardPicker').classList.add('hidden');
+    document.getElementById('excessBlock').classList.add('hidden');
+    document.getElementById('passConfirmBtn').disabled = true;
+    document.getElementById('toPlayFromPassBtn').classList.add('hidden');
+    render();
+  });
+
+  function cardText(c){ return c.rank + SUIT_SYMBOL[c.suit]; }
+  function fullSuitName(s){ return {S:'Spades',H:'Hearts',D:'Diamonds',C:'Clubs'}[s]; }
+
+  function renderPlay(){
+    document.getElementById('trumpDisplay').textContent = 'Trump: ' + SUIT_SYMBOL[state.trump] + ' ' + fullSuitName(state.trump);
+    document.getElementById('trickNumDisplay').textContent = 'Trick ' + state.trickNum;
+
+    const forcedExcess = pendingExcessForCurrentSeat();
+    document.getElementById('excessLayArea').classList.toggle('hidden', !forcedExcess);
+    document.getElementById('entryArea').classList.toggle('hidden', !!forcedExcess);
+    if(forcedExcess){
+      const list = state.excessPending.cards.map(r=>r+SUIT_SYMBOL[state.trump]).join(', ');
+      document.getElementById('excessLayList').textContent = SEAT_NAMES[state.currentSeat] + ' must lay: ' + list + ' — only the highest counts for scoring.';
+    }
+
+    document.getElementById('turnIndicator').textContent = seatsPlayedCount()<4
+      ? (SEAT_NAMES[state.currentSeat] + ' to play' + (forcedExcess ? ' (forced excess)' : ''))
+      : 'Trick complete';
+
+    const slots = document.getElementById('trickSlots');
+    slots.innerHTML = '';
+    for(let seat=0; seat<4; seat++){
+      const div = document.createElement('div');
+      const cardsForSeat = state.trick.filter(c=>c.seat===seat);
+      const hasPlayed = cardsForSeat.length>0;
+      div.className = 'slot' + (hasPlayed?' filled':'') + (cardsForSeat.some(c=>c.buried)? ' excess':'') +
+        (!hasPlayed && seat===state.currentSeat && seatsPlayedCount()<4 ? ' active':'');
+      const label = document.createElement('div');
+      label.className='seat-label';
+      label.textContent = SEAT_NAMES[seat];
+      div.appendChild(label);
+      const face = document.createElement('div');
+      face.className='card-face';
+      if(hasPlayed){
+        const top = effectiveCardForSeat(seat);
+        face.textContent = cardText(top);
+        face.style.color = SUIT_COLOR[top.suit]==='red' ? 'var(--red)' : 'var(--ink)';
+        div.appendChild(face);
+        if(cardsForSeat.length>1){
+          const note = document.createElement('div');
+          note.className='buried-note';
+          const buried = cardsForSeat.filter(c=>c.buried).map(c=>cardText(c)).join(',');
+          note.textContent = '+ '+buried+' (buried)';
+          div.appendChild(note);
+        }
+      } else {
+        face.textContent = '—';
+        face.style.color = 'var(--wood-light)';
+        div.appendChild(face);
+      }
+      slots.appendChild(div);
+    }
+
+    const rankBtns = document.querySelectorAll('#rankRow .choice-btn');
+    rankBtns.forEach(b=>{
+      b.classList.toggle('selected', b.dataset.rank===state.selectedRank);
+      b.disabled = seatsPlayedCount()>=4 || forcedExcess;
+    });
+    const suitBtns = document.querySelectorAll('#suitRow .choice-btn');
+    suitBtns.forEach(b=>{
+      const s = b.dataset.suit;
+      const key = (state.selectedRank||'') + '-' + s;
+      b.disabled = seatsPlayedCount()>=4 || forcedExcess || !state.selectedRank || state.playedCards.has(key);
+    });
+
+    const scoreTable = document.getElementById('scoreTable');
+    const rows = [
+      ['High (Ace of trump)', state.captured.High],
+      ['Low (2 of trump)', state.captured.Low],
+      ['Jack of trump', state.captured.Jack],
+      ['Pedro (5 of trump)', state.captured.Pedro],
+      ['Off-Pedro (5 of ' + fullSuitName(state.offSuit) + ')', state.captured.OffPedro],
+    ];
+    let html = '<tr><th>Point</th><th>You</th><th>Opp</th></tr>';
+    rows.forEach(([label,team])=>{
+      html += '<tr><td>'+label+'</td>' +
+        '<td class="'+(team===0?'pt-got':'pt-open')+'">'+(team===0?'✓':'—')+'</td>' +
+        '<td class="'+(team===1?'pt-got':'pt-open')+'">'+(team===1?'✓':'—')+'</td></tr>';
+    });
+    html += '<tr><td>Game points (running)</td><td>'+state.gamePoints[0]+'</td><td>'+state.gamePoints[1]+'</td></tr>';
+    scoreTable.innerHTML = html;
+
+    const hist = document.getElementById('history');
+    if(state.history.length===0){
+      hist.innerHTML = '<div class="empty-note">No tricks completed yet.</div>';
+    } else {
+      hist.innerHTML = '';
+      [...state.history].reverse().forEach(t=>{
+        const row = document.createElement('div');
+        row.className='trick-row';
+        const cardsStr = t.cards.map(c=> SEAT_NAMES[c.seat][0]+':'+cardText(c)+(c.buried?'<span class="buried-tag">(buried)</span>':'')).join('  ');
+        const flagsStr = t.flags.map(f=>'<span class="pt-flag">'+f+'</span>').join('');
+        row.innerHTML = '<span class="trick-cards">#'+t.num+'  '+cardsStr+flagsStr+'</span>' +
+          '<span class="trick-winner '+(TEAM_OF_SEAT[t.winnerSeat]===0?'win-you':'win-opp')+'">'+SEAT_NAMES[t.winnerSeat]+' won</span>';
+        hist.appendChild(row);
+      });
+    }
+    renderDiscardPile();
+  }
+
+  // ---------- TOP-LEVEL PHASE ROUTER ----------
+  function render(){
+    const steps = {
+      dealer: 'dealerStep',
+      deal1: 'dealStep1',
+      bidding: 'setup',
+      deal2: 'dealStep2',
+      pass: 'passStep',
+      play: 'play'
+    };
+    Object.values(steps).forEach(id=>document.getElementById(id).classList.add('hidden'));
+    document.getElementById(steps[state.dealPhase]).classList.remove('hidden');
+
+    if(state.dealPhase==='deal1'){
+      buildSeatRing('seatRing1');
+      for(let s=0;s<4;s++) document.getElementById('seatRing1-count-'+s).textContent = state.handCounts[s];
+      document.getElementById('deckCount1').textContent = state.deckRemaining + ' left';
+      document.getElementById('dealBtn1').disabled = false;
+      document.getElementById('toBiddingBtn').classList.add('hidden');
+    }
+    if(state.dealPhase==='deal2'){
+      buildSeatRing('seatRing2');
+      for(let s=0;s<4;s++) document.getElementById('seatRing2-count-'+s).textContent = state.handCounts[s];
+      document.getElementById('deckCount2').textContent = state.deckRemaining + ' left';
+      document.getElementById('dealBtn2').disabled = false;
+      document.getElementById('toPlayBtn').classList.add('hidden');
+      renderDiscardPile();
+    }
+    if(state.dealPhase==='pass'){
+      [...document.getElementById('passOfferRow').children].forEach(b=>b.classList.toggle('selected', state.passOfferSeat!==null && parseInt(b.dataset.seat,10)===state.passOfferSeat));
+      document.getElementById('passReceiverLine').textContent = state.passOfferSeat!==null ? ('Receiving partner: ' + SEAT_NAMES[(state.passOfferSeat+2)%4]) : '';
+      document.getElementById('toPlayFromPassBtn').classList.toggle('hidden', !state.passSummary);
+    }
+    if(state.dealPhase==='play'){
+      buildRankRow();
+      renderPlay();
+      const line = document.getElementById('passSummaryLine');
+      if(!state.passSummary || state.passSummary.none){
+        line.textContent = 'No trump passed this hand.';
+      } else {
+        let txt = 'Trump passed: ' + SEAT_NAMES[state.passSummary.fromSeat] + ' → ' + SEAT_NAMES[state.passSummary.toSeat] + '  (' + state.passSummary.cards.join(', ') + ' of ' + fullSuitName(state.trump) + ')';
+        line.textContent = txt;
+      }
+    }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

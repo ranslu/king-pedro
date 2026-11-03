@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>King Pedro — Seat the Table</title>
+<style>
+  :root {
+    --wood-dark: #3e2723;
+    --wood-mid: #6d4c31;
+    --linen: #f2e8d5;
+    --linen-dark: #e0d3b8;
+    --accent-red: #a33b2a;
+    --accent-gold: #c9a24b;
+    --text-dark: #2b1d13;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--wood-dark);
+    background-image: radial-gradient(circle at 50% 0%, #4e342a, var(--wood-dark) 70%);
+    color: var(--text-dark);
+    font-family: 'Georgia', serif;
+    padding: 24px;
+  }
+  h1 {
+    color: var(--linen);
+    text-align: center;
+    letter-spacing: 1px;
+    border-bottom: 3px double var(--accent-gold);
+    padding-bottom: 10px;
+  }
+  .subtitle {
+    color: var(--linen-dark);
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 24px;
+  }
+  .table-layout {
+    max-width: 520px;
+    margin: 0 auto 24px;
+  }
+  .seat-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
+  .seat {
+    background: var(--linen);
+    border: 2px solid var(--wood-mid);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    flex: 1;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+  }
+  .seat.selected { box-shadow: 0 0 0 3px var(--accent-gold); }
+  .seat .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--wood-mid); }
+  .seat .occupant { font-weight: bold; font-size: 15px; margin-top: 4px; }
+  .seat .tag { font-size: 12px; color: var(--accent-red); }
+
+  .controls { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  button {
+    background: var(--accent-red);
+    color: var(--linen);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover { background: #8a2f21; }
+  button.secondary { background: var(--wood-mid); }
+  button:disabled { background: #999; cursor: not-allowed; }
+
+  .chattiness { text-align: center; color: var(--linen); margin-bottom: 20px; }
+  .chattiness input { vertical-align: middle; }
+
+  .roster {
+    max-width: 640px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .character-card {
+    background: var(--linen);
+    border: 2px solid var(--wood-mid);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    position: relative;
+  }
+  .character-card:hover { border-color: var(--accent-gold); }
+  .character-card h3 { margin: 0 0 4px; color: var(--wood-dark); }
+  .character-card .tag { color: var(--accent-red); font-size: 13px; margin-bottom: 6px; }
+  .character-card .bio { font-size: 13px; margin-bottom: 8px; }
+  .character-card .stars { color: var(--accent-gold); letter-spacing: 2px; }
+  .character-card .hear-me {
+    margin-top: 8px;
+    display: inline-block;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  .vyshyvanka-strip {
+    height: 6px;
+    background: repeating-linear-gradient(45deg, var(--accent-red) 0 6px, var(--accent-gold) 6px 12px);
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+  .tribute-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 11px;
+    color: var(--wood-mid);
+    font-style: italic;
+  }
+  .bark-log {
+    max-width: 640px;
+    margin: 20px auto 0;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--linen-dark);
+    font-size: 13px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+
+<h1>King Pedro</h1>
+<div class="subtitle">Seat the Table</div>
+
+<div class="table-layout">
+  <div class="seat-row">
+    <div class="seat" id="seat-north" data-seat="north" onclick="selectSeat('north')">
+      <div class="label">Partner (North)</div>
+      <div class="occupant">Tap to assign</div>
+      <div class="tag"></div>
+    </div>
+  </div>
+  <div class="seat-row">
+    <div class="seat" id="seat-west" data-seat="west" onclick="selectSeat('west')">
+      <div class="label">Opponent (West)</div>
+      <div class="occupant">Tap to assign</div>
+      <div class="tag"></div>
+    </div>
+    <div class="seat" id="seat-east" data-seat="east" onclick="selectSeat('east')">
+      <div class="label">Opponent (East)</div>
+      <div class="occupant">Tap to assign</div>
+      <div class="tag"></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="secondary" onclick="randomTable()">Random Table</button>
+  <button class="secondary" onclick="fillEmptySeats()">Fill Empty Seats</button>
+  <button id="dealBtn" onclick="dealCards()" disabled>Deal the Cards</button>
+</div>
+
+<div class="chattiness">
+  Chattiness:
+  <input type="range" min="0" max="2" value="1" id="chattinessSlider" oninput="updateChattinessLabel()">
+  <span id="chattinessLabel">Occasional</span>
+</div>
+
+<div class="roster" id="roster"></div>
+<div class="bark-log" id="barkLog"><em>Bark log — lines spoken during preview appear here.</em></div>
+
+<script>
+/* ---- Character data (mirrors data/characters.json) ---- */
+const ROSTER = [
+  {
+    id: "iron_mike", name: "Iron Mike", attitudeTag: "Aggressive",
+    bioShort: "Bids high, unafraid to gamble for the sweep.", skillStars: 4,
+    voice: { lang: "en-US", pitch: 0.75, rate: 1.05 },
+    barks: {
+      game_start_intro: ["Alright, deal 'em. I'm not here to lose.", "Let's see what you've got.", "Sit down, this won't take long."]
+    }
+  },
+  {
+    id: "prof_elena", name: "Prof. Elena", attitudeTag: "Calculating",
+    bioShort: "Plays the odds. Rarely bids without doing the math first.", skillStars: 5,
+    voice: { lang: "en-US", pitch: 1.25, rate: 1.0 },
+    barks: {
+      game_start_intro: ["Let's begin. I've already considered the odds.", "A fair deal, statistically speaking.", "I do enjoy a well-played hand."]
+    }
+  },
+  {
+    id: "bohdan", name: "Bohdan", attitudeTag: "Steady",
+    bioShort: "Prairie-raised, slow to rattle, quick with a proverb.", skillStars: 3,
+    voice: { lang: "en-US", pitch: 0.95, rate: 0.9 },
+    barks: {
+      game_start_intro: ["Sit, sit. Good hand comes to those who wait.", "Ah, cards. Just like back home on the farm table.", "Deal them out — no rush, no rush."]
+    }
+  },
+  {
+    id: "lucky_lou", name: "Lucky Lou", attitudeTag: "Wild",
+    bioShort: "Plays on instinct and nerve. Unpredictable by design.", skillStars: 3,
+    voice: { lang: "en-US", pitch: 1.4, rate: 1.2 },
+    barks: {
+      game_start_intro: ["Ooh, feeling lucky today!", "Deal me in, deal me in!", "Let's shake things up!"]
+    }
+  }
+];
+
+/* No-repeat bag per character+trigger, same pattern as BarkLibrary.kt */
+const bags = {};
+function nextBark(character, trigger) {
+  const lines = character.barks[trigger];
+  if (!lines || lines.length === 0) return null;
+  const key = character.id + ":" + trigger;
+  if (!bags[key] || bags[key].length === 0) {
+    bags[key] = [...Array(lines.length).keys()].sort(() => Math.random() - 0.5);
+  }
+  const idx = bags[key].pop();
+  return lines[idx];
+}
+
+function speakLine(character, line) {
+  logBark(character.name, line);
+  if (!('speechSynthesis' in window)) return;
+  const utter = new SpeechSynthesisUtterance(line);
+  utter.pitch = character.voice.pitch;
+  utter.rate = character.voice.rate;
+  utter.lang = character.voice.lang;
+  speechSynthesis.speak(utter);
+}
+
+function logBark(name, line) {
+  const log = document.getElementById('barkLog');
+  log.innerHTML = `<strong>${name}:</strong> "${line}"<br>` + log.innerHTML;
+}
+
+/* ---- Seat assignment state ---- */
+let selectedSeat = null;
+const table = { west: null, north: null, east: null };
+
+function selectSeat(seat) {
+  selectedSeat = seat;
+  document.querySelectorAll('.seat').forEach(el => el.classList.remove('selected'));
+  document.getElementById('seat-' + seat).classList.add('selected');
+}
+
+function assignSeat(seat, character) {
+  table[seat] = character;
+  const el = document.getElementById('seat-' + seat);
+  el.querySelector('.occupant').textContent = character.name;
+  el.querySelector('.tag').textContent = character.attitudeTag;
+  checkDealReady();
+}
+
+function checkDealReady() {
+  const ready = table.west && table.north && table.east;
+  document.getElementById('dealBtn').disabled = !ready;
+}
+
+function randomTable() {
+  const shuffled = [...ROSTER].sort(() => Math.random() - 0.5);
+  assignSeat('west', shuffled[0]);
+  assignSeat('north', shuffled[1]);
+  assignSeat('east', shuffled[2]);
+}
+
+function fillEmptySeats() {
+  const used = new Set(Object.values(table).filter(Boolean).map(c => c.id));
+  const unused = ROSTER.filter(c => !used.has(c.id)).sort(() => Math.random() - 0.5);
+  ['west', 'north', 'east'].forEach(seat => {
+    if (!table[seat] && unused.length) assignSeat(seat, unused.shift());
+  });
+}
+
+function updateChattinessLabel() {
+  const labels = ["Off", "Occasional", "Chatty"];
+  document.getElementById('chattinessLabel').textContent =
+    labels[document.getElementById('chattinessSlider').value];
+}
+
+function dealCards() {
+  alert("Table set:\n" +
+    "North (partner): " + table.north.name + "\n" +
+    "West (opponent): " + table.west.name + "\n" +
+    "East (opponent): " + table.east.name + "\n\n" +
+    "(Hand off to game engine here.)");
+}
+
+/* ---- Roster render ---- */
+function renderRoster() {
+  const container = document.getElementById('roster');
+  ROSTER.forEach(character => {
+    const card = document.createElement('div');
+    card.className = 'character-card';
+    card.innerHTML = `
+      <div class="vyshyvanka-strip"></div>
+      <h3>${character.name}</h3>
+      <div class="tag">${character.attitudeTag}</div>
+      <div class="bio">${character.bioShort}</div>
+      <div class="stars">${'★'.repeat(character.skillStars)}${'☆'.repeat(5 - character.skillStars)}</div>
+      <button class="hear-me" onclick="event.stopPropagation(); previewVoice('${character.id}')">🔊 Hear me</button>
+    `;
+    card.onclick = () => {
+      if (selectedSeat) assignSeat(selectedSeat, character);
+    };
+    container.appendChild(card);
+  });
+}
+
+function previewVoice(id) {
+  const character = ROSTER.find(c => c.id === id);
+  const line = nextBark(character, 'game_start_intro');
+  if (line) speakLine(character, line);
+}
+
+renderRoster();
+</script>
+
+</body>
+</html>
