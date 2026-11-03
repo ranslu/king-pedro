@@ -380,6 +380,29 @@
     .decision.trumpBox h3{ font-size:.74rem; margin-bottom:.15rem; }
   }
   .bidline{ display:none !important; }        /* the live bid now lives in the panel */
+
+  /* ---- bad-play reporter ---- */
+  .bpSheet{ max-height:88vh; overflow-y:auto; text-align:left; }
+  .bpSheet h3{ font-family:Cinzel,serif; font-size:.78rem; margin:.7rem 0 .3rem; }
+  .bpList{ display:flex; flex-direction:column; gap:.25rem; max-height:26vh; overflow-y:auto;
+    border:1px solid #cdbf9a; border-radius:8px; padding:.25rem; background:rgba(255,255,255,.35); }
+  .bpRow{ font-family:Georgia,serif; font-size:.74rem; text-align:left; padding:.35rem .5rem; border-radius:6px;
+    background:transparent; color:#2a2010; border:1px solid transparent; box-shadow:none; cursor:pointer; }
+  .bpRow.sel{ background:#f3d98c; border-color:#8a6a26; }
+  .bpRow b{ font-family:Cinzel,serif; }
+  .bpCards{ display:flex; flex-wrap:wrap; gap:.3rem; }
+  .bpCards .card{ --w:42px; cursor:pointer; }
+  .bpCards .card.pick{ box-shadow:0 0 0 3px #3c9a52, 0 2px 5px var(--shadow); }
+  .bpCards .card.was{ box-shadow:0 0 0 3px #b3271e, 0 2px 5px var(--shadow); }
+  .bpSheet textarea{ width:100%; min-height:3.2em; font-family:Georgia,serif; font-size:.78rem; padding:.35rem .45rem;
+    border-radius:6px; border:1px solid #b39f72; background:#fffdf6; color:#2a2010; resize:vertical; }
+  .bpBtns{ display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.7rem; }
+  .bpBtns button{ flex:1; font-size:.74rem; }
+  .bpSheet button.ghost{ color:#3a2b12; border-color:rgba(58,43,18,.45); background:rgba(255,255,255,.3); }
+  .bpNote{ font-size:.68rem; opacity:.75; margin-top:.3rem; }
+  .bpSaved{ font-size:.72rem; border-top:1px solid rgba(0,0,0,.1); padding:.35rem 0; display:flex; gap:.4rem; align-items:flex-start; }
+  .bpSaved span{ flex:1; }
+  .bpSaved button{ font-size:.6rem; padding:.2rem .45rem; }
 </style>
 </head>
 <body>
@@ -415,6 +438,7 @@
     <button id="newBtn">New game</button>
     <button id="stepBtn" class="ghost">Step ▸</button>
     <button id="autoBtn">Auto ▶</button>
+    <button id="badBtn" class="ghost" title="Report a bad AI play">⚑ Bad play</button>
     <label>Speed <input type="range" id="speed" min="1" max="10" value="6"></label>
   </div>
 
@@ -456,6 +480,13 @@
         <button class="go" id="lobbyStartBtn" style="display:none">Start game</button>
         <p class="hint" id="lobbyWait" style="display:none">Waiting for the host to start…</p>
       </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="badOverlay">
+    <div class="sheet bpSheet">
+      <h2>⚑ Report a bad play</h2>
+      <div id="bpBody"></div>
     </div>
   </div>
 
@@ -1146,8 +1177,10 @@ function actionSpeak(seat,mood,arg){ return State.human[seat] ? simpleText(mood,
 
 // ---- consume one event ----
 function applyEvent(e){
+  GameRec.onEvent(e);
   switch(e.type){
     case "deal": {
+      BadPlay.onDeal(e);
       State.dealer_now=e.dealer; State.declarer=-1; State.trump=null; State.bid=null;
       State.folded=[false,false,false,false]; State.revealedSeat=null;
       if(State.onlineMode){ State.revealed=[false,false,false,false]; State.revealed[State.mySeat]=true; }
@@ -1180,9 +1213,10 @@ function applyEvent(e){
       bubble(e.seat,actionSpeak(e.seat,"passt",e.cards.map(cardStr).join(" ")));
       ticker(`${PLAYERS[e.seat].name} passes ${e.cards.map(cardStr).join(" ")} to ${PLAYERS[e.partner].name}, then folds.`);
       break;
-    case "trickStart": State.trick=[]; State.awaitingPlay=null; renderTrick();
+    case "trickStart": BadPlay.trickNum=e.num; State.trick=[]; State.awaitingPlay=null; renderTrick();
       ticker(`Trick ${e.num} — ${PLAYERS[e.leader].name} leads.`); break;
     case "play":
+      BadPlay.onPlay(e);
       State.trick.push({seat:e.seat,card:e.card,buried:e.buried});
       State.awaitingPlay=null;
       // remove the played card from the seat's displayed hand
@@ -1327,7 +1361,202 @@ function tick(){
   State.timer=setTimeout(tick,d);
 }
 
+// ============================================================
+//  SAVE EVERYTHING. Every game is recorded event by event and sent to the
+//  King Pedro server after every hand; bad-play reports are sent the moment
+//  they're saved. Anything not yet confirmed by the server stays on this
+//  device and is re-sent the next time the game opens.
+// ============================================================
+const newId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2)).replace(/[^A-Za-z0-9_-]/g,"");
+const Sync = {
+  PENDING:"kp_games_pending",
+  post(kind, item){
+    return fetch(`${SERVER_URL}/api/${kind}`, { method:"POST", body:JSON.stringify(item),
+      headers:{"content-type":"text/plain"}, keepalive: JSON.stringify(item).length < 60000 })
+      .then(r => r.ok);
+  },
+  pendingGames(){ try{ return JSON.parse(localStorage.getItem(this.PENDING)||"{}"); }catch(_){ return {}; } },
+  keepGame(g){
+    const all=this.pendingGames(); all[g.id]=g;
+    try{ localStorage.setItem(this.PENDING, JSON.stringify(all)); }
+    catch(_){ // storage full: keep the newest games
+      const ids=Object.keys(all).sort((a,b)=>String(all[a].updatedAt).localeCompare(String(all[b].updatedAt)));
+      while(ids.length>1){ delete all[ids.shift()]; try{ localStorage.setItem(this.PENDING, JSON.stringify(all)); return; }catch(_){} }
+    }
+  },
+  sendGame(g){
+    const stamp=g.updatedAt;
+    this.post("game", g).then(ok=>{
+      if(!ok) return;
+      const all=this.pendingGames();
+      if(all[g.id] && all[g.id].updatedAt===stamp && g.finished){ delete all[g.id]; try{ localStorage.setItem(this.PENDING, JSON.stringify(all)); }catch(_){} }
+    }).catch(()=>{});
+  },
+  sendReport(r){
+    return this.post("report", r).then(ok=>{
+      if(!ok) return false;
+      const list=BadPlay.load(), x=list.find(q=>q.id===r.id); if(x){ x.synced=true; BadPlay.store(list); }
+      return true;
+    }).catch(()=>false);
+  },
+  retryAll(){
+    for(const g of Object.values(this.pendingGames())) this.sendGame(g);
+    for(const r of BadPlay.load()) if(!r.synced) this.sendReport(r);
+  }
+};
+const GameRec = {
+  cur:null,
+  start(){ this.cur=null; },
+  ensure(){
+    if(this.cur) return this.cur;
+    this.cur={ id:newId(), v:1, startedAt:new Date().toISOString(), updatedAt:null, finished:false,
+      mode: State.onlineMode ? "online" : "device", room: State.roomCode || null,
+      players: PLAYERS.map(p=>p.name), humanSeats: State.human.slice(), hands:[], score:[0,0] };
+    return this.cur;
+  },
+  onEvent(e){
+    if(!e || !e.type) return;
+    const g=this.ensure();
+    if(e.type==="deal" || !g.hands.length) g.hands.push({ events:[] });
+    g.hands[g.hands.length-1].events.push(JSON.parse(JSON.stringify(e)));
+    if(e.type==="handResult"){
+      g.score=(e.gameScore||State.gameScore).slice();
+      if(e.won) g.finished=true;
+      this.save(true);
+    } else if(e.type==="trickEnd") this.save(false);
+  },
+  save(upload){
+    if(!this.cur) return;
+    this.cur.updatedAt=new Date().toISOString();
+    Sync.keepGame(this.cur);
+    if(upload) Sync.sendGame(this.cur);
+  },
+  flush(){            // page closing / hidden: make sure the latest state is on the device, try to upload
+    if(!this.cur) return;
+    this.save(false);
+    const body=JSON.stringify(this.cur);
+    if(navigator.sendBeacon && body.length < 60000)
+      navigator.sendBeacon(`${SERVER_URL}/api/game`, new Blob([body],{type:"text/plain"}));
+  }
+};
+addEventListener("pagehide", ()=>GameRec.flush());
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") GameRec.flush(); });
+setTimeout(()=>Sync.retryAll(), 1500);
+
+// ============================================================
+//  BAD-PLAY REPORTER. Records every play of the current hand (with the
+//  hand the player held at that moment), lets the human flag one as a
+//  mistake, pick the card that should have been played and add notes.
+//  Reports are kept on this device; Copy / Download sends them on so the
+//  AI fixes can be compiled from real games.
+// ============================================================
+const BadPlay = {
+  KEY:"kp_badplays", log:null, trickNum:0, sel:-1, pick:null,
+  load(){ try{ return JSON.parse(localStorage.getItem(this.KEY)||"[]"); }catch(_){ return []; } },
+  store(list){ try{ localStorage.setItem(this.KEY, JSON.stringify(list)); return true; }catch(_){ return false; } },
+  onDeal(e){
+    this.log={ dealer:e.dealer, startHands:e.hands.map(h=>h.map(c=>({...c}))), plays:[] };
+    this.trickNum=0;
+  },
+  onPlay(e){
+    if(!this.log || e.buried) return;
+    const held=(State.hands[e.seat]||[]).map(c=>({...c}));
+    this.log.plays.push({ trick:this.trickNum, seat:e.seat, card:{...e.card},
+      handBefore:held, trickBefore:State.trick.filter(t=>!t.buried).map(t=>({seat:t.seat,card:{...t.card}})),
+      human:!!State.human[e.seat] });
+  },
+  open(){
+    stopAuto();
+    this.sel=-1; this.pick=null;
+    this.render();
+    el("badOverlay").classList.add("show");
+  },
+  close(){ el("badOverlay").classList.remove("show"); },
+  render(){
+    const body=el("bpBody"), saved=this.load();
+    const plays=(this.log?this.log.plays:[]).map((p,i)=>({p,i})).reverse();
+    let h="";
+    if(!plays.length) h+=`<p class="bpNote">No cards played yet this hand. You can still describe a bad bid, trump call or pass below.</p>`;
+    else {
+      h+=`<h3>1. Which play was bad?</h3><div class="bpList">`+
+        plays.map(({p,i})=>`<button class="bpRow${i===this.sel?" sel":""}" data-i="${i}">Trick ${p.trick} · <b>${PLAYERS[p.seat].name}</b> played <b>${cardStr(p.card)}</b>${p.trickBefore.length?` (after ${p.trickBefore.map(t=>cardStr(t.card)).join(" ")})`:" (led)"}</button>`).join("")+
+        `</div>`;
+    }
+    if(this.sel>=0){
+      const p=this.log.plays[this.sel];
+      h+=`<h3>2. Tap the card ${PLAYERS[p.seat].name} should have played</h3><div class="bpCards" id="bpCards"></div>
+          <p class="bpNote">Red = what was played. Green = your choice.</p>`;
+    }
+    h+=`<h3>${this.sel>=0?"3":plays.length?"2":"1"}. What was wrong, and what should have happened?</h3>
+        <textarea id="bpWhy" placeholder="e.g. Partner was already winning — should have fed the Pedro instead of trumping."></textarea>
+        <div class="bpBtns"><button id="bpSave">Save report</button><button class="ghost" id="bpCancel">Close</button></div>
+        <h3>Saved reports (${saved.length})</h3>`+
+        (saved.length? saved.map((r,k)=>`<div class="bpSaved"><span>${r.synced?"✓":"⏳"} ${new Date(r.at).toLocaleString()} — ${r.summary}</span><button class="ghost" data-del="${k}">Delete</button></div>`).join("")
+          +`<div class="bpBtns"><button id="bpCopy">Copy all</button><button id="bpDownload">Download</button></div>`
+          : `<p class="bpNote">None yet.</p>`)+`<p class="bpNote">✓ = safely on the server. ⏳ = on this device, will be sent automatically.</p>`;
+    body.innerHTML=h;
+    body.querySelectorAll(".bpRow").forEach(b=>b.onclick=()=>{ this.sel=+b.dataset.i; this.pick=null; this.render(); });
+    if(this.sel>=0){
+      const p=this.log.plays[this.sel], box=el("bpCards");
+      for(const c of p.handBefore){
+        const n=cardEl(c,State.trump);
+        if(c.suit===p.card.suit&&c.rank===p.card.rank) n.classList.add("was");
+        if(this.pick&&c.suit===this.pick.suit&&c.rank===this.pick.rank) n.classList.add("pick");
+        n.onclick=()=>{ const why=el("bpWhy").value; this.pick={...c}; this.render(); el("bpWhy").value=why; };
+        box.appendChild(n);
+      }
+    }
+    el("bpSave").onclick=()=>this.save();
+    el("bpCancel").onclick=()=>this.close();
+    body.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+      const why=el("bpWhy").value, list=this.load(); list.splice(+b.dataset.del,1); this.store(list); this.render(); el("bpWhy").value=why; });
+    if(el("bpCopy")) el("bpCopy").onclick=()=>this.copy();
+    if(el("bpDownload")) el("bpDownload").onclick=()=>this.download();
+  },
+  save(){
+    const why=el("bpWhy").value.trim();
+    const p=this.sel>=0?this.log.plays[this.sel]:null;
+    if(!p && !why){ ticker("Pick the bad play or type what went wrong first."); return; }
+    const r={ v:1, id:newId(), gameId: GameRec.cur ? GameRec.cur.id : null, handNo: GameRec.cur ? GameRec.cur.hands.length : null,
+      synced:false, at:new Date().toISOString(), why,
+      summary: p ? `Trick ${p.trick}: ${PLAYERS[p.seat].name} played ${cardStr(p.card)}${this.pick?`, should be ${cardStr(this.pick)}`:""}` : why.slice(0,60),
+      player: p ? PLAYERS[p.seat].name : null, seat: p ? p.seat : null,
+      played: p ? cardStr(p.card) : null, shouldPlay: this.pick ? cardStr(this.pick) : null,
+      trick: p ? p.trick : null, trickSoFar: p ? p.trickBefore.map(t=>`${PLAYERS[t.seat].name} ${cardStr(t.card)}`) : [],
+      handAtTheTime: p ? p.handBefore.map(cardStr) : [],
+      trump: State.trump, bid: State.bid, declarer: State.declarer>=0 ? PLAYERS[State.declarer].name : null,
+      dealer: this.log ? PLAYERS[this.log.dealer].name : null, gameScore: State.gameScore.slice(),
+      players: PLAYERS.map(x=>x.name), humanSeats: State.human.slice(),
+      startHands: this.log ? this.log.startHands.map(hh=>hh.map(cardStr)) : null,
+      playsThisHand: this.log ? this.log.plays.map(q=>`T${q.trick} ${PLAYERS[q.seat].name} ${cardStr(q.card)}`) : [],
+      raw: p ? { play:p, pick:this.pick } : null };
+    const list=this.load(); list.push(r);
+    if(!this.store(list)){ ticker("Couldn't save — this browser is blocking storage. Use Copy instead."); return; }
+    ticker(`Bad play saved (${list.length} total) — sending to the server…`);
+    Sync.sendReport(r).then(ok=>{ ticker(ok ? "Bad play saved and sent ✓" : "Bad play saved on this device — it will be sent when you're back online."); if(el("badOverlay").classList.contains("show")) this.render(); });
+    GameRec.save(true);
+    this.sel=-1; this.pick=null; this.render();
+  },
+  text(){ return JSON.stringify(this.load(),null,1); },
+  copy(){
+    const t=this.text();
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject())
+      .then(()=>ticker("All bad-play reports copied — paste them to Claude."))
+      .catch(()=>{ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select();
+        try{ document.execCommand("copy"); ticker("All bad-play reports copied."); }catch(_){ ticker("Copy failed — use Download."); }
+        a.remove(); });
+  },
+  download(){
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([this.text()],{type:"application/json"}));
+    a.download=`king-pedro-bad-plays-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+};
+el("badBtn").onclick=()=>BadPlay.open();
+
 function newGame(){
+  GameRec.start();
   stopAuto();
   State.dealer=Math.floor(Math.random()*4); State.gameScore=[0,0];
   State.gen=null; State.resumeValue=undefined; State.lastEvent=null; State.paused=false;
