@@ -1,1 +1,46 @@
-[]
+[
+  {
+    "id": "a215b115-b15e-406a-a1b4-07eb7ef6ca29",
+    "startedAt": "2026-11-03T08:29:36.795Z",
+    "updatedAt": "2026-11-03T09:02:41.416Z",
+    "players": [
+      "Joe",
+      "Grace",
+      "Randy",
+      "Steve"
+    ],
+    "humanSeats": [
+      false,
+      false,
+      true,
+      false
+    ],
+    "hands": 4,
+    "finalScore": [
+      -59,
+      78
+    ]
+  },
+  {
+    "id": "77679f2d-682b-4a56-927b-1acb145d07ac",
+    "startedAt": "2026-11-03T09:02:46.114Z",
+    "updatedAt": "2026-11-03T09:08:13.943Z",
+    "players": [
+      "Joe",
+      "Grace",
+      "Jean",
+      "Randy"
+    ],
+    "humanSeats": [
+      false,
+      false,
+      false,
+      true
+    ],
+    "hands": 6,
+    "finalScore": [
+      212,
+      73
+    ]
+  }
+]
