@@ -309,19 +309,208 @@ class PlayerMemory(
         }
     }
 
+    /** Writes one seat's memory to king-pedro-memory/seat_N.json (temp file + rename, so a crash can't leave half a file). */
     private fun saveMemory(seatPosition: Int) {
         val memory = memories[seatPosition] ?: return
         val file = File(memoryDir, "seat_$seatPosition.json")
-        // In real impl: use kotlinx.serialization to write JSON
-        // file.writeText(Json.encodeToString(memory))
+        val tmp = File(memoryDir, "seat_$seatPosition.json.tmp")
+        try {
+            tmp.writeText(MemoryJson.encode(memory))
+            if (!tmp.renameTo(file)) {           // Windows won't rename over an existing file
+                file.delete()
+                tmp.renameTo(file)
+            }
+        } catch (e: Exception) {
+            System.err.println("PlayerMemory: could not save ${file.path}: ${e.message}")
+        }
     }
 
+    /** Loads every king-pedro-memory/seat_N.json. A missing or damaged file just means that seat starts fresh. */
     private fun loadAllMemories() {
-        // In real impl: load all seat_*.json files
+        val seatFile = Regex("""seat_(\d+)\.json""")
+        val files = File(memoryDir).listFiles() ?: return
+        for (f in files) {
+            val seat = seatFile.matchEntire(f.name)?.groupValues?.get(1)?.toIntOrNull() ?: continue
+            try {
+                memories[seat] = MemoryJson.decode(f.readText(), seat)
+            } catch (e: Exception) {
+                System.err.println("PlayerMemory: ignoring unreadable ${f.path}: ${e.message}")
+            }
+        }
     }
 
     fun getMemory(seatPosition: Int): CharacterMemory {
         return memories.getOrDefault(seatPosition, CharacterMemory(seatPosition, "Seat$seatPosition"))
+    }
+}
+
+/**
+ * Hand-rolled JSON for CharacterMemory, so the AI needs no external library
+ * (same approach as the Sep 17 version). Unknown keys are ignored and missing
+ * keys keep their defaults, so older or newer files still load.
+ */
+internal object MemoryJson {
+
+    fun encode(m: CharacterMemory): String {
+        val hs = m.lastHandStrength
+        val sb = StringBuilder()
+        sb.append("{\n")
+        sb.append("  \"seatPosition\": ${m.seatPosition},\n")
+        sb.append("  \"characterName\": ${str(m.characterName)},\n")
+        sb.append("  \"bidConfidence\": ${m.bidConfidence},\n")
+        sb.append("  \"winEagerness\": ${m.winEagerness},\n")
+        sb.append("  \"feedPartnerBias\": ${m.feedPartnerBias},\n")
+        sb.append("  \"leadTrumpBias\": ${m.leadTrumpBias},\n")
+        sb.append("  \"lastUpdated\": ${m.lastUpdated},\n")
+        sb.append("  \"lastHandStrength\": {\"hasHigh\": ${hs.hasHigh}, \"hasLow\": ${hs.hasLow}, " +
+            "\"hasJack\": ${hs.hasJack}, \"hasPedro\": ${hs.hasPedro}, \"offPedroCount\": ${hs.offPedroCount}, " +
+            "\"trumpCount\": ${hs.trumpCount}, \"strength\": ${hs.strength}},\n")
+        sb.append("  \"partnerBidHistory\": [")
+        sb.append(m.partnerBidHistory.joinToString(",") {
+            "\n    {\"handNumber\": ${it.handNumber}, \"partnerBid\": ${it.partnerBid}, " +
+                "\"partnerTrump\": ${it.partnerTrump?.let(::str) ?: "null"}, \"handOutcome\": ${it.handOutcome}}"
+        })
+        sb.append(if (m.partnerBidHistory.isEmpty()) "],\n" else "\n  ],\n")
+        sb.append("  \"handOutcomes\": [")
+        sb.append(m.handOutcomes.joinToString(",") {
+            "\n    {\"handNumber\": ${it.handNumber}, \"biddedPoints\": ${it.biddedPoints}, " +
+                "\"actualPoints\": ${it.actualPoints}, \"playerDecision\": ${str(it.playerDecision)}, " +
+                "\"wasCorrection\": ${it.wasCorrection}}"
+        })
+        sb.append(if (m.handOutcomes.isEmpty()) "]\n" else "\n  ]\n")
+        sb.append("}\n")
+        return sb.toString()
+    }
+
+    fun decode(json: String, seat: Int): CharacterMemory {
+        @Suppress("UNCHECKED_CAST")
+        val o = Parser(json).parseValue() as? Map<String, Any?>
+            ?: throw IllegalArgumentException("not a JSON object")
+        val m = CharacterMemory(seat, (o["characterName"] as? String) ?: "Seat$seat")
+        (o["bidConfidence"] as? Double)?.let { m.bidConfidence = it }
+        (o["winEagerness"] as? Double)?.let { m.winEagerness = it }
+        (o["feedPartnerBias"] as? Double)?.let { m.feedPartnerBias = it }
+        (o["leadTrumpBias"] as? Double)?.let { m.leadTrumpBias = it }
+        (o["lastUpdated"] as? Double)?.let { m.lastUpdated = it.toLong() }
+        (o["lastHandStrength"] as? Map<*, *>)?.let { h ->
+            m.lastHandStrength = HandStrength(
+                hasHigh = h["hasHigh"] == true, hasLow = h["hasLow"] == true,
+                hasJack = h["hasJack"] == true, hasPedro = h["hasPedro"] == true,
+                offPedroCount = h.int("offPedroCount"), trumpCount = h.int("trumpCount"),
+                strength = (h["strength"] as? Double) ?: 0.0
+            )
+        }
+        (o["partnerBidHistory"] as? List<*>)?.forEach { e ->
+            val h = e as? Map<*, *> ?: return@forEach
+            m.partnerBidHistory.add(PartnerBidEvent(h.int("handNumber"), h.int("partnerBid"),
+                h["partnerTrump"] as? String, h.int("handOutcome")))
+        }
+        (o["handOutcomes"] as? List<*>)?.forEach { e ->
+            val h = e as? Map<*, *> ?: return@forEach
+            m.handOutcomes.add(HandOutcome(h.int("handNumber"), h.int("biddedPoints"), h.int("actualPoints"),
+                (h["playerDecision"] as? String) ?: "auto", h["wasCorrection"] == true))
+        }
+        return m
+    }
+
+    private fun Map<*, *>.int(key: String) = (this[key] as? Double)?.toInt() ?: 0
+
+    private fun str(s: String): String {
+        val sb = StringBuilder("\"")
+        for (c in s) when (c) {
+            '"' -> sb.append("\\\""); '\\' -> sb.append("\\\\")
+            '\n' -> sb.append("\\n"); '\r' -> sb.append("\\r"); '\t' -> sb.append("\\t")
+            else -> if (c < ' ') sb.append("\\u%04x".format(c.code)) else sb.append(c)
+        }
+        return sb.append('"').toString()
+    }
+
+    /** Minimal JSON reader: objects -> Map, arrays -> List, numbers -> Double. */
+    private class Parser(private val s: String) {
+        private var i = 0
+
+        fun parseValue(): Any? {
+            skipWs()
+            if (i >= s.length) throw IllegalArgumentException("unexpected end of JSON")
+            return when (s[i]) {
+                '{' -> parseObject()
+                '[' -> parseArray()
+                '"' -> parseString()
+                't' -> literal("true", true)
+                'f' -> literal("false", false)
+                'n' -> literal("null", null)
+                else -> parseNumber()
+            }
+        }
+
+        private fun parseObject(): Map<String, Any?> {
+            val map = LinkedHashMap<String, Any?>()
+            i++; skipWs()
+            if (peek() == '}') { i++; return map }
+            while (true) {
+                skipWs()
+                val key = parseString()
+                skipWs(); expect(':')
+                map[key] = parseValue()
+                skipWs()
+                if (peek() == ',') { i++; continue }
+                expect('}'); return map
+            }
+        }
+
+        private fun parseArray(): List<Any?> {
+            val list = ArrayList<Any?>()
+            i++; skipWs()
+            if (peek() == ']') { i++; return list }
+            while (true) {
+                list.add(parseValue())
+                skipWs()
+                if (peek() == ',') { i++; continue }
+                expect(']'); return list
+            }
+        }
+
+        private fun parseString(): String {
+            expect('"')
+            val sb = StringBuilder()
+            while (true) {
+                if (i >= s.length) throw IllegalArgumentException("unterminated string")
+                val c = s[i++]
+                when (c) {
+                    '"' -> return sb.toString()
+                    '\\' -> {
+                        val e = s[i++]
+                        when (e) {
+                            'n' -> sb.append('\n'); 'r' -> sb.append('\r'); 't' -> sb.append('\t')
+                            'b' -> sb.append('\b'); 'f' -> sb.append('\u000C')
+                            'u' -> { sb.append(s.substring(i, i + 4).toInt(16).toChar()); i += 4 }
+                            else -> sb.append(e)
+                        }
+                    }
+                    else -> sb.append(c)
+                }
+            }
+        }
+
+        private fun parseNumber(): Double {
+            val start = i
+            while (i < s.length && (s[i].isDigit() || s[i] in "+-.eE")) i++
+            return s.substring(start, i).toDoubleOrNull()
+                ?: throw IllegalArgumentException("bad value at position $start")
+        }
+
+        private fun literal(word: String, value: Any?): Any? {
+            if (!s.startsWith(word, i)) throw IllegalArgumentException("bad value at position $i")
+            i += word.length
+            return value
+        }
+
+        private fun peek() = if (i < s.length) s[i] else '\u0000'
+        private fun expect(c: Char) {
+            if (peek() != c) throw IllegalArgumentException("expected '$c' at position $i")
+            i++
+        }
+        private fun skipWs() { while (i < s.length && s[i].isWhitespace()) i++ }
     }
 }
 
