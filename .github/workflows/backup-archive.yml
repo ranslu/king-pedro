@@ -1,0 +1,61 @@
+# Nightly copy of every bad-play report and game record from the online
+# server into this repo (data/archive/), so they live in two places and can
+# be read from any session. Run it by hand from the Actions tab with
+# "Run workflow".
+name: Backup bad plays and games
+
+on:
+  schedule:
+    - cron: "41 9 * * *"   # 09:41 UTC daily (early morning in Canada)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backup-archive
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download reports and games
+        env:
+          SERVER: https://king-pedro-online.king-pedro-server.workers.dev
+        run: |
+          set -euo pipefail
+          mkdir -p data/archive/games
+          get() { curl -fsS --retry 4 --retry-delay 5 --max-time 60 "$SERVER$1"; }
+
+          # Never replace a good backup with an error page: each file must be valid JSON first.
+          get /api/reports > /tmp/reports.json
+          jq -e 'type == "array"' /tmp/reports.json > /dev/null
+          get /api/games > /tmp/games.json
+          jq -e 'type == "array"' /tmp/games.json > /dev/null
+
+          jq . /tmp/reports.json > data/archive/reports.json
+          jq . /tmp/games.json > data/archive/games.json
+
+          # One file per game. Re-download a game only if it changed since the last backup.
+          jq -r '.[] | "\(.id) \(.updatedAt)"' /tmp/games.json | while read -r id updated; do
+            [[ "$id" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "skipping odd id"; continue; }
+            f="data/archive/games/$id.json"
+            if [ -f "$f" ] && [ "$(jq -r .updatedAt "$f")" = "$updated" ]; then continue; fi
+            get "/api/game/$id" > /tmp/game.json
+            jq -e '.id' /tmp/game.json > /dev/null
+            jq . /tmp/game.json > "$f"
+          done
+
+          echo "reports: $(jq length data/archive/reports.json), games: $(jq length data/archive/games.json)"
+
+      - name: Commit if anything changed
+        run: |
+          git add data/archive
+          if git diff --cached --quiet; then echo "No changes."; exit 0; fi
+          git config user.name "king-pedro-backup"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Backup bad plays and games ($(date -u +%Y-%m-%d))"
+          git push
