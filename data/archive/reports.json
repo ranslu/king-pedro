@@ -1,1 +1,112 @@
-[]
+[
+  {
+    "v": 1,
+    "id": "9d195564-eb04-4912-988a-ac601b150007",
+    "gameId": "b29829d1-0959-42dd-b210-8f5c4925dbec",
+    "handNo": 3,
+    "synced": false,
+    "at": "2026-11-04T05:53:03.836Z",
+    "why": "It's important to let the partner know where the Ace is.  Then the player can more aggressively scalp players trumps. Must make the bid at least.",
+    "summary": "It's important to let the partner know where the Ace is.  Th",
+    "player": null,
+    "seat": null,
+    "played": null,
+    "shouldPlay": null,
+    "trick": null,
+    "trickSoFar": [],
+    "handAtTheTime": [],
+    "trump": "spades",
+    "bid": 44,
+    "declarer": "Randy",
+    "dealer": "Steve",
+    "gameScore": [
+      52,
+      134
+    ],
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "startHands": [
+      [
+        "2♥",
+        "3♥",
+        "9♦",
+        "K♦",
+        "5♣",
+        "Q♣",
+        "A♣",
+        "9♠",
+        "K♠"
+      ],
+      [
+        "8♥",
+        "J♥",
+        "4♦",
+        "2♣",
+        "7♣",
+        "8♣",
+        "10♣",
+        "J♣",
+        "10♠"
+      ],
+      [
+        "9♥",
+        "K♥",
+        "7♦",
+        "3♣",
+        "4♣",
+        "2♠",
+        "3♠",
+        "8♠",
+        "A♠"
+      ],
+      [
+        "5♥",
+        "6♥",
+        "Q♥",
+        "3♦",
+        "6♣",
+        "9♣",
+        "K♣",
+        "J♠",
+        "Q♠"
+      ]
+    ],
+    "playsThisHand": [
+      "T1 Randy A♣",
+      "T1 Grace Q♦",
+      "T1 Jean A♥",
+      "T1 Steve Q♥",
+      "T2 Randy K♦",
+      "T2 Grace J♥",
+      "T2 Jean 2♠",
+      "T2 Steve A♦",
+      "T3 Jean 3♠",
+      "T3 Steve Q♠",
+      "T3 Randy 7♠",
+      "T3 Grace 10♠",
+      "T4 Steve J♠",
+      "T4 Randy 5♣",
+      "T4 Grace 6♠",
+      "T4 Jean 8♠",
+      "T5 Steve K♣",
+      "T5 Randy 9♠",
+      "T5 Grace 4♠",
+      "T5 Jean 5♠",
+      "T6 Randy K♠",
+      "T6 Jean A♠"
+    ],
+    "raw": null,
+    "receivedAt": "2026-11-04T05:53:03.637Z",
+    "updatedAt": "2026-11-04T05:53:03.637Z"
+  }
+]
