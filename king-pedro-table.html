@@ -370,6 +370,17 @@
     .decision.trumpBox.show{ transform:translate(-50%,0); }
     .decision.trumpBox h3{ font-size:.74rem; margin-bottom:.15rem; }
   }
+  /* phones: the decision box joins the top panel, so the bottom controls (Bad play) stay visible */
+  .hud .decision{ position:static; transform:none; opacity:1; pointer-events:auto; display:none;
+    width:auto; max-width:none; border:0; border-top:1px solid #c9b88c; border-radius:0; box-shadow:none;
+    background:rgba(255,255,255,.55); padding:.35rem .6rem .45rem; transition:none; }
+  .hud .decision.show,.hud .decision.trumpBox.show{ display:block; transform:none; }
+  .hud .decision.trumpBox{ width:auto; max-width:none; padding:.35rem .6rem .45rem; }
+  .hud .decision .row{ margin-top:.25rem; }
+  .hud .decision > div:not(.row){ font-size:.7rem; }
+  .hud .decision.trumpBox button.suitBtn{ font-size:.68rem; padding:.24rem .3rem; }
+  .hud .decision h3{ margin-bottom:.15rem; }
+  .hud .decision:not(.trumpBox) .row{ display:inline-flex; vertical-align:middle; margin:.25rem .2rem 0; }
   .bidline{ display:none !important; }        /* the live bid now lives in the panel */
 
   /* ---- bad-play reporter ---- */
@@ -1548,6 +1559,16 @@ const BadPlay = {
   }
 };
 el("badBtn").onclick=()=>BadPlay.open();
+
+// Phones: dock the decision box inside the top panel so it never covers the bottom controls.
+const decisionMQ = matchMedia("(max-width:600px)");
+function placeDecision(){
+  const d=el("decision"), hud=el("hud");
+  if(decisionMQ.matches){ if(d.parentNode!==hud) hud.appendChild(d); }
+  else if(d.parentNode===hud) hud.after(d);
+}
+decisionMQ.addEventListener("change", placeDecision);
+placeDecision();
 
 function newGame(){
   GameRec.start();
