@@ -108,5 +108,114 @@
     "raw": null,
     "receivedAt": "2026-11-04T05:53:03.637Z",
     "updatedAt": "2026-11-04T05:53:03.637Z"
+  },
+  {
+    "v": 1,
+    "id": "4d1927a4-dce4-47bf-9195-4d92ad16fe0e",
+    "gameId": "758c794e-0cb1-41cf-9730-70e95762fa2f",
+    "handNo": 2,
+    "synced": false,
+    "at": "2026-11-06T00:41:29.309Z",
+    "why": "Partner should have played the Ace of trumps earlier.   We could have made more points.",
+    "summary": "Partner should have played the Ace of trumps earlier.   We c",
+    "player": null,
+    "seat": null,
+    "played": null,
+    "shouldPlay": null,
+    "trick": null,
+    "trickSoFar": [],
+    "handAtTheTime": [],
+    "trump": "clubs",
+    "bid": 38,
+    "declarer": "Randy",
+    "dealer": "Jean",
+    "gameScore": [
+      15,
+      47
+    ],
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "startHands": [
+      [
+        "9♥",
+        "3♦",
+        "4♦",
+        "6♦",
+        "7♦",
+        "4♣",
+        "J♣",
+        "K♣",
+        "3♠"
+      ],
+      [
+        "5♦",
+        "9♦",
+        "10♦",
+        "A♦",
+        "7♣",
+        "8♣",
+        "5♠",
+        "6♠",
+        "K♠"
+      ],
+      [
+        "3♥",
+        "5♥",
+        "6♥",
+        "7♥",
+        "10♥",
+        "Q♥",
+        "2♣",
+        "10♣",
+        "Q♣"
+      ],
+      [
+        "8♥",
+        "8♦",
+        "J♦",
+        "Q♦",
+        "3♣",
+        "9♣",
+        "2♠",
+        "7♠",
+        "8♠"
+      ]
+    ],
+    "playsThisHand": [
+      "T1 Randy Q♠",
+      "T1 Grace 5♠",
+      "T1 Jean Q♥",
+      "T1 Steve 9♣",
+      "T2 Steve J♦",
+      "T2 Randy 9♥",
+      "T2 Grace A♦",
+      "T2 Jean 2♣",
+      "T3 Jean 6♣",
+      "T3 Steve 3♣",
+      "T3 Randy 4♣",
+      "T3 Grace 8♣",
+      "T4 Grace A♠",
+      "T4 Jean Q♣",
+      "T4 Steve Q♦",
+      "T4 Randy K♣",
+      "T5 Randy A♥",
+      "T5 Grace 5♣",
+      "T5 Jean 10♣",
+      "T5 Steve K♦",
+      "T6 Jean A♣"
+    ],
+    "raw": null,
+    "receivedAt": "2026-11-06T00:41:29.469Z",
+    "updatedAt": "2026-11-06T00:41:29.469Z"
   }
 ]
