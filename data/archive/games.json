@@ -2,7 +2,7 @@
   {
     "id": "a215b115-b15e-406a-a1b4-07eb7ef6ca29",
     "startedAt": "2026-11-03T08:29:36.795Z",
-    "updatedAt": "2026-11-06T05:47:50.760Z",
+    "updatedAt": "2026-11-07T07:14:54.808Z",
     "players": [
       "Joe",
       "Grace",
@@ -46,7 +46,7 @@
   {
     "id": "e375a9de-f61f-4113-9272-ed2d008eb8e3",
     "startedAt": "2026-11-03T19:43:16.551Z",
-    "updatedAt": "2026-11-06T05:47:50.760Z",
+    "updatedAt": "2026-11-07T07:14:54.808Z",
     "players": [
       "Joe",
       "Grace",
@@ -921,6 +921,182 @@
     "finalScore": [
       19,
       -7
+    ]
+  },
+  {
+    "id": "260b2abe-844a-404e-909b-5d5f09fe973c",
+    "startedAt": "2026-11-06T19:24:27.630Z",
+    "updatedAt": "2026-11-06T19:27:02.926Z",
+    "players": [
+      "randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 1,
+    "finalScore": [
+      41,
+      21
+    ]
+  },
+  {
+    "id": "03b8f7b4-6db5-49e8-9b7a-d0132e35a5eb",
+    "startedAt": "2026-11-06T20:14:23.183Z",
+    "updatedAt": "2026-11-06T20:15:08.304Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 1,
+    "finalScore": [
+      11,
+      51
+    ]
+  },
+  {
+    "id": "c6081552-d4fc-4720-bc9b-993f5edc946c",
+    "startedAt": "2026-11-06T21:00:08.768Z",
+    "updatedAt": "2026-11-06T21:11:10.206Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 7,
+    "finalScore": [
+      184,
+      98
+    ]
+  },
+  {
+    "id": "a70ed18e-7387-4c1f-9b5d-4022d9687aaa",
+    "startedAt": "2026-11-06T21:19:57.368Z",
+    "updatedAt": "2026-11-06T21:45:52.725Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 9,
+    "finalScore": [
+      168,
+      234
+    ]
+  },
+  {
+    "id": "d0f58293-9607-46d0-aab9-e2b32a83d938",
+    "startedAt": "2026-11-07T03:09:10.885Z",
+    "updatedAt": "2026-11-07T03:25:24.712Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 11,
+    "finalScore": [
+      155,
+      272
+    ]
+  },
+  {
+    "id": "85998330-7f6a-4a22-a972-683c12aefd9b",
+    "startedAt": "2026-11-07T04:49:09.836Z",
+    "updatedAt": "2026-11-07T04:53:56.061Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 6,
+    "finalScore": [
+      -25,
+      121
+    ]
+  },
+  {
+    "id": "bdea7712-7e2e-4639-91c6-b8a71e188144",
+    "startedAt": "2026-11-07T05:46:28.650Z",
+    "updatedAt": "2026-11-07T05:47:32.641Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 2,
+    "finalScore": [
+      -44,
+      53
+    ]
+  },
+  {
+    "id": "84513adb-f58f-484b-9790-02363316ddf0",
+    "startedAt": "2026-11-07T05:56:25.834Z",
+    "updatedAt": "2026-11-07T05:58:35.349Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 3,
+    "finalScore": [
+      -36,
+      87
     ]
   }
 ]
