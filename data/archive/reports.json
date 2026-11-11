@@ -217,5 +217,181 @@
     "raw": null,
     "receivedAt": "2026-11-06T00:41:29.469Z",
     "updatedAt": "2026-11-06T00:41:29.469Z"
+  },
+  {
+    "v": 1,
+    "id": "19884eaa-2a7f-4c40-89e6-12039fa07957",
+    "gameId": "713e4bbb-134f-4cb8-8cc7-32996a42dfe6",
+    "handNo": 12,
+    "synced": false,
+    "at": "2026-11-11T03:57:24.073Z",
+    "why": "Opponent threw several cards at the first trick.   All players should see all the cards the first trick are.",
+    "summary": "Opponent threw several cards at the first trick.   All playe",
+    "player": null,
+    "seat": null,
+    "played": null,
+    "shouldPlay": null,
+    "trick": null,
+    "trickSoFar": [],
+    "handAtTheTime": [],
+    "trump": "hearts",
+    "bid": 54,
+    "declarer": "Steve",
+    "dealer": "Steve",
+    "gameScore": [
+      157,
+      196
+    ],
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "startHands": [
+      [
+        "2♥",
+        "J♥",
+        "8♦",
+        "K♦",
+        "A♦",
+        "6♣",
+        "Q♣",
+        "3♠",
+        "10♠"
+      ],
+      [
+        "5♥",
+        "7♥",
+        "4♦",
+        "Q♦",
+        "5♣",
+        "5♠",
+        "7♠",
+        "8♠",
+        "K♠"
+      ],
+      [
+        "5♦",
+        "10♦",
+        "J♦",
+        "3♣",
+        "K♣",
+        "2♠",
+        "4♠",
+        "9♠",
+        "A♠"
+      ],
+      [
+        "8♥",
+        "9♥",
+        "K♥",
+        "A♥",
+        "3♦",
+        "10♣",
+        "J♣",
+        "6♠",
+        "J♠"
+      ]
+    ],
+    "playsThisHand": [
+      "T1 Steve 7♥"
+    ],
+    "raw": null,
+    "receivedAt": "2026-11-11T03:57:24.277Z",
+    "updatedAt": "2026-11-11T03:57:24.277Z"
+  },
+  {
+    "v": 1,
+    "id": "8cc23c3f-e981-4446-b2ea-741675b86214",
+    "gameId": "fc24c3bf-27f0-4a8a-a65b-30f616b92069",
+    "handNo": 7,
+    "synced": false,
+    "at": "2026-11-11T05:05:44.468Z",
+    "why": "Partner played his Ace trump too late.  Should be signing the partner where the Ace lays.",
+    "summary": "Partner played his Ace trump too late.  Should be signing th",
+    "player": null,
+    "seat": null,
+    "played": null,
+    "shouldPlay": null,
+    "trick": null,
+    "trickSoFar": [],
+    "handAtTheTime": [],
+    "trump": null,
+    "bid": null,
+    "declarer": null,
+    "dealer": "Jean",
+    "gameScore": [
+      115,
+      91
+    ],
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "startHands": [
+      [
+        "4♦",
+        "6♦",
+        "8♦",
+        "10♦",
+        "3♣",
+        "5♣",
+        "7♣",
+        "K♠",
+        "A♠"
+      ],
+      [
+        "5♥",
+        "6♥",
+        "K♥",
+        "K♦",
+        "A♦",
+        "10♣",
+        "K♣",
+        "6♠",
+        "9♠"
+      ],
+      [
+        "2♥",
+        "9♥",
+        "J♥",
+        "5♦",
+        "J♦",
+        "4♣",
+        "3♠",
+        "5♠",
+        "10♠"
+      ],
+      [
+        "7♥",
+        "8♥",
+        "2♦",
+        "3♦",
+        "6♣",
+        "8♣",
+        "J♣",
+        "7♠",
+        "Q♠"
+      ]
+    ],
+    "playsThisHand": [],
+    "raw": null,
+    "receivedAt": "2026-11-11T05:05:44.547Z",
+    "updatedAt": "2026-11-11T05:05:44.547Z"
   }
 ]

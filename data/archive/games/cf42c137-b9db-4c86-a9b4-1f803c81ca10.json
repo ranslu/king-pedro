@@ -1,0 +1,3193 @@
+{
+  "id": "cf42c137-b9db-4c86-a9b4-1f803c81ca10",
+  "v": 1,
+  "startedAt": "2026-11-11T00:33:08.060Z",
+  "updatedAt": "2026-11-11T00:39:05.272Z",
+  "finished": false,
+  "mode": "device",
+  "room": null,
+  "players": [
+    "Randy",
+    "Grace",
+    "Jean",
+    "Steve"
+  ],
+  "humanSeats": [
+    true,
+    false,
+    false,
+    false
+  ],
+  "hands": [
+    {
+      "events": [
+        {
+          "type": "deal",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 7
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 2
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 2
+              },
+              {
+                "suit": "hearts",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ]
+          ],
+          "dealer": 2,
+          "peeked": {
+            "suit": "clubs",
+            "rank": 4
+          }
+        },
+        {
+          "type": "bid",
+          "seat": 3,
+          "bid": 30
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 31
+        },
+        {
+          "type": "bid",
+          "seat": 1,
+          "bid": 36
+        },
+        {
+          "type": "pass",
+          "seat": 2
+        },
+        {
+          "type": "bid",
+          "seat": 3,
+          "bid": 41
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 42
+        },
+        {
+          "type": "pass",
+          "seat": 1
+        },
+        {
+          "type": "bid",
+          "seat": 3,
+          "bid": 44
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 45
+        },
+        {
+          "type": "bid",
+          "seat": 3,
+          "bid": 46
+        },
+        {
+          "type": "pass",
+          "seat": 0
+        },
+        {
+          "type": "trump",
+          "seat": 3,
+          "trump": "spades",
+          "bid": 46,
+          "bidTeam": 1
+        },
+        {
+          "type": "deal2",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "hearts",
+                "rank": 13
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 7
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 7
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 2
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 2
+              },
+              {
+                "suit": "hearts",
+                "rank": 3
+              },
+              {
+                "suit": "hearts",
+                "rank": 8
+              },
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 4
+              },
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 9
+              },
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ]
+          ]
+        },
+        {
+          "type": "passt",
+          "seat": 1,
+          "partner": 3,
+          "cards": [
+            {
+              "suit": "clubs",
+              "rank": 5
+            }
+          ]
+        },
+        {
+          "type": "settle",
+          "hands": [
+            [
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 2
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ],
+            [],
+            [
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              }
+            ],
+            [
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ]
+          ],
+          "folded": [
+            false,
+            true,
+            false,
+            false
+          ],
+          "trump": "spades"
+        },
+        {
+          "type": "trickStart",
+          "num": 1,
+          "leader": 3
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 4
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "spades",
+            "rank": 5
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "spades",
+            "rank": 9
+          },
+          "lead": false,
+          "say": "feed",
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 2,
+          "winCard": {
+            "suit": "spades",
+            "rank": 9
+          },
+          "points": 14,
+          "captured": [
+            14,
+            0
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 2,
+          "leader": 2
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "hearts",
+            "rank": 14
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 6
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "clubs",
+            "rank": 13
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 3,
+          "winCard": {
+            "suit": "spades",
+            "rank": 6
+          },
+          "points": 0,
+          "captured": [
+            14,
+            0
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 3,
+          "leader": 3
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 7
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "spades",
+            "rank": 2
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "spades",
+            "rank": 11
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 2,
+          "winCard": {
+            "suit": "spades",
+            "rank": 11
+          },
+          "points": 1,
+          "captured": [
+            16,
+            0
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 4,
+          "leader": 2
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "clubs",
+            "rank": 12
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "clubs",
+            "rank": 5
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "diamonds",
+            "rank": 14
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 3,
+          "winCard": {
+            "suit": "clubs",
+            "rank": 5
+          },
+          "points": 5,
+          "captured": [
+            16,
+            5
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 5,
+          "leader": 3
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 10
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "spades",
+            "rank": 12
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "spades",
+            "rank": 8
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 0,
+          "winCard": {
+            "suit": "spades",
+            "rank": 12
+          },
+          "points": 10,
+          "captured": [
+            26,
+            5
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 6,
+          "leader": 0
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "spades",
+            "rank": 14
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "spades",
+            "rank": 3
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 13
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 0,
+          "winCard": {
+            "suit": "spades",
+            "rank": 14
+          },
+          "points": 31,
+          "captured": [
+            57,
+            5
+          ]
+        },
+        {
+          "type": "handResult",
+          "captured": [
+            57,
+            5
+          ],
+          "made": false,
+          "bidTeam": 1,
+          "bid": 46,
+          "gameScore": [
+            57,
+            -46
+          ],
+          "won": false,
+          "declarer": 3
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "deal",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              },
+              {
+                "suit": "spades",
+                "rank": 2
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 4
+              },
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 2
+              },
+              {
+                "suit": "hearts",
+                "rank": 3
+              },
+              {
+                "suit": "hearts",
+                "rank": 8
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ]
+          ],
+          "dealer": 3,
+          "peeked": {
+            "suit": "clubs",
+            "rank": 7
+          }
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 30
+        },
+        {
+          "type": "bid",
+          "seat": 1,
+          "bid": 36
+        },
+        {
+          "type": "pass",
+          "seat": 2
+        },
+        {
+          "type": "pass",
+          "seat": 3
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 37
+        },
+        {
+          "type": "bid",
+          "seat": 1,
+          "bid": 39
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 40
+        },
+        {
+          "type": "bid",
+          "seat": 1,
+          "bid": 41
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 42
+        },
+        {
+          "type": "pass",
+          "seat": 1
+        },
+        {
+          "type": "trump",
+          "seat": 0,
+          "trump": "clubs",
+          "bid": 42,
+          "bidTeam": 0
+        },
+        {
+          "type": "deal2",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "hearts",
+                "rank": 13
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 7
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              },
+              {
+                "suit": "spades",
+                "rank": 2
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 4
+              },
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 2
+              },
+              {
+                "suit": "hearts",
+                "rank": 3
+              },
+              {
+                "suit": "hearts",
+                "rank": 8
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 8
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "hearts",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 7
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ]
+          ]
+        },
+        {
+          "type": "settle",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "hearts",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              }
+            ],
+            [
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              }
+            ],
+            [
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 7
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ]
+          ],
+          "folded": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "trump": "clubs"
+        },
+        {
+          "type": "trickStart",
+          "num": 1,
+          "leader": 0
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "spades",
+            "rank": 12
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "clubs",
+            "rank": 9
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "clubs",
+            "rank": 6
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 13
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 1,
+          "winCard": {
+            "suit": "clubs",
+            "rank": 9
+          },
+          "points": 9,
+          "captured": [
+            0,
+            9
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 2,
+          "leader": 1
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "hearts",
+            "rank": 14
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "clubs",
+            "rank": 10
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "clubs",
+            "rank": 12
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "spades",
+            "rank": 11
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 3,
+          "winCard": {
+            "suit": "clubs",
+            "rank": 12
+          },
+          "points": 10,
+          "captured": [
+            0,
+            19
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 3,
+          "leader": 3
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 14
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "hearts",
+            "rank": 11
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "hearts",
+            "rank": 12
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "spades",
+            "rank": 5
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 2,
+          "winCard": {
+            "suit": "spades",
+            "rank": 5
+          },
+          "points": 5,
+          "captured": [
+            5,
+            19
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 4,
+          "leader": 2
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "spades",
+            "rank": 10
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "clubs",
+            "rank": 11
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "hearts",
+            "rank": 13
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "clubs",
+            "rank": 13
+          },
+          "lead": false,
+          "say": "feed",
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 1,
+          "winCard": {
+            "suit": "clubs",
+            "rank": 13
+          },
+          "points": 31,
+          "captured": [
+            5,
+            50
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 5,
+          "leader": 1
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "clubs",
+            "rank": 4
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "clubs",
+            "rank": 5
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "clubs",
+            "rank": 7
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "clubs",
+            "rank": 2
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 3,
+          "winCard": {
+            "suit": "clubs",
+            "rank": 7
+          },
+          "points": 5,
+          "captured": [
+            6,
+            55
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 6,
+          "leader": 3
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "clubs",
+            "rank": 3
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "clubs",
+            "rank": 14
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "surrender",
+          "seat": 1,
+          "cards": [
+            {
+              "suit": "diamonds",
+              "rank": 14
+            }
+          ]
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "clubs",
+            "rank": 8
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 0,
+          "winCard": {
+            "suit": "clubs",
+            "rank": 14
+          },
+          "points": 1,
+          "captured": [
+            7,
+            55
+          ]
+        },
+        {
+          "type": "handResult",
+          "captured": [
+            7,
+            55
+          ],
+          "made": false,
+          "bidTeam": 0,
+          "bid": 42,
+          "gameScore": [
+            15,
+            9
+          ],
+          "won": false,
+          "declarer": 0
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "deal",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 2
+              },
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 7
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ]
+          ],
+          "dealer": 0,
+          "peeked": {
+            "suit": "clubs",
+            "rank": 14
+          }
+        },
+        {
+          "type": "pass",
+          "seat": 1
+        },
+        {
+          "type": "bid",
+          "seat": 2,
+          "bid": 30
+        },
+        {
+          "type": "pass",
+          "seat": 3
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 31
+        },
+        {
+          "type": "bid",
+          "seat": 2,
+          "bid": 37
+        },
+        {
+          "type": "bid",
+          "seat": 0,
+          "bid": 38
+        },
+        {
+          "type": "pass",
+          "seat": 2
+        },
+        {
+          "type": "trump",
+          "seat": 0,
+          "trump": "diamonds",
+          "bid": 38,
+          "bidTeam": 0
+        },
+        {
+          "type": "deal2",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "hearts",
+                "rank": 13
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 4
+              },
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 8
+              },
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 7
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 2
+              },
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 8
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 2
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 3
+              },
+              {
+                "suit": "hearts",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 7
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              },
+              {
+                "suit": "spades",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ]
+          ]
+        },
+        {
+          "type": "settle",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 7
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 8
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              }
+            ],
+            [
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ]
+          ],
+          "folded": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "trump": "diamonds"
+        },
+        {
+          "type": "trickStart",
+          "num": 1,
+          "leader": 0
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "hearts",
+            "rank": 14
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "diamonds",
+            "rank": 9
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "clubs",
+            "rank": 13
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 14
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 1,
+          "winCard": {
+            "suit": "diamonds",
+            "rank": 9
+          },
+          "points": 9,
+          "captured": [
+            0,
+            9
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 2,
+          "leader": 1
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "spades",
+            "rank": 8
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "diamonds",
+            "rank": 10
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "diamonds",
+            "rank": 14
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "diamonds",
+            "rank": 4
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 3,
+          "winCard": {
+            "suit": "diamonds",
+            "rank": 14
+          },
+          "points": 11,
+          "captured": [
+            0,
+            20
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 3,
+          "leader": 3
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "spades",
+            "rank": 12
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "diamonds",
+            "rank": 5
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "hearts",
+            "rank": 11
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "diamonds",
+            "rank": 8
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 2,
+          "winCard": {
+            "suit": "diamonds",
+            "rank": 8
+          },
+          "points": 5,
+          "captured": [
+            5,
+            20
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 4,
+          "leader": 2
+        },
+        {
+          "type": "play",
+          "seat": 2,
+          "card": {
+            "suit": "diamonds",
+            "rank": 2
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "diamonds",
+            "rank": 3
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "diamonds",
+            "rank": 13
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "diamonds",
+            "rank": 7
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 0,
+          "winCard": {
+            "suit": "diamonds",
+            "rank": 13
+          },
+          "points": 30,
+          "captured": [
+            36,
+            20
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 5,
+          "leader": 0
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "diamonds",
+            "rank": 12
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "play",
+          "seat": 1,
+          "card": {
+            "suit": "hearts",
+            "rank": 5
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "surrender",
+          "seat": 2,
+          "cards": [
+            {
+              "suit": "hearts",
+              "rank": 12
+            },
+            {
+              "suit": "clubs",
+              "rank": 12
+            }
+          ]
+        },
+        {
+          "type": "play",
+          "seat": 3,
+          "card": {
+            "suit": "diamonds",
+            "rank": 6
+          },
+          "lead": false,
+          "say": null,
+          "speakLead": false
+        },
+        {
+          "type": "trickEnd",
+          "winner": 0,
+          "winCard": {
+            "suit": "diamonds",
+            "rank": 12
+          },
+          "points": 5,
+          "captured": [
+            41,
+            20
+          ]
+        },
+        {
+          "type": "trickStart",
+          "num": 6,
+          "leader": 0
+        },
+        {
+          "type": "play",
+          "seat": 0,
+          "card": {
+            "suit": "diamonds",
+            "rank": 11
+          },
+          "lead": true,
+          "say": null,
+          "speakLead": true
+        },
+        {
+          "type": "surrender",
+          "seat": 1,
+          "cards": [
+            {
+              "suit": "spades",
+              "rank": 9
+            }
+          ]
+        },
+        {
+          "type": "surrender",
+          "seat": 3,
+          "cards": [
+            {
+              "suit": "clubs",
+              "rank": 11
+            }
+          ]
+        },
+        {
+          "type": "trickEnd",
+          "winner": 0,
+          "winCard": {
+            "suit": "diamonds",
+            "rank": 11
+          },
+          "points": 1,
+          "captured": [
+            42,
+            20
+          ]
+        },
+        {
+          "type": "handResult",
+          "captured": [
+            42,
+            20
+          ],
+          "made": true,
+          "bidTeam": 0,
+          "bid": 38,
+          "gameScore": [
+            57,
+            29
+          ],
+          "won": false,
+          "declarer": 0
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "deal",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 4
+              },
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 3
+              },
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 8
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "hearts",
+                "rank": 13
+              },
+              {
+                "suit": "diamonds",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ]
+          ],
+          "dealer": 1,
+          "peeked": {
+            "suit": "clubs",
+            "rank": 7
+          }
+        },
+        {
+          "type": "bid",
+          "seat": 2,
+          "bid": 30
+        },
+        {
+          "type": "bid",
+          "seat": 3,
+          "bid": 40
+        },
+        {
+          "type": "pass",
+          "seat": 0
+        },
+        {
+          "type": "pass",
+          "seat": 1
+        },
+        {
+          "type": "bid",
+          "seat": 2,
+          "bid": 46
+        },
+        {
+          "type": "bid",
+          "seat": 3,
+          "bid": 48
+        },
+        {
+          "type": "bid",
+          "seat": 2,
+          "bid": 50
+        },
+        {
+          "type": "pass",
+          "seat": 3
+        },
+        {
+          "type": "trump",
+          "seat": 2,
+          "trump": "clubs",
+          "bid": 50,
+          "bidTeam": 0
+        },
+        {
+          "type": "deal2",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 4
+              },
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "hearts",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 7
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "diamonds",
+                "rank": 13
+              },
+              {
+                "suit": "diamonds",
+                "rank": 14
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 2
+              },
+              {
+                "suit": "hearts",
+                "rank": 3
+              },
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 8
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 7
+              },
+              {
+                "suit": "clubs",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 5
+              },
+              {
+                "suit": "hearts",
+                "rank": 9
+              },
+              {
+                "suit": "hearts",
+                "rank": 13
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              },
+              {
+                "suit": "spades",
+                "rank": 9
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "hearts",
+                "rank": 14
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 3
+              },
+              {
+                "suit": "clubs",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 9
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 2
+              },
+              {
+                "suit": "spades",
+                "rank": 6
+              },
+              {
+                "suit": "spades",
+                "rank": 11
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "score": [
+    57,
+    29
+  ],
+  "receivedAt": "2026-11-11T00:34:58.740Z"
+}
