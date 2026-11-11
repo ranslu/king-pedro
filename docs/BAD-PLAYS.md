@@ -3,6 +3,20 @@
 Source: `data/archive/` (games and reports backed up from the online server).
 Update this file each time reports are compiled; mark items **Fixed (PR #n)** when a fix ships.
 
+## 2026-11-10 — Randy's saved Bad-play reports (amendment)
+
+Source: `data/archive/reports.json` (2 reports backed up) + the Report-a-bad-play panel (3 saved, all marked safely on the server).
+
+| # | Saved | Game · hand | Trump / bid | Randy's report |
+|---|---|---|---|---|
+| R1 | 03/11 23:53 | b29829d1 · 3 | ♠ / Randy 44 | Let the partner know where the Ace is, so they can scalp the opponents' trumps more aggressively. Must make the bid at least. |
+| R2 | 05/11 18:41 | 758c794e · 2 | ♣ / Randy 38 | Partner should have played the Ace of trumps earlier; we could have made more points. |
+| R3 | 10/11 21:57 | not backed up yet | — | "Opponent threw several cards at the first trick. All playe…" (text cut off on screen; full text still only on the server). |
+
+Themes: R1 + R2 are both **Ace-of-trump signalling** (the "Call the Ace" strategy: lead a low trump to ask partner for the Ace; partner with the Ace plays it early). R3 looks like the **excess-trump trick-1 display** rule (excess cards laid face-up so all players see them).
+
+Status: **Open** — not yet changed in the AI. Per the process below, R1/R2 still need `analyze-position.js` before touching play logic; R3 needs its full text from the next backup.
+
 ## 2026-11-04 — first compile
 
 Data: 2 games, 10 hands, played by Randy on 2026-11-03. **No Bad-play reports were saved to the server**, so these
