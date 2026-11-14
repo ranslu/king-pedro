@@ -1,0 +1,203 @@
+{
+  "id": "d66d165f-f92f-4c2d-bf20-3ccd87aa28a7",
+  "v": 1,
+  "startedAt": "2026-11-14T05:39:39.880Z",
+  "updatedAt": "2026-11-14T05:39:45.732Z",
+  "finished": false,
+  "mode": "device",
+  "room": null,
+  "players": [
+    "R",
+    "Grace",
+    "Jean",
+    "Steve"
+  ],
+  "humanSeats": [
+    true,
+    false,
+    false,
+    false
+  ],
+  "hands": [
+    {
+      "events": [
+        {
+          "type": "deal",
+          "hands": [
+            [
+              {
+                "suit": "hearts",
+                "rank": 10
+              },
+              {
+                "suit": "hearts",
+                "rank": 12
+              },
+              {
+                "suit": "diamonds",
+                "rank": 2
+              },
+              {
+                "suit": "diamonds",
+                "rank": 5
+              },
+              {
+                "suit": "diamonds",
+                "rank": 9
+              },
+              {
+                "suit": "diamonds",
+                "rank": 12
+              },
+              {
+                "suit": "clubs",
+                "rank": 5
+              },
+              {
+                "suit": "spades",
+                "rank": 4
+              },
+              {
+                "suit": "spades",
+                "rank": 8
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 3
+              },
+              {
+                "suit": "diamonds",
+                "rank": 6
+              },
+              {
+                "suit": "diamonds",
+                "rank": 11
+              },
+              {
+                "suit": "clubs",
+                "rank": 2
+              },
+              {
+                "suit": "clubs",
+                "rank": 6
+              },
+              {
+                "suit": "clubs",
+                "rank": 11
+              },
+              {
+                "suit": "clubs",
+                "rank": 14
+              },
+              {
+                "suit": "spades",
+                "rank": 5
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 7
+              },
+              {
+                "suit": "hearts",
+                "rank": 9
+              },
+              {
+                "suit": "hearts",
+                "rank": 13
+              },
+              {
+                "suit": "diamonds",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 8
+              },
+              {
+                "suit": "clubs",
+                "rank": 13
+              },
+              {
+                "suit": "spades",
+                "rank": 3
+              },
+              {
+                "suit": "spades",
+                "rank": 10
+              },
+              {
+                "suit": "spades",
+                "rank": 13
+              }
+            ],
+            [
+              {
+                "suit": "hearts",
+                "rank": 4
+              },
+              {
+                "suit": "diamonds",
+                "rank": 7
+              },
+              {
+                "suit": "diamonds",
+                "rank": 10
+              },
+              {
+                "suit": "clubs",
+                "rank": 4
+              },
+              {
+                "suit": "clubs",
+                "rank": 7
+              },
+              {
+                "suit": "clubs",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 7
+              },
+              {
+                "suit": "spades",
+                "rank": 12
+              },
+              {
+                "suit": "spades",
+                "rank": 14
+              }
+            ]
+          ],
+          "dealer": 1,
+          "peeked": {
+            "suit": "hearts",
+            "rank": 5
+          }
+        },
+        {
+          "type": "bid",
+          "seat": 2,
+          "bid": 30
+        },
+        {
+          "type": "pass",
+          "seat": 3
+        }
+      ]
+    }
+  ],
+  "score": [
+    0,
+    0
+  ],
+  "receivedAt": "2026-11-14T05:39:45.732Z"
+}
