@@ -393,5 +393,92 @@
     "raw": null,
     "receivedAt": "2026-11-11T05:05:44.547Z",
     "updatedAt": "2026-11-11T05:05:44.547Z"
+  },
+  {
+    "v": 1,
+    "id": "da0e560b-7b0f-4ef2-bfdb-0be4e63e53a2",
+    "gameId": "b932dafa-7e9e-4ad9-93b9-48c524aeaf72",
+    "handNo": 8,
+    "synced": false,
+    "at": "2026-11-17T03:57:27.508Z",
+    "why": "Partner should have  played the Ace of trumps sooner.  Partners objective is to communicate his high trump, when the player plays a low trump. Not a rare fadt rule, but a best practice.",
+    "summary": "Partner should have  played the Ace of trumps sooner.  Partn",
+    "player": null,
+    "seat": null,
+    "played": null,
+    "shouldPlay": null,
+    "trick": null,
+    "trickSoFar": [],
+    "handAtTheTime": [],
+    "trump": null,
+    "bid": null,
+    "declarer": null,
+    "dealer": "Steve",
+    "gameScore": [
+      184,
+      19
+    ],
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "startHands": [
+      [
+        "J♥",
+        "K♥",
+        "10♦",
+        "A♦",
+        "2♣",
+        "7♣",
+        "3♠",
+        "9♠",
+        "K♠"
+      ],
+      [
+        "3♥",
+        "4♥",
+        "2♦",
+        "3♦",
+        "7♦",
+        "8♦",
+        "6♣",
+        "5♠",
+        "7♠"
+      ],
+      [
+        "2♥",
+        "6♥",
+        "7♥",
+        "10♥",
+        "9♦",
+        "Q♦",
+        "9♣",
+        "10♣",
+        "J♣"
+      ],
+      [
+        "9♥",
+        "4♦",
+        "6♦",
+        "K♦",
+        "3♣",
+        "5♣",
+        "8♣",
+        "K♣",
+        "6♠"
+      ]
+    ],
+    "playsThisHand": [],
+    "raw": null,
+    "receivedAt": "2026-11-17T03:57:27.570Z",
+    "updatedAt": "2026-11-17T03:57:27.570Z"
   }
 ]
