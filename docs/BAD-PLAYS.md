@@ -13,11 +13,11 @@ Source: `data/archive/reports.json` (2 reports backed up) + the Report-a-bad-pla
 | R2 | 05/11 18:41 | 758c794e · 2 | ♣ / Randy 38 | Partner should have played the Ace of trumps earlier; we could have made more points. |
 | R3 | 10/11 21:57 | 713e4bbb · 12 | ♥ / 54 | Opponent threw several cards at the first trick. All players should see all the cards of the first trick. |
 | R4 | 10/11 23:05 | fc24c3bf · 7 | — | Partner played his Ace trump too late. Should be signing the partner where the Ace lays. |
-| R5 | 16/11 21:57 | not backed up yet | — | "Partner should have played the Ace of trumps sooner. Partn…" (full text still only on the server). |
+| R5 | 16/11 21:57 | b932dafa · 8 | — | Partner should have played the Ace of trumps sooner. Partner's objective is to communicate his high trump when the player leads a low trump — not a hard rule, but best practice. |
 
 Themes: R1, R2, R4 and R5 are all **Ace-of-trump signalling** (the "Call the Ace" strategy: lead a low trump to ask partner for the Ace; partner with the Ace plays it early). R3 is the **excess-trump trick-1 display** rule (excess cards laid face-up so all players see them).
 
-Status: **Open** — not yet changed in the AI. Per the process below, R1/R2 still need `analyze-position.js` before touching play logic; R5 needs its full text from the next backup.
+Status: **Open** — not yet changed in the AI. Per the process below, R1/R2 still need `analyze-position.js` before touching play logic; All five are backed up; R1/R2/R4/R5 still need `analyze-position.js` before touching play logic.
 
 ## 2026-11-04 — first compile
 
