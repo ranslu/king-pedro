@@ -11,11 +11,13 @@ Source: `data/archive/reports.json` (2 reports backed up) + the Report-a-bad-pla
 |---|---|---|---|---|
 | R1 | 03/11 23:53 | b29829d1 · 3 | ♠ / Randy 44 | Let the partner know where the Ace is, so they can scalp the opponents' trumps more aggressively. Must make the bid at least. |
 | R2 | 05/11 18:41 | 758c794e · 2 | ♣ / Randy 38 | Partner should have played the Ace of trumps earlier; we could have made more points. |
-| R3 | 10/11 21:57 | not backed up yet | — | "Opponent threw several cards at the first trick. All playe…" (text cut off on screen; full text still only on the server). |
+| R3 | 10/11 21:57 | 713e4bbb · 12 | ♥ / 54 | Opponent threw several cards at the first trick. All players should see all the cards of the first trick. |
+| R4 | 10/11 23:05 | fc24c3bf · 7 | — | Partner played his Ace trump too late. Should be signing the partner where the Ace lays. |
+| R5 | 16/11 21:57 | not backed up yet | — | "Partner should have played the Ace of trumps sooner. Partn…" (full text still only on the server). |
 
-Themes: R1 + R2 are both **Ace-of-trump signalling** (the "Call the Ace" strategy: lead a low trump to ask partner for the Ace; partner with the Ace plays it early). R3 looks like the **excess-trump trick-1 display** rule (excess cards laid face-up so all players see them).
+Themes: R1, R2, R4 and R5 are all **Ace-of-trump signalling** (the "Call the Ace" strategy: lead a low trump to ask partner for the Ace; partner with the Ace plays it early). R3 is the **excess-trump trick-1 display** rule (excess cards laid face-up so all players see them).
 
-Status: **Open** — not yet changed in the AI. Per the process below, R1/R2 still need `analyze-position.js` before touching play logic; R3 needs its full text from the next backup.
+Status: **Open** — not yet changed in the AI. Per the process below, R1/R2 still need `analyze-position.js` before touching play logic; R5 needs its full text from the next backup.
 
 ## 2026-11-04 — first compile
 
@@ -72,3 +74,9 @@ AI bids: 8 hands, 6 made, 2 set (Jean 46 → 41; Steve 50 → 46). No bidding ch
 
 Check every future report with `analyze-position.js` before changing the AI. Plays the analysis also dislikes are real
 mistakes; plays it likes but Randy doesn't are strategy preferences.
+
+### 2026-11-16 — freeze fix
+
+Opening **Bad play** paused Auto and **Close** never resumed it, so the game sat idle ("frozen"). Fixed: Close
+(or tapping the backdrop / Esc) resumes Auto if it was running; saving can no longer throw out of the sheet.
+**Fixed** in `king-pedro-table.html` and `docs/index.html` (service worker `kp-v7`).

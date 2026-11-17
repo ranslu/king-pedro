@@ -1470,13 +1470,19 @@ const BadPlay = {
       handBefore:held, trickBefore:State.trick.filter(t=>!t.buried).map(t=>({seat:t.seat,card:{...t.card}})),
       human:!!State.human[e.seat] });
   },
+  wasAuto:false,
   open(){
+    // remember whether Auto was running so Close can resume it (otherwise the game sits idle = "frozen")
+    this.wasAuto=!!State.auto;
     stopAuto();
     this.sel=-1; this.pick=null;
-    this.render();
+    try{ this.render(); }catch(err){ console.error("bad-play render",err); }
     el("badOverlay").classList.add("show");
   },
-  close(){ el("badOverlay").classList.remove("show"); },
+  close(){
+    el("badOverlay").classList.remove("show");
+    if(this.wasAuto){ this.wasAuto=false; if(!State.auto && !State.onlineMode && !State.gameOver) startAuto(); }
+  },
   render(){
     const body=el("bpBody"), saved=this.load();
     const plays=(this.log?this.log.plays:[]).map((p,i)=>({p,i})).reverse();
@@ -1538,9 +1544,9 @@ const BadPlay = {
     const list=this.load(); list.push(r);
     if(!this.store(list)){ ticker("Couldn't save — this browser is blocking storage. Use Copy instead."); return; }
     ticker(`Bad play saved (${list.length} total) — sending to the server…`);
-    Sync.sendReport(r).then(ok=>{ ticker(ok ? "Bad play saved and sent ✓" : "Bad play saved on this device — it will be sent when you're back online."); if(el("badOverlay").classList.contains("show")) this.render(); });
-    GameRec.save(true);
-    this.sel=-1; this.pick=null; this.render();
+    try{ Sync.sendReport(r).then(ok=>{ ticker(ok ? "Bad play saved and sent ✓" : "Bad play saved on this device — it will be sent when you're back online."); if(el("badOverlay").classList.contains("show")) this.render(); }).catch(()=>{}); }catch(err){ console.error("bad-play send",err); }
+    try{ GameRec.save(true); }catch(err){ console.error("bad-play game save",err); }
+    this.sel=-1; this.pick=null; try{ this.render(); }catch(err){ console.error(err); }
   },
   text(){ return JSON.stringify(this.load(),null,1); },
   copy(){
@@ -1559,6 +1565,9 @@ const BadPlay = {
   }
 };
 el("badBtn").onclick=()=>BadPlay.open();
+// safety exits so the report sheet can never trap the game: tap the dark backdrop or press Esc
+el("badOverlay").addEventListener("click",e=>{ if(e.target===el("badOverlay")) BadPlay.close(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && el("badOverlay").classList.contains("show")) BadPlay.close(); });
 
 // Phones: dock the decision box inside the top panel so it never covers the bottom controls.
 const decisionMQ = matchMedia("(max-width:600px)");
