@@ -24,7 +24,7 @@ def build_block() -> str:
     for c in data["characters"]:
         lines = {k: [str(x) for x in v if str(x).strip() and str(x).strip() != "..."]
                  for k, v in c.get("barks", {}).items()}
-        by_seat[SEAT[c["seatDefault"]]] = {"name": c["name"], "barks": lines}
+        by_seat[SEAT[c["seatDefault"]]] = {"name": c["name"], "voice": c.get("voice", {}), "barks": lines}
     body = json.dumps({str(k): by_seat[k] for k in sorted(by_seat)}, ensure_ascii=False, indent=1)
     return (f"{BEGIN}\n"
             "// Generated from characters/characters.json by tools/sync-characters.py. Edit the JSON, then rerun.\n"
