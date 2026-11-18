@@ -1844,7 +1844,7 @@ const BadPlay = {
         <div class="bpBtns"><button id="bpSave">Save report</button><button class="ghost" id="bpCancel">Close</button></div>
         <h3>Saved reports (${saved.length})</h3>`+
         (saved.length? saved.map((r,k)=>`<div class="bpSaved"><span>${r.synced?"✓":"⏳"} ${new Date(r.at).toLocaleString()} — ${esc(r.summary)}</span><button class="ghost" data-del="${k}">Delete</button></div>`).join("")
-          +`<div class="bpBtns"><button id="bpCopy">Copy all</button><button id="bpDownload">Download</button></div>`
+          +`<div class="bpBtns"><button id="bpCopy">Copy all</button><button id="bpDownload">Download</button></div>`+(saved.some(r=>r.synced)?`<div class="bpBtns"><button class="ghost" id="bpClear">Clear sent reports</button></div>`:"")
           : `<p class="bpNote">None yet.</p>`)+`<p class="bpNote">✓ = safely on the server. ⏳ = on this device, will be sent automatically.</p>`;
     body.innerHTML=h;
     body.querySelectorAll(".bpRow").forEach(b=>b.onclick=()=>{ this.sel=+b.dataset.i; this.pick=null; this.render(); });
@@ -1864,6 +1864,12 @@ const BadPlay = {
       const why=el("bpWhy").value, list=this.load(); list.splice(+b.dataset.del,1); this.store(list); this.render(); el("bpWhy").value=why; });
     if(el("bpCopy")) el("bpCopy").onclick=()=>this.copy();
     if(el("bpDownload")) el("bpDownload").onclick=()=>this.download();
+    if(el("bpClear")) el("bpClear").onclick=()=>{          // reports marked ✓ are safe on the server; keep only unsent ones here
+      const keep=this.load().filter(r=>!r.synced), gone=this.load().length-keep.length;
+      if(!confirm(`Clear ${gone} sent report${gone===1?"":"s"} from this device? They stay saved on the server.`)) return;
+      const why=el("bpWhy").value; this.store(keep); this.render(); el("bpWhy").value=why;
+      ticker(`Cleared ${gone} sent report${gone===1?"":"s"} from this device.`);
+    };
   },
   save(){
     const why=el("bpWhy").value.trim();

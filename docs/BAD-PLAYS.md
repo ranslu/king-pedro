@@ -117,3 +117,21 @@ the signal. Not yet in the online server's AI, which still uses the older card p
 
 - ~~Show every card thrown on the first trick clearly (report 2026-11-11).~~ **Fixed (2026-11-18):** cards a player throws to get down to five now fan out face-up beside their played card at full brightness, the ticker names them, and the first trick stays on the table longer. Also fixed: a fast Step could wipe the next trick's cards off the table.
 - ~~Online server: move it to the look-ahead card play and this Ace signal.~~ **Done (2026-11-18):** online AI seats now use the same look-ahead play and Ace signal as the device game.
+
+## 2026-11-18 — all reports resolved and archived
+
+No new reports since the 2026-11-17 one. All 5 reports are resolved:
+
+| Report | Resolution |
+|---|---|
+| 11-04, 11-06, 11-11, 11-17 — partner should show the Ace of trump | Ace signal: device PR #21, online server PR #24 |
+| 11-11 — everyone must see all the cards thrown on the first trick | Thrown cards fanned face-up PR #22; held on the table 7 s / until Step PR #25 |
+
+**Archived:** `data/archive/compiled/2026-11-18-reports.json`. From now on `data/archive/reports.json` lists only
+reports not yet compiled; the nightly backup leaves out any report whose id is in `data/archive/compiled/`, and
+keeps the full history in `data/archive/all-reports.json`. The game server keeps every report permanently (it has no
+delete, so reports can't be wiped by anyone). On the phone, **Clear sent reports** in the Bad play sheet empties the
+list of reports already on the server.
+
+**To compile next time:** read `data/archive/reports.json`, then move the compiled reports into a new
+`data/archive/compiled/<date>-reports.json`.
