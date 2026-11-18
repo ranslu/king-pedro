@@ -110,6 +110,8 @@
   }
   .trick .pc{ position:absolute; transform:translate(-50%,-50%) scale(.5); opacity:0; }
   .trick .pc.in{ animation:dropIn .28s ease-out forwards; }
+  .trick.crowded .card{ --w:clamp(30px,6vw,46px) !important; }   /* first-trick throws: smaller so every card fits */
+  .trick .pc.thrown{ box-shadow:0 0 0 2px var(--brass-hi), 0 2px 6px var(--shadow); }
   @keyframes dropIn{ to{ transform:translate(-50%,-50%) scale(1); opacity:1 } }
 
   /* ---- seats ---- */
@@ -1125,11 +1127,17 @@ function renderTrick(){
   const wrap=el("trick"); wrap.innerHTML="";
   // place each played card near its seat, offset toward center
   const pos={0:[50,86],1:[14,50],2:[50,14],3:[86,50]};
-  State.trick.forEach((e)=>{
-    const node=cardEl(e.card,State.trump,{dim:e.buried});
+  // Extra cards a player throws on the first trick fan out beside their played card so everyone can see them.
+  const dir={0:1,1:1,2:1,3:-1}, count={};
+  wrap.classList.toggle("crowded", State.trick.some(e=>e.buried));
+  State.trick.forEach((e,i)=>{
+    const node=cardEl(e.card,State.trump);
     node.classList.add("pc","in");
-    const [x,y]=pos[visSlot(e.seat)];
-    node.style.left=x+"%"; node.style.top=y+"%";
+    const slot=visSlot(e.seat), [x,y]=pos[slot], k=count[e.seat]=(count[e.seat]||0)+1;
+    node.style.left = k>1 ? `calc(${x}% + ${dir[slot]*(k-1)*0.6} * var(--w))` : x+"%";
+    node.style.top=y+"%";
+    node.style.zIndex = dir[slot]>0 ? i+1 : 50-i;   // a leftward fan stacks under, so every corner index stays readable
+    if(e.buried){ node.classList.add("thrown"); node.title="Thrown on the first trick"; }
     wrap.appendChild(node);
   });
 }
@@ -1247,6 +1255,7 @@ function applyEvent(e){
       if(e.say==="feed") bubble(e.seat,actionSpeak(e.seat,"feed"));
       else if(e.speakLead) bubble(e.seat,actionSpeak(e.seat,"lead"));
       if(!e.buried) ticker(`${PLAYERS[e.seat].name} plays <b>${cardStr(e.card)}</b>${points(e.card,State.trump)?` (${points(e.card,State.trump)} pts)`:""}.`);
+      else ticker(`${PLAYERS[e.seat].name} also ${PLAYERS[e.seat].name==="You"?"throw":"throws"} <b>${State.trick.filter(t=>t.seat===e.seat&&t.buried).map(t=>cardStr(t.card)).join(" ")}</b> on the first trick.`);
       break;
     case "surrender":
       State.folded[e.seat]=true; State.hands[e.seat]=[]; bubble(e.seat,actionSpeak(e.seat,"fold"));
@@ -1255,7 +1264,8 @@ function applyEvent(e){
       bubble(e.winner,actionSpeak(e.winner,"win"));
       if(e.points>=30) bubble((e.winner+1)%4, actionSpeak((e.winner+1)%4,"big"));
       ticker(`${PLAYERS[e.winner].name} takes trick — +${e.points} to ${TEAM_NAME(e.winner%2)}.`);
-      setTimeout(()=>{ State.trick=[]; renderTrick(); }, baseDelay()*0.6);
+      { const shown=State.trick;   // clear only this trick: a fast Step may already have started the next one
+        setTimeout(()=>{ if(State.trick===shown){ State.trick=[]; renderTrick(); } }, baseDelay()*(shown.some(t=>t.buried)?2.5:0.6)); }
       break;
     case "handResult":
       State.gameScore=e.gameScore.slice(); renderRail();
@@ -1377,8 +1387,9 @@ function tick(){
   if(State.paused) return;
   let d=baseDelay();
   const last=State.lastEvent;
+  if(last && last.type==="trickEnd" && State.trick.some(t=>t.buried)) d*=2.5;  // let everyone see first-trick throws
   if(last){ if(last.type==="trickEnd"||last.type==="trump"||last.type==="deal2"||last.type==="settle") d*=1.5;
-            if(last.type==="handResult") d*=2.4; if(last.type==="play"&&last.buried) d*=0.4; }
+            if(last.type==="handResult") d*=2.4; if(last.type==="play"&&last.buried) d*=1.2; }
   if(State.gameOver && !State.gen){ stopAuto(); return; }
   State.timer=setTimeout(tick,d);
 }
