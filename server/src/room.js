@@ -1,6 +1,7 @@
 import {
   RULES, DEFAULT_PLAYERS, isTrump, points, legalPlays, currentWinner,
   safeBid, aiBid, choosePlay, wantsPass, freshDeck, shuffle, handSort,
+  smartPlay, aceSignal, cardKey,
 } from "./rules.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -245,6 +246,8 @@ export class GameRoom {
       hands[s] = nh;
     }
     const folded = [false, false, false, false];
+    // public information for the look-ahead AI: cards seen in play, and trumps passed openly to a partner
+    const knownIn = [new Set(), new Set(), new Set(), new Set()], seen = new Set();
     for (let s = 0; s < 4; s++) {
       const tr = hands[s].filter((c) => isTrump(c, trump));
       if (tr.length === 0) { folded[s] = true; hands[s] = []; this.broadcastEvent({ type: "fold", seat: s }); }
@@ -258,10 +261,11 @@ export class GameRoom {
           if (!folded[partner]) {
             this.broadcastEvent({ type: "passt", seat: s, partner, cards: tr.slice() });
             hands[partner] = hands[partner].concat(tr);
+            for (const c of tr) knownIn[partner].add(cardKey(c));
             for (let n = 0; n < tr.length; n++) {
               const toss = minByLocal(hands[partner].filter((c) => points(c, trump) === 0), (c) => powerLocal(c, trump))
                 || minByLocal(hands[partner], (c) => points(c, trump));
-              if (toss) { const i = hands[partner].indexOf(toss); hands[partner].splice(i, 1); }
+              if (toss) { const i = hands[partner].indexOf(toss); hands[partner].splice(i, 1); knownIn[partner].delete(cardKey(toss)); }
             }
             folded[s] = true; hands[s] = [];
           }
@@ -284,6 +288,7 @@ export class GameRoom {
         const trumpLed = trick.length > 0 && isTrump(trick[0].card, trump);
         if (RULES.surrenderWhenVoidOnTrumpLead && trumpLed && !hands[s].some((c) => isTrump(c, trump))) {
           this.broadcastEvent({ type: "surrender", seat: s, cards: hands[s].slice() });
+          for (const c of hands[s]) seen.add(cardKey(c));
           folded[s] = true; hands[s] = []; continue;
         }
         const force = tn === 1 && step === 0;
@@ -294,12 +299,15 @@ export class GameRoom {
           const found = hands[s].find((c) => c.suit === card.suit && c.rank === card.rank);
           card = found || legal[0];
         } else {
-          let res = choosePlay(this.seatMeta[s], hands[s], trick, trump, force, aceGone);
-          if (res.card) { card = res.card; say = res.say; } else card = res;
+          // same look-ahead play as the device game, plus the declarer's-partner Ace signal
+          const legal = legalPlays(hands[s], trick, trump);
+          const st = { hands, folded, trick, leader, tn, step, handPts, aceGone, trump, knownIn, seen, bid: highBid, bidTeam };
+          card = aceSignal(s, st, legal, smartPlay(s, st, legal), declarer);
+          if (trick.length && currentWinner(trick, trump).seat === (s + 2) % 4 && points(card, trump) >= 5) say = "feed";
           await sleep(500);
         }
         hands[s].splice(hands[s].indexOf(card), 1);
-        trick.push({ seat: s, card });
+        trick.push({ seat: s, card }); seen.add(cardKey(card)); knownIn[s].delete(cardKey(card));
         if (isTrump(card, trump) && card.rank === 14) aceGone = true;
         this.broadcastEvent({ type: "play", seat: s, card, lead: step === 0, say, speakLead: step === 0 && !ledSpoke && Math.random() < 0.4 });
         await sleep(250);
@@ -308,7 +316,7 @@ export class GameRoom {
           while (extras > 0) {
             const bury = minByLocal(hands[s], (c) => points(c, trump) * 100 + powerLocal(c, trump));
             hands[s].splice(hands[s].indexOf(bury), 1);
-            trick.push({ seat: s, card: bury, buried: true });
+            trick.push({ seat: s, card: bury, buried: true }); seen.add(cardKey(bury)); knownIn[s].delete(cardKey(bury));
             if (isTrump(bury, trump) && bury.rank === 14) aceGone = true;
             this.broadcastEvent({ type: "play", seat: s, card: bury, buried: true });
             extras--;

@@ -31,3 +31,5 @@ game can occasionally stall waiting on a connection race. It never leaks
 hidden card data when this happens — worst case is the game doesn't
 progress and someone needs to create a fresh room. Real usage (typing in a
 4-letter code takes at least a second or two) doesn't hit this.
+
+The AI seats use the same look-ahead card play as the table (`smartPlay` and `aceSignal`, copied at the end of `src/rules.js`), so online opponents play exactly like device ones. About 4 ms of CPU per AI play, roughly 1.4 s per all-AI game, well inside the Durable Object limit of 30 s CPU per invocation. Copy any change to that code from `../king-pedro-table.html`.
