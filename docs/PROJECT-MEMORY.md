@@ -25,6 +25,7 @@ Source of truth for code is the repo; this file records intent and decisions.
 
 ## AI design
 - PlayerMemory.kt: per-seat CharacterMemory (bidConfidence + playWeights: winEagerness / feedPartnerBias / leadTrumpBias); hybrid learning = automatic small nudge per hand (about +/-2.5%) plus stronger override from Randy's tagged corrections (tagBid / tagPlay, about +/-15%); JSON persistence to king-pedro-memory/.
+- Partnership signal (2026-11-18): the declarer's partner leads or plays the Ace of trump early to show where it is (Randy's reports in docs/BAD-PLAYS.md).
 - Bidding uses an expected-tricks / points model (14-slot trump ladder, win probability by stack position), scaled by learned bidConfidence.
 - Tier 1 enhancements (2026-09-26): 1A hand-strength evaluation (0.0-1.0), 1B positional weights (LEADER / MID_HAND / CLOSER), 1C partner-signal inference from the partner's last 5 bid/outcome pairs. Integration steps: docs/INTEGRATION_GUIDE.md.
 
@@ -38,7 +39,12 @@ Source of truth for code is the repo; this file records intent and decisions.
 - King Pedro Trick Tracker (single-file HTML, same theme) for tracking a live/physical game, updated to the final trump-pass rule. Published as a Claude artifact; copy in Drive King-Pedro/Assets.
 - "King Pedro - Player Strategy Guide" Claude Doc (bidding, trump, leading, partner play, dos/don'ts).
 
-## Local Geekom notes
+## Where the code lives
+- **GitHub `ranslu/king-pedro`, branch `master`, is the source of truth.** The live game is served from it (GitHub Pages) and the server deploys from it. Google Drive `King-Pedro/Assets` holds backup copies only.
+- The Geekom is a local copy, not the master: pull from GitHub before editing there, and push changes back the same day. Anything only on the Geekom is not backed up.
+- Bad-play reports and every game are saved to the online server and copied nightly into `data/archive/`; compiled findings are in `docs/BAD-PLAYS.md`.
+
+## Local Geekom notes (a copy of GitHub)
 - Checkout: C:\Users\rslus\king-pedro. Desktop shortcut points at king-pedro-table.html using assets/king-pedro.ico.
 - archive/geekom-intellij-2026-09-27/ holds the older IntelliJ-project copies of the Kotlin sources (package com.example.kingpedro, MemoryCard naming) and the 2026-09-17 table snapshot. Repo root KingPedroCore.kt / PlayerMemory.kt are the newer synced versions.
 - Default branch is master. GitHub Pages serves docs/ at https://ranslu.github.io/king-pedro/.

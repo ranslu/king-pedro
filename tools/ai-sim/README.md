@@ -13,3 +13,4 @@ Results (per hand, vs the previous AI): look-ahead card play **+26.9 ± 0.9** po
 opening bids at the minimum instead of jumping **+2.0 ± 0.7** points.
 - `analyze-position.js`: rebuilds one recorded play from `data/archive/games/<id>.json` and scores every legal card over many hidden-card layouts. Use it to check Bad-play reports before changing the AI
 - `guard.js` / `guardmatch.js`: the counter-safety guard experiment (2026-11-04). No rule improved play and two made it worse, so it isn't used in the game; see `docs/BAD-PLAYS.md`
+- `ace.js` / `acematch.js`: "show your partner the Ace of trump" rules (2026-11-18). Only the version limited to the declarer's partner is cost-free; it is the one in the game
