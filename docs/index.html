@@ -615,6 +615,8 @@ const PLAYERS = [
 ];
 const TEAM_NAME = t => t===0 ? `${PLAYERS[0].name} / ${PLAYERS[2].name}` : `${PLAYERS[1].name} / ${PLAYERS[3].name}`;
 const DEFAULT_PLAYERS = PLAYERS.map(p=>({...p}));
+// Names (typed here or sent by other online players) go into the page as HTML, so drop markup characters.
+const cleanName = n => String(n==null?"":n).replace(/[<>&"'`]/g,"").trim().slice(0,20);
 function speak(seat,mood,arg){
   const pool = VOICES[seat][mood] || ["..."];
   let s = pool[Math.floor(Math.random()*pool.length)];
@@ -1674,7 +1676,7 @@ function applySetupSelections(){
     if(setupHuman[s]){
       const idx=humansInSeatOrder.indexOf(s);
       const custom=setupNames[s].trim();
-      PLAYERS[s].name = custom || (humansInSeatOrder.length>1 ? `Player ${idx+1}` : "You");
+      PLAYERS[s].name = cleanName(custom) || (humansInSeatOrder.length>1 ? `Player ${idx+1}` : "You");
       PLAYERS[s].tag = "Human";
     } else {
       PLAYERS[s].name = DEFAULT_PLAYERS[s].name;
@@ -1697,7 +1699,7 @@ function connectToRoom(code, asHost){
     else if(msg.type==="roster"){
       State.isHost=msg.isHost; State.mySeat=msg.yourSeat;
       State.human = msg.roster.map(r=>r.claimed);
-      msg.roster.forEach(r=>{ PLAYERS[r.seat].name=r.name; PLAYERS[r.seat].tag=r.tag; });
+      msg.roster.forEach(r=>{ PLAYERS[r.seat].name=cleanName(r.name)||PLAYERS[r.seat].name; PLAYERS[r.seat].tag=cleanName(r.tag); });
       renderLobbyRoster(msg.roster, msg.isHost);
       if(msg.started){ State.onlineMode=true; closeOnline(); beginOnlineGame(); }
     }

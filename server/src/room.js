@@ -146,7 +146,7 @@ export class GameRoom {
     if (this.seatOf(connId) !== -1) return; // one seat per connection
     const occ = this.seats[seatIdx];
     if (occ && this.sockets.has(occ.connId)) return; // already taken by a live player
-    this.seats[seatIdx] = { connId, name: (name || "").trim().slice(0, 20) || `Player ${seatIdx + 1}` };
+    this.seats[seatIdx] = { connId, name: String(name || "").replace(/[<>&"'`]/g, "").trim().slice(0, 20) || `Player ${seatIdx + 1}` };
     this.seatMeta[seatIdx].name = this.seats[seatIdx].name;
     this.broadcastRoster();
   }
