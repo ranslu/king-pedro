@@ -1267,7 +1267,8 @@ function applyEvent(e){
       if(e.points>=30) bubble((e.winner+1)%4, actionSpeak((e.winner+1)%4,"big"));
       ticker(`${PLAYERS[e.winner].name} takes trick — +${e.points} to ${TEAM_NAME(e.winner%2)}.`);
       { const shown=State.trick;   // clear only this trick: a fast Step may already have started the next one
-        setTimeout(()=>{ if(State.trick===shown){ State.trick=[]; renderTrick(); } }, baseDelay()*(shown.some(t=>t.buried)?2.5:0.6)); }
+        // a trick with first-trick throws stays up until the next trick starts, so everyone can study it
+        if(!shown.some(t=>t.buried)) setTimeout(()=>{ if(State.trick===shown){ State.trick=[]; renderTrick(); } }, baseDelay()*0.6); }
       break;
     case "handResult":
       State.gameScore=e.gameScore.slice(); renderRail();
@@ -1385,11 +1386,15 @@ function startAuto(){ State.auto=true; el("autoBtn").textContent="Pause ❚❚";
 function stopAuto(){ State.auto=false; el("autoBtn").textContent="Auto ▶"; clearTimeout(State.timer); }
 function tick(){
   if(!State.auto || State.paused) return;
+  State.holding=false;
   step();
   if(State.paused) return;
   let d=baseDelay();
   const last=State.lastEvent;
-  if(last && last.type==="trickEnd" && State.trick.some(t=>t.buried)) d*=2.5;  // let everyone see first-trick throws
+  if(last && last.type==="trickEnd" && State.trick.some(t=>t.buried)){   // let everyone see first-trick throws
+    d=Math.max(d*1.5, FIRST_TRICK_HOLD_MS); State.holding=true;
+    ticker(el("ticker").innerHTML+` <small>(tap the table to continue)</small>`);
+  }
   if(last){ if(last.type==="trickEnd"||last.type==="trump"||last.type==="deal2"||last.type==="settle") d*=1.5;
             if(last.type==="handResult") d*=2.4; if(last.type==="play"&&last.buried) d*=1.2; }
   if(State.gameOver && !State.gen){ stopAuto(); return; }
@@ -1611,6 +1616,12 @@ function placeDecision(){
 }
 decisionMQ.addEventListener("change", placeDecision);
 placeDecision();
+
+// How long a first trick with thrown cards stays on the table in auto play (tap the table to go on sooner).
+const FIRST_TRICK_HOLD_MS=7000;
+el("felt").addEventListener("click",()=>{
+  if(State.holding && State.auto && !State.paused){ State.holding=false; clearTimeout(State.timer); tick(); }
+});
 
 function newGame(){
   GameRec.start();
