@@ -80,3 +80,40 @@ mistakes; plays it likes but Randy doesn't are strategy preferences.
 Opening **Bad play** paused Auto and **Close** never resumed it, so the game sat idle ("frozen"). Fixed: Close
 (or tapping the backdrop / Esc) resumes Auto if it was running; saving can no longer throw out of the sheet.
 **Fixed** in `king-pedro-table.html` and `docs/index.html` (service worker `kp-v7`).
+
+## 2026-11-18 — your reports: "partner should show the Ace of trump"
+
+Data: 5 Bad-play reports (2026-11-04 to 11-17), 145 recorded games. Four reports make the same point; the fifth
+(seeing every card thrown on the first trick) is a display request, listed under Next.
+
+In all four reported hands Randy was the declarer and his partner Jean held the Ace of trump but kept it back:
+
+| Game · hand | Trump (bid) | What Jean did | Result |
+|---|---|---|---|
+| b29829d1 · 3 | ♠ (Randy 44) | Led 3♠ holding A♠; Grace's 10♠ won (+10 to opponents). A♠ only came out on the last trick. | Made 46 |
+| 758c794e · 2 | ♣ (Randy 38) | Led 6♣ holding A♣ (and Q♣, 10♣). | — |
+| fc24c3bf · 6 | ♣ (Randy 39) | Led 4♣ holding A♣; Grace's Q♣ won (+10 to opponents). A♣ came out on trick 5. | **Set 37 vs 39** |
+| b932dafa · 7 | ♥ (Randy 43) | Randy led 6♥; Jean answered 7♥ holding A♥. A♥ came out on trick 5. | Made 46 |
+
+**Deep analysis** (2,000 layouts each, `analyze-position.js`) rates holding the Ace back as better in all four, by
+4–23 points. But that analysis plays the rest of the hand with AI partners, so it cannot value what a human declarer
+does with the information "my partner has the Ace".
+
+**Duplicate matches** (`tools/ai-sim/acematch.js`, 1,500 deals × 2, points per hand):
+
+| Rule | Result |
+|---|---|
+| Always answer partner's trump lead with the Ace | −1.0 ± 0.6 |
+| Always lead the Ace instead of a lower trump | −0.7 ± 0.6 |
+| Both, always | −1.3 ± 0.6 (worse) |
+| Answer with the Ace, only when partner is the declarer | 0.0 ± 0.6 |
+| **Both, only when partner is the declarer** | **−0.1 ± 0.6 (no cost)** |
+
+**Shipped:** the declarer's partner now leads the Ace of trump rather than a lower trump, and plays it on the
+declarer's trump lead (`aceSignal()` in the table). It costs nothing between AI players and gives a human declarer
+the signal. Not yet in the online server's AI, which still uses the older card play.
+
+### Next
+
+- Show every card thrown on the first trick clearly (report 2026-11-11); ties in with the "fan trump beyond six" rule.
+- Online server: move it to the look-ahead card play and this Ace signal.
