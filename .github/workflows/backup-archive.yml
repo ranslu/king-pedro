@@ -36,7 +36,14 @@ jobs:
           get /api/games > /tmp/games.json
           jq -e 'type == "array"' /tmp/games.json > /dev/null
 
-          jq . /tmp/reports.json > data/archive/reports.json
+          # Full copy of every report ever saved; reports.json keeps only those not yet compiled
+          # (a report is compiled once its id is in data/archive/compiled/*.json).
+          jq . /tmp/reports.json > data/archive/all-reports.json
+          shopt -s nullglob; compiled=(data/archive/compiled/*.json)
+          if [ ${#compiled[@]} -gt 0 ]; then
+            jq -s '[.[].reports[]?.id]' "${compiled[@]}" > /tmp/done.json
+          else echo '[]' > /tmp/done.json; fi
+          jq --slurpfile done /tmp/done.json '[.[] | select(.id as $i | ($done[0] | index($i)) | not)]' /tmp/reports.json > data/archive/reports.json
           jq . /tmp/games.json > data/archive/games.json
 
           # One file per game. Re-download a game only if it changed since the last backup.
@@ -49,7 +56,7 @@ jobs:
             jq . /tmp/game.json > "$f"
           done
 
-          echo "reports: $(jq length data/archive/reports.json), games: $(jq length data/archive/games.json)"
+          echo "pending reports: $(jq length data/archive/reports.json) of $(jq length data/archive/all-reports.json), games: $(jq length data/archive/games.json)"
 
       - name: Commit if anything changed
         run: |
