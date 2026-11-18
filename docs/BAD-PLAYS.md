@@ -115,5 +115,5 @@ the signal. Not yet in the online server's AI, which still uses the older card p
 
 ### Next
 
-- Show every card thrown on the first trick clearly (report 2026-11-11); ties in with the "fan trump beyond six" rule.
+- ~~Show every card thrown on the first trick clearly (report 2026-11-11).~~ **Fixed (2026-11-18):** cards a player throws to get down to five now fan out face-up beside their played card at full brightness, the ticker names them, and the first trick stays on the table longer. Also fixed: a fast Step could wipe the next trick's cards off the table.
 - Online server: move it to the look-ahead card play and this Ace signal.
