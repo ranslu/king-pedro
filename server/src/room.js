@@ -334,7 +334,8 @@ export class GameRoom {
       }
       handPts[win.seat % 2] += trickPts;
       this.broadcastEvent({ type: "trickEnd", winner: win.seat, winCard: win.card, points: trickPts, captured: handPts.slice() });
-      await sleep(500);
+      // a trick with first-trick throws stays on everyone's table for 7 s before the next trick starts
+      await sleep(trick.some((e) => e.buried) ? 7000 : 500);
     }
 
     const made = handPts[bidTeam] >= highBid;
