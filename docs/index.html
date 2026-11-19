@@ -159,6 +159,7 @@
   .seat.west > .bidBox, .seat.east > .bidBox{ order:-1; }
   .seat.north > .bidBox{ order:5; }
   .seat.south > .bidBox{ display:none; }
+  .bidBox.done{ visibility:hidden; }
   .bidBox.high{ border-color:var(--brass-hi); box-shadow:inset 0 1px 3px rgba(0,0,0,.55), 0 0 0 1px var(--brass), 0 0 8px rgba(240,212,136,.45); }
 
   .hand{ display:flex; justify-content:center; align-items:center; min-height:1px; }
@@ -1414,7 +1415,8 @@ function renderPlates(){
     const isDealer = p.seat===State.dealer_now;
     const isDecl = p.seat===State.declarer;
     const bidShown = (State.seatBids||[])[p.seat], slot = visSlot(p.seat);
-    const bidCls = "bidBox"+(bidShown!=null&&isDecl?" high":""), bidTitle = bidShown!=null ? p.name+" bid "+bidShown : p.name+": no bid";
+    // bid boxes only show while bidding is going on; once trump is set they vanish until the next deal
+    const bidCls = "bidBox"+(bidShown!=null&&isDecl?" high":"")+(State.trump?" done":""), bidTitle = bidShown!=null ? p.name+" bid "+bidShown : p.name+": no bid";
     const bidHtml = `<div class="${bidCls}" title="${bidTitle}">${bidShown ?? ''}</div>`;
     const sideBox = el("bb"+slot);   // west/east/north: separate box placed by CSS; south keeps it on the plate
     sideBox.className = bidCls; sideBox.title = bidTitle; sideBox.textContent = bidShown ?? "";
