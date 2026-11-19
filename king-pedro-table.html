@@ -137,14 +137,19 @@
   .seat.out .plate{ opacity:.45; filter:grayscale(.5); }
   /* each player's bid sits in a small felt (baize) box on their name plate; blank once they pass */
   .bidBox{
-    min-width:clamp(30px,4.6vw,44px); height:clamp(24px,3.4vw,32px); padding:0 .3rem; margin-left:.15rem;
+    min-width:clamp(50px,7vw,70px); height:clamp(38px,5vw,50px); padding:0 .4rem; margin-left:.15rem;
     display:flex; align-items:center; justify-content:center; flex:none;
     background:radial-gradient(80% 90% at 50% 35%, var(--felt-hi), var(--felt) 60%, var(--felt-lo));
     border:1px solid rgba(201,162,75,.6); border-radius:6px;
     box-shadow:inset 0 1px 3px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.4);
-    font-family:Cinzel,serif; font-weight:700; font-size:clamp(.8rem,1.8vw,1.05rem); color:var(--brass-hi);
+    font-family:Cinzel,serif; font-weight:700; font-size:clamp(1.25rem,2.8vw,1.75rem); color:var(--brass-hi); border-width:2px;
     text-shadow:0 1px 1px rgba(0,0,0,.6);
   }
+  /* opponents (west/east): box sits above their name; partner (north): below their cards, clear of the score panel */
+  .seat > .bidBox{ margin-left:0; }
+  .seat.west > .bidBox, .seat.east > .bidBox{ order:-1; }
+  .seat.north > .bidBox{ order:5; }
+  .seat.south > .bidBox{ display:none; }
   .bidBox.high{ border-color:var(--brass-hi); box-shadow:inset 0 1px 3px rgba(0,0,0,.55), 0 0 0 1px var(--brass), 0 0 8px rgba(240,212,136,.45); }
 
   .hand{ display:flex; justify-content:center; align-items:center; min-height:1px; }
@@ -440,10 +445,10 @@
       <div class="bidline" id="bidline" style="display:none"></div>
       <div class="trick" id="trick"></div>
 
-      <div class="seat south" data-seat="0"><div class="bubble" id="b0"></div><div class="plate" id="p0"></div><div class="hand" id="h0"></div></div>
-      <div class="seat west"  data-seat="1"><div class="bubble" id="b1"></div><div class="plate" id="p1"></div><div class="hand" id="h1"></div></div>
-      <div class="seat north" data-seat="2"><div class="bubble" id="b2"></div><div class="plate" id="p2"></div><div class="hand" id="h2"></div></div>
-      <div class="seat east"  data-seat="3"><div class="bubble" id="b3"></div><div class="plate" id="p3"></div><div class="hand" id="h3"></div></div>
+      <div class="seat south" data-seat="0"><div class="bubble" id="b0"></div><div class="plate" id="p0"></div><div class="hand" id="h0"></div><div class="bidBox" id="bb0"></div></div>
+      <div class="seat west"  data-seat="1"><div class="bubble" id="b1"></div><div class="plate" id="p1"></div><div class="hand" id="h1"></div><div class="bidBox" id="bb1"></div></div>
+      <div class="seat north" data-seat="2"><div class="bubble" id="b2"></div><div class="plate" id="p2"></div><div class="hand" id="h2"></div><div class="bidBox" id="bb2"></div></div>
+      <div class="seat east"  data-seat="3"><div class="bubble" id="b3"></div><div class="plate" id="p3"></div><div class="hand" id="h3"></div><div class="bidBox" id="bb3"></div></div>
     </div>
   </div>
 
@@ -1393,11 +1398,15 @@ function renderPlates(){
     const plate=el("p"+visSlot(p.seat));
     const isDealer = p.seat===State.dealer_now;
     const isDecl = p.seat===State.declarer;
-    const bidShown = (State.seatBids||[])[p.seat];
+    const bidShown = (State.seatBids||[])[p.seat], slot = visSlot(p.seat);
+    const bidCls = "bidBox"+(bidShown!=null&&isDecl?" high":""), bidTitle = bidShown!=null ? p.name+" bid "+bidShown : p.name+": no bid";
+    const bidHtml = `<div class="${bidCls}" title="${bidTitle}">${bidShown ?? ''}</div>`;
+    const sideBox = el("bb"+slot);   // west/east/north: separate box placed by CSS; south keeps it on the plate
+    sideBox.className = bidCls; sideBox.title = bidTitle; sideBox.textContent = bidShown ?? "";
     plate.innerHTML =
       `<div class="disc" style="background:radial-gradient(circle at 38% 32%, #fff, ${p.color})">${p.name[0]}</div>`+
       `<div class="nm">${p.name}<small>${p.tag} · ${TEAM_NAME(p.seat%2)}</small></div>`+
-      `<div class="bidBox${bidShown!=null&&isDecl?' high':''}" title="${bidShown!=null?p.name+' bid '+bidShown:p.name+': no bid'}">${bidShown ?? ''}</div>`+
+      (slot===0 ? bidHtml : '')+
       `<div class="chip">${isDealer?'<span class="badge deal" title="Dealer">D</span>':''}${isDecl?'<span class="badge decl" title="Declarer">★</span>':''}</div>`;
     const seatEl = el("h"+visSlot(p.seat)).parentElement;
     seatEl.classList.toggle("out",State.folded[p.seat]);
