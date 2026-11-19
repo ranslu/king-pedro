@@ -144,6 +144,22 @@
   .badge.deal{ background:#e7ddc4; color:#3a2a10; }
   .badge.decl{ background:var(--brass); color:#2a1d07; }
   .seat.out .plate{ opacity:.45; filter:grayscale(.5); }
+  /* each player's bid sits in a small felt (baize) box on their name plate; blank once they pass */
+  .bidBox{
+    min-width:clamp(50px,7vw,70px); height:clamp(38px,5vw,50px); padding:0 .4rem; margin-left:.15rem;
+    display:flex; align-items:center; justify-content:center; flex:none;
+    background:radial-gradient(80% 90% at 50% 35%, var(--felt-hi), var(--felt) 60%, var(--felt-lo));
+    border:1px solid rgba(201,162,75,.6); border-radius:6px;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.4);
+    font-family:Cinzel,serif; font-weight:700; font-size:clamp(1.25rem,2.8vw,1.75rem); color:var(--brass-hi); border-width:2px;
+    text-shadow:0 1px 1px rgba(0,0,0,.6);
+  }
+  /* opponents (west/east): box sits above their name; partner (north): below their cards, clear of the score panel */
+  .seat > .bidBox{ margin-left:0; }
+  .seat.west > .bidBox, .seat.east > .bidBox{ order:-1; }
+  .seat.north > .bidBox{ order:5; }
+  .seat.south > .bidBox{ display:none; }
+  .bidBox.high{ border-color:var(--brass-hi); box-shadow:inset 0 1px 3px rgba(0,0,0,.55), 0 0 0 1px var(--brass), 0 0 8px rgba(240,212,136,.45); }
 
   .hand{ display:flex; justify-content:center; align-items:center; min-height:1px; }
   .hand.h-row{ }
@@ -392,6 +408,12 @@
   .hud .decision.trumpBox button.suitBtn{ font-size:.68rem; padding:.24rem .3rem; }
   .hud .decision h3{ margin-bottom:.15rem; }
   .hud .decision:not(.trumpBox) .row{ display:inline-flex; vertical-align:middle; margin:.25rem .2rem 0; }
+  /* bid controls: big, well-spaced touch targets so −, +, Pass and Bid are easy to hit */
+  .decision .bidRow{ gap:1.1rem; align-items:center; }
+  .hud .decision:not(.trumpBox) .bidRow{ margin:.4rem .9rem 0; }
+  .decision .bidRow button{ min-width:52px; min-height:44px; font-size:.85rem; padding:.45rem 1rem; }
+  .decision .bidRow #decMinus, .decision .bidRow #decPlus{ min-width:52px; font-size:1.25rem; padding:.2rem .8rem; }
+  .decision .bidRow .bidNum{ font-size:1.3rem; min-width:2em; text-align:center; }
   @media (max-width:600px){ #voiceBtn .vText{ display:none; } }   /* phones: speaker icon only */
   .bidline{ display:none !important; }        /* the live bid now lives in the panel */
 
@@ -438,10 +460,10 @@
       <div class="bidline" id="bidline" style="display:none"></div>
       <div class="trick" id="trick"></div>
 
-      <div class="seat south" data-seat="0"><div class="bubble" id="b0"></div><div class="plate" id="p0"></div><div class="hand" id="h0"></div></div>
-      <div class="seat west"  data-seat="1"><div class="bubble" id="b1"></div><div class="plate" id="p1"></div><div class="hand" id="h1"></div></div>
-      <div class="seat north" data-seat="2"><div class="bubble" id="b2"></div><div class="plate" id="p2"></div><div class="hand" id="h2"></div></div>
-      <div class="seat east"  data-seat="3"><div class="bubble" id="b3"></div><div class="plate" id="p3"></div><div class="hand" id="h3"></div></div>
+      <div class="seat south" data-seat="0"><div class="bubble" id="b0"></div><div class="plate" id="p0"></div><div class="hand" id="h0"></div><div class="bidBox" id="bb0"></div></div>
+      <div class="seat west"  data-seat="1"><div class="bubble" id="b1"></div><div class="plate" id="p1"></div><div class="hand" id="h1"></div><div class="bidBox" id="bb1"></div></div>
+      <div class="seat north" data-seat="2"><div class="bubble" id="b2"></div><div class="plate" id="p2"></div><div class="hand" id="h2"></div><div class="bidBox" id="bb2"></div></div>
+      <div class="seat east"  data-seat="3"><div class="bubble" id="b3"></div><div class="plate" id="p3"></div><div class="hand" id="h3"></div><div class="bidBox" id="bb3"></div></div>
     </div>
   </div>
 
@@ -1391,9 +1413,15 @@ function renderPlates(){
     const plate=el("p"+visSlot(p.seat));
     const isDealer = p.seat===State.dealer_now;
     const isDecl = p.seat===State.declarer;
+    const bidShown = (State.seatBids||[])[p.seat], slot = visSlot(p.seat);
+    const bidCls = "bidBox"+(bidShown!=null&&isDecl?" high":""), bidTitle = bidShown!=null ? p.name+" bid "+bidShown : p.name+": no bid";
+    const bidHtml = `<div class="${bidCls}" title="${bidTitle}">${bidShown ?? ''}</div>`;
+    const sideBox = el("bb"+slot);   // west/east/north: separate box placed by CSS; south keeps it on the plate
+    sideBox.className = bidCls; sideBox.title = bidTitle; sideBox.textContent = bidShown ?? "";
     plate.innerHTML =
       `<div class="disc" style="background:radial-gradient(circle at 38% 32%, #fff, ${p.color})">${p.name[0]}</div>`+
       `<div class="nm">${p.name}<small>${p.tag} · ${TEAM_NAME(p.seat%2)}</small></div>`+
+      (slot===0 ? bidHtml : '')+
       `<div class="chip">${isDealer?'<span class="badge deal" title="Dealer">D</span>':''}${isDecl?'<span class="badge decl" title="Declarer">★</span>':''}</div>`;
     const seatEl = el("h"+visSlot(p.seat)).parentElement;
     seatEl.classList.toggle("out",State.folded[p.seat]);
@@ -1505,7 +1533,7 @@ function applyEvent(e){
   switch(e.type){
     case "deal": {
       BadPlay.onDeal(e);
-      State.dealer_now=e.dealer; State.declarer=-1; State.trump=null; State.bid=null;
+      State.dealer_now=e.dealer; State.declarer=-1; State.trump=null; State.bid=null; State.seatBids=[null,null,null,null];
       State.folded=[false,false,false,false]; State.revealedSeat=null;
       if(State.onlineMode){ State.revealed=[false,false,false,false]; State.revealed[State.mySeat]=true; }
       else if(State.passAndPlay) State.revealed=[false,false,false,false];
@@ -1516,10 +1544,11 @@ function applyEvent(e){
       if(GameRec.cur && GameRec.cur.hands.length===1){ const ai=[0,1,2,3].filter(isAI); if(ai.length) maybeSay(ai[Math.floor(Math.random()*ai.length)],"intro"); }
       ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each${showPeek?` and peeks the bottom card <b>${cardStr(e.peeked)}</b>`:` and quietly peeks the bottom card`}.`);
       break; }
-    case "bid": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"bid",e.bid));
+    case "bid": State.bid=e.bid; State.declarer=e.seat; (State.seatBids||(State.seatBids=[null,null,null,null]))[e.seat]=e.bid; bubble(e.seat,actionSpeak(e.seat,"bid",e.bid));
       ticker(`${PLAYERS[e.seat].name} bids <b>${e.bid}</b>.`); renderMedallion(); renderPlates(); break;
-    case "pass": bubble(e.seat,actionSpeak(e.seat,"pass")); ticker(`${PLAYERS[e.seat].name} passes.`); break;
-    case "stuck": State.bid=e.bid; State.declarer=e.seat; bubble(e.seat,actionSpeak(e.seat,"stuck"));
+    case "pass": if(State.seatBids) State.seatBids[e.seat]=null;
+      bubble(e.seat,actionSpeak(e.seat,"pass")); ticker(`${PLAYERS[e.seat].name} passes.`); renderPlates(); break;
+    case "stuck": State.bid=e.bid; State.declarer=e.seat; (State.seatBids||(State.seatBids=[null,null,null,null]))[e.seat]=e.bid; bubble(e.seat,actionSpeak(e.seat,"stuck"));
       ticker(`No one bid — ${PLAYERS[e.seat].name} is stuck at <b>${e.bid}</b>.`); renderMedallion(); renderPlates(); break;
     case "trump":
       State.trump=e.trump; State.bid=e.bid; State.declarer=e.seat;
@@ -1617,12 +1646,12 @@ function renderDecisionBody(y){
     box.innerHTML = `<h3>${name} — your bid</h3>
       <div>${bidderName? `High bid <b>${y.highBid}</b> by <b>${bidderName}</b>` : "No bids yet"} &middot; need ${y.need} (max ${y.max})</div>
       ${statusLine? `<div class="bidStatus">${statusLine}</div>` : ""}
-      <div class="row">
+      <div class="row bidRow">
         <button id="decMinus" class="ghost">−</button>
         <span class="bidNum" id="bidNum">${y.need}</span>
         <button id="decPlus" class="ghost">+</button>
       </div>
-      <div class="row">
+      <div class="row bidRow">
         <button id="decPass" class="ghost">Pass</button>
         <button id="decBid">Bid</button>
       </div>`;
@@ -1979,7 +2008,7 @@ function newGame(){
   State.dealer=Math.floor(Math.random()*4); State.gameScore=[0,0];
   State.gen=null; State.resumeValue=undefined; State.lastEvent=null; State.paused=false;
   State.gameOver=false; State.trick=[]; State.awaitingPlay=null; State.revealedSeat=null;
-  State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1;
+  State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1; State.seatBids=[null,null,null,null];
   State.folded=[false,false,false,false];
   State.revealed = State.passAndPlay ? [false,false,false,false]
     : (State.human.some(Boolean) ? State.human.slice() : [true,true,true,true]);
@@ -2106,7 +2135,7 @@ function setLocalControlsVisible(v){
 }
 function beginOnlineGame(){
   State.gameOver=false; State.dealer=0; State.gameScore=[0,0]; State.trick=[];
-  State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1;
+  State.hands=[[],[],[],[]]; State.trump=null; State.bid=null; State.declarer=-1; State.seatBids=[null,null,null,null];
   State.folded=[false,false,false,false]; hideDecision(); el("revealGate").classList.remove("show");
   setLocalControlsVisible(false);
   renderAll(false); ticker("Online game starting…"); el("banner").classList.remove("show");
