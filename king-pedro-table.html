@@ -399,6 +399,12 @@
   .hud .decision.trumpBox button.suitBtn{ font-size:.68rem; padding:.24rem .3rem; }
   .hud .decision h3{ margin-bottom:.15rem; }
   .hud .decision:not(.trumpBox) .row{ display:inline-flex; vertical-align:middle; margin:.25rem .2rem 0; }
+  /* bid controls: big, well-spaced touch targets so −, +, Pass and Bid are easy to hit */
+  .decision .bidRow{ gap:1.1rem; align-items:center; }
+  .hud .decision:not(.trumpBox) .bidRow{ margin:.4rem .9rem 0; }
+  .decision .bidRow button{ min-width:52px; min-height:44px; font-size:.85rem; padding:.45rem 1rem; }
+  .decision .bidRow #decMinus, .decision .bidRow #decPlus{ min-width:52px; font-size:1.25rem; padding:.2rem .8rem; }
+  .decision .bidRow .bidNum{ font-size:1.3rem; min-width:2em; text-align:center; }
   @media (max-width:600px){ #voiceBtn .vText{ display:none; } }   /* phones: speaker icon only */
   .bidline{ display:none !important; }        /* the live bid now lives in the panel */
 
@@ -1631,12 +1637,12 @@ function renderDecisionBody(y){
     box.innerHTML = `<h3>${name} — your bid</h3>
       <div>${bidderName? `High bid <b>${y.highBid}</b> by <b>${bidderName}</b>` : "No bids yet"} &middot; need ${y.need} (max ${y.max})</div>
       ${statusLine? `<div class="bidStatus">${statusLine}</div>` : ""}
-      <div class="row">
+      <div class="row bidRow">
         <button id="decMinus" class="ghost">−</button>
         <span class="bidNum" id="bidNum">${y.need}</span>
         <button id="decPlus" class="ghost">+</button>
       </div>
-      <div class="row">
+      <div class="row bidRow">
         <button id="decPass" class="ghost">Pass</button>
         <button id="decBid">Bid</button>
       </div>`;
