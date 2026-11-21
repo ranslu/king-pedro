@@ -219,7 +219,7 @@
 
   /* ---- speech bubbles ---- */
   .bubble{
-    position:absolute; max-width:clamp(120px,20vw,210px);
+    position:absolute; width:max-content; max-width:clamp(120px,20vw,210px);
     background:var(--parch); color:#2a2113; border-radius:12px;
     padding:.4rem .6rem; font-family:Georgia,serif; font-size:clamp(.6rem,1.3vw,.78rem);
     line-height:1.25; box-shadow:0 6px 16px rgba(0,0,0,.5);
@@ -228,14 +228,14 @@
   }
   .bubble.show{ opacity:1; transform:translateY(0) scale(1); }
   .bubble::before{ content:""; position:absolute; width:0;height:0; }
-  .seat.south .bubble{ bottom:104%; left:50%; transform-origin:bottom; }
-  .seat.north .bubble{ top:104%; left:50%; }
-  .seat.west  .bubble{ left:104%; top:0; }
-  .seat.east  .bubble{ right:104%; top:0; text-align:right; }
-  .seat.south .bubble{ transform:translateX(-50%) translateY(6px) scale(.96); }
-  .seat.south .bubble.show{ transform:translateX(-50%) translateY(0) scale(1); }
-  .seat.north .bubble{ transform:translateX(-50%) translateY(-6px) scale(.96); }
-  .seat.north .bubble.show{ transform:translateX(-50%) translateY(0) scale(1); }
+  /* opponents (west/east): above their cards; me and partner (south/north): beside them */
+  .seat.west  .bubble{ bottom:104%; left:0; }
+  .seat.east  .bubble{ bottom:104%; right:0; text-align:right; }
+  .seat.south .bubble{ right:104%; bottom:0; text-align:right; }
+  .seat.north .bubble{ left:104%; top:45%; }
+  /* no room beside (narrow screens): sit off the cards toward the table centre instead */
+  .seat.south .bubble.tight{ right:auto; left:0; bottom:104%; text-align:left; }
+  .seat.north .bubble.tight{ left:auto; right:0; top:104%; }
 
   /* ---- top score rail ---- */
   .rail{
@@ -1490,6 +1490,8 @@ let bubbleTimers={};
 function bubble(seat,text){
   if(isAI(seat)) Voice.say(seat,text);
   const b=el("b"+visSlot(seat)); b.textContent=text; b.classList.add("show");
+  b.classList.remove("tight");                          // beside the cards unless that runs off-screen
+  const r=b.getBoundingClientRect(); if(r.left<0 || r.right>innerWidth) b.classList.add("tight");
   clearTimeout(bubbleTimers[seat]);
   bubbleTimers[seat]=setTimeout(()=>b.classList.remove("show"), Math.max(1400, baseDelay()*2.2));
 }
