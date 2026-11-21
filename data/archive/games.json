@@ -2,7 +2,7 @@
   {
     "id": "a215b115-b15e-406a-a1b4-07eb7ef6ca29",
     "startedAt": "2026-11-03T08:29:36.795Z",
-    "updatedAt": "2026-11-20T08:20:27.524Z",
+    "updatedAt": "2026-11-21T15:56:14.693Z",
     "players": [
       "Joe",
       "Grace",
@@ -46,7 +46,7 @@
   {
     "id": "e375a9de-f61f-4113-9272-ed2d008eb8e3",
     "startedAt": "2026-11-03T19:43:16.551Z",
-    "updatedAt": "2026-11-20T08:20:27.664Z",
+    "updatedAt": "2026-11-21T15:56:14.726Z",
     "players": [
       "Joe",
       "Grace",
@@ -1674,7 +1674,7 @@
   {
     "id": "713e4bbb-134f-4cb8-8cc7-32996a42dfe6",
     "startedAt": "2026-11-11T03:45:07.926Z",
-    "updatedAt": "2026-11-20T08:20:28.117Z",
+    "updatedAt": "2026-11-21T15:56:14.836Z",
     "players": [
       "Randy",
       "Grace",
@@ -1784,7 +1784,7 @@
   {
     "id": "1550f796-e1fc-4365-96f0-3f931ac87702",
     "startedAt": "2026-11-11T18:27:23.359Z",
-    "updatedAt": "2026-11-20T08:20:28.085Z",
+    "updatedAt": "2026-11-21T15:56:14.792Z",
     "players": [
       "Randy",
       "Grace",
@@ -3434,7 +3434,7 @@
   {
     "id": "878084fd-313e-4000-ae82-1584ff5729d1",
     "startedAt": "2026-11-18T20:14:21.138Z",
-    "updatedAt": "2026-11-20T08:20:28.080Z",
+    "updatedAt": "2026-11-21T15:56:14.832Z",
     "players": [
       "Randy",
       "Grace",
@@ -3957,6 +3957,402 @@
     "finalScore": [
       285,
       -75
+    ]
+  },
+  {
+    "id": "75b11616-bfb2-4def-ab01-99c2b02ff902",
+    "startedAt": "2026-11-20T20:00:54.158Z",
+    "updatedAt": "2026-11-20T20:14:38.878Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 6,
+    "finalScore": [
+      -10,
+      70
+    ]
+  },
+  {
+    "id": "117e25ab-f369-4eb8-aae5-0776974f8db0",
+    "startedAt": "2026-11-20T21:06:17.134Z",
+    "updatedAt": "2026-11-20T21:12:32.644Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 4,
+    "finalScore": [
+      165,
+      21
+    ]
+  },
+  {
+    "id": "193976e6-d78a-443e-b3f4-de32bbe08a16",
+    "startedAt": "2026-11-20T21:16:13.081Z",
+    "updatedAt": "2026-11-20T21:20:28.174Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 4,
+    "finalScore": [
+      -25,
+      216
+    ]
+  },
+  {
+    "id": "db1fa0d4-1428-4f5f-9351-23b976153bc5",
+    "startedAt": "2026-11-20T21:36:08.031Z",
+    "updatedAt": "2026-11-20T21:39:38.108Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 4,
+    "finalScore": [
+      -23,
+      226
+    ]
+  },
+  {
+    "id": "d30c6790-3cf1-4169-a255-2d0932e97136",
+    "startedAt": "2026-11-20T21:39:48.153Z",
+    "updatedAt": "2026-11-20T21:39:52.749Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 1,
+    "finalScore": [
+      0,
+      0
+    ]
+  },
+  {
+    "id": "a6c2f064-94af-4649-b046-0c747ca9c3fa",
+    "startedAt": "2026-11-20T21:41:01.751Z",
+    "updatedAt": "2026-11-20T21:50:34.278Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 9,
+    "finalScore": [
+      200,
+      -54
+    ]
+  },
+  {
+    "id": "9f964216-75dc-40cb-8bf1-88f48dd5c129",
+    "startedAt": "2026-11-21T00:17:33.400Z",
+    "updatedAt": "2026-11-21T00:49:42.750Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 7,
+    "finalScore": [
+      204,
+      142
+    ]
+  },
+  {
+    "id": "fe32238c-d04e-4ec5-88fe-90fa61124fca",
+    "startedAt": "2026-11-21T01:48:28.043Z",
+    "updatedAt": "2026-11-21T01:57:05.069Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 8,
+    "finalScore": [
+      75,
+      143
+    ]
+  },
+  {
+    "id": "50708aeb-0465-46b2-be41-922dabcd3d8d",
+    "startedAt": "2026-11-21T01:57:34.283Z",
+    "updatedAt": "2026-11-21T01:59:25.067Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 2,
+    "finalScore": [
+      10,
+      52
+    ]
+  },
+  {
+    "id": "032e256a-7314-4663-9f16-25e72d37dce5",
+    "startedAt": "2026-11-21T03:00:16.245Z",
+    "updatedAt": "2026-11-21T03:06:36.053Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 5,
+    "finalScore": [
+      233,
+      3
+    ]
+  },
+  {
+    "id": "9bdf8bea-ca35-405b-a807-cb74e9069e89",
+    "startedAt": "2026-11-21T03:23:18.167Z",
+    "updatedAt": "2026-11-21T03:27:09.510Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 6,
+    "finalScore": [
+      58,
+      144
+    ]
+  },
+  {
+    "id": "99d6c33c-cca7-4580-bfe4-2353a0c0631f",
+    "startedAt": "2026-11-21T04:22:33.075Z",
+    "updatedAt": "2026-11-21T04:41:05.938Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 8,
+    "finalScore": [
+      274,
+      69
+    ]
+  },
+  {
+    "id": "171a3ae9-28ed-4f5c-8997-d95d14492946",
+    "startedAt": "2026-11-21T05:30:27.461Z",
+    "updatedAt": "2026-11-21T06:11:28.243Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 9,
+    "finalScore": [
+      186,
+      237
+    ]
+  },
+  {
+    "id": "f409dd9d-4999-4563-8477-132384a8c9b7",
+    "startedAt": "2026-11-21T05:42:35.682Z",
+    "updatedAt": "2026-11-21T05:48:22.012Z",
+    "players": [
+      "Joe",
+      "Grace",
+      "Jean",
+      "Randy"
+    ],
+    "humanSeats": [
+      false,
+      false,
+      false,
+      true
+    ],
+    "hands": 7,
+    "finalScore": [
+      165,
+      78
+    ]
+  },
+  {
+    "id": "fc99ade6-2f4c-4895-8fbe-c4b5e510fb43",
+    "startedAt": "2026-11-21T06:12:05.730Z",
+    "updatedAt": "2026-11-21T06:16:24.788Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 6,
+    "finalScore": [
+      55,
+      -2
+    ]
+  },
+  {
+    "id": "582f30ea-2b01-4276-bc1a-4f3690ddb366",
+    "startedAt": "2026-11-21T15:55:25.762Z",
+    "updatedAt": "2026-11-21T15:56:03.929Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 2,
+    "finalScore": [
+      55,
+      7
+    ]
+  },
+  {
+    "id": "e3b5c5db-bc24-46d3-8f79-c25929ed4e12",
+    "startedAt": "2026-11-21T15:56:50.697Z",
+    "updatedAt": "2026-11-21T16:05:05.368Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 5,
+    "finalScore": [
+      240,
+      -6
+    ]
+  },
+  {
+    "id": "1c3c410a-7341-4998-9507-14f0b7b8c1b3",
+    "startedAt": "2026-11-21T16:27:29.033Z",
+    "updatedAt": "2026-11-21T16:30:15.155Z",
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "hands": 4,
+    "finalScore": [
+      93,
+      41
     ]
   }
 ]
