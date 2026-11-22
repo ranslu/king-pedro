@@ -217,24 +217,13 @@
     .ticker{ bottom:calc(clamp(45px,6.8vh,57px) + env(safe-area-inset-bottom, 0px)); }
   }
 
-  /* ---- desktop / landscape: conversation log on the sides, side players to bottom ---- */
+  /* ---- desktop / landscape: move ticker to the right side ---- */
   @media (min-aspect-ratio: 4/3){
-    /* Narrow table to free left/right margins for the conversation panel */
-    .table-wrap{ width:min(72vw, calc((100vh - clamp(96px,14vh,130px) - 24px) * 1.45)); }
-    /* West/East: move from the felt sides to bottom corners of the felt */
-    .seat.west{ left:7%; top:auto; bottom:12%; transform:none; }
-    .seat.east{ right:7%; left:auto; top:auto; bottom:12%; transform:none; }
-    /* Bubbles for bottom-corner seats pop upward */
-    .seat.west .bubble{ left:50%; top:auto; bottom:104%; right:auto;
-      transform:translateX(-50%) translateY(6px) scale(.96); text-align:center; }
-    .seat.west .bubble.show{ transform:translateX(-50%) translateY(0) scale(1); }
-    .seat.east .bubble{ left:50%; right:auto; top:auto; bottom:104%;
-      transform:translateX(-50%) translateY(6px) scale(.96); text-align:center; }
-    .seat.east .bubble.show{ transform:translateX(-50%) translateY(0) scale(1); }
-    /* Bottom ticker hidden — conversation moves to the side panel */
-    .ticker{ display:none; }
-    /* Activate the side log */
-    .convo-log{ display:flex !important; }
+    .ticker{
+      left:auto; right:1.5%; bottom:50%; transform:translateY(50%);
+      max-width:min(14vw,220px); text-align:left; white-space:normal;
+      border-radius:10px; line-height:1.4;
+    }
   }
 
   /* ---- speech bubbles ---- */
@@ -306,25 +295,6 @@
     border:1px solid rgba(201,162,75,.3); max-width:80vw; text-align:center; z-index:35;
     pointer-events:none;
   }
-
-  /* ---- side conversation log (desktop landscape only; hidden on mobile) ---- */
-  .convo-log{
-    display:none;
-    position:absolute; right:1.2%; top:50%; transform:translateY(-50%);
-    width:min(13vw,200px); min-width:110px;
-    max-height:60vh; overflow-y:auto;
-    flex-direction:column; gap:.28rem;
-    background:rgba(6,28,16,.78); border:1px solid rgba(201,162,75,.3);
-    border-radius:12px; padding:.5rem .65rem; z-index:35;
-    scrollbar-width:thin; scrollbar-color:rgba(201,162,75,.35) transparent;
-  }
-  .convo-entry{
-    font-family:Georgia,'Times New Roman',serif;
-    font-size:clamp(.56rem,1vw,.72rem); color:rgba(243,234,208,.6);
-    line-height:1.3; padding:.22rem 0;
-    border-bottom:1px solid rgba(201,162,75,.13);
-  }
-  .convo-entry:last-child{ border-bottom:none; color:#ffe8a0; font-weight:bold; opacity:1; }
 
   .banner{
     position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.9);
@@ -500,7 +470,6 @@
   </div>
 
   <div class="ticker" id="ticker">Press <b>New game</b> to deal.</div>
-  <div class="convo-log" id="convoLog"><div class="convo-entry">Press <b>New game</b> to deal.</div></div>
   <div class="banner" id="banner"></div>
 
   <div class="controls">
@@ -1534,16 +1503,7 @@ function bubble(seat,text){
   clearTimeout(bubbleTimers[seat]);
   bubbleTimers[seat]=setTimeout(()=>b.classList.remove("show"), Math.max(1400, baseDelay()*2.2));
 }
-const MAX_CONVO=8;
-function ticker(t,clearLog){
-  el("ticker").innerHTML=t;
-  const log=el("convoLog"); if(!log) return;
-  if(clearLog){ log.innerHTML=""; }
-  const e=document.createElement("div"); e.className="convo-entry"; e.innerHTML=t;
-  log.appendChild(e);
-  while(log.children.length>MAX_CONVO) log.removeChild(log.firstChild);
-  log.scrollTop=log.scrollHeight;
-}
+function ticker(t){ el("ticker").innerHTML=t; }
 function banner(title,sub){ const b=el("banner"); b.innerHTML=`<h2>${title}</h2><p>${sub}</p>`; b.classList.add("show");
   setTimeout(()=>b.classList.remove("show"), Math.max(1800,baseDelay()*3)); }
 
@@ -1585,7 +1545,7 @@ function applyEvent(e){
       renderAll(true);
       const showPeek = State.onlineMode ? (e.peeked!=null) : (!State.passAndPlay && (State.human[e.dealer] || !State.human.some(Boolean)));
       if(GameRec.cur && GameRec.cur.hands.length===1){ const ai=[0,1,2,3].filter(isAI); if(ai.length) maybeSay(ai[Math.floor(Math.random()*ai.length)],"intro"); }
-      ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each${showPeek?` and peeks the bottom card <b>${cardStr(e.peeked)}</b>`:` and quietly peeks the bottom card`}.`,true);
+      ticker(`<b>${PLAYERS[e.dealer].name}</b> deals 9 each${showPeek?` and peeks the bottom card <b>${cardStr(e.peeked)}</b>`:` and quietly peeks the bottom card`}.`);
       break; }
     case "bid": State.bid=e.bid; State.declarer=e.seat; (State.seatBids||(State.seatBids=[null,null,null,null]))[e.seat]=e.bid; bubble(e.seat,actionSpeak(e.seat,"bid",e.bid));
       ticker(`${PLAYERS[e.seat].name} bids <b>${e.bid}</b>.`); renderMedallion(); renderPlates(); break;
@@ -1611,7 +1571,7 @@ function applyEvent(e){
       ticker(`${PLAYERS[e.seat].name} passes ${e.cards.map(cardStr).join(" ")} to ${PLAYERS[e.partner].name}, then folds.`);
       break;
     case "trickStart": BadPlay.trickNum=e.num; State.trick=[]; State.awaitingPlay=null; renderTrick();
-      ticker(`Trick ${e.num} — ${PLAYERS[e.leader].name} leads.`,true); break;
+      ticker(`Trick ${e.num} — ${PLAYERS[e.leader].name} leads.`); break;
     case "play":
       BadPlay.onPlay(e);
       State.trick.push({seat:e.seat,card:e.card,buried:e.buried});
@@ -2056,7 +2016,7 @@ function newGame(){
   State.revealed = State.passAndPlay ? [false,false,false,false]
     : (State.human.some(Boolean) ? State.human.slice() : [true,true,true,true]);
   hideDecision(); el("revealGate").classList.remove("show");
-  renderAll(false); ticker("New game — press <b>Step ▸</b> or <b>Auto ▶</b> to begin.",true);
+  renderAll(false); ticker("New game — press <b>Step ▸</b> or <b>Auto ▶</b> to begin.");
   el("banner").classList.remove("show");
 }
 
