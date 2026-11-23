@@ -480,5 +480,183 @@
     "raw": null,
     "receivedAt": "2026-11-17T03:57:27.570Z",
     "updatedAt": "2026-11-17T03:57:27.570Z"
+  },
+  {
+    "v": 1,
+    "id": "2cdebd8b-f095-4851-91c6-b29bbeb82645",
+    "gameId": "654a806b-3c54-4b98-9cc3-a5c030312193",
+    "handNo": 5,
+    "synced": false,
+    "at": "2026-11-22T23:14:04.246Z",
+    "why": "Not sure why, my partner threw away the Ace of trumps so quickly when the opposition started the trick.  What a waste of an Ace.",
+    "summary": "Not sure why, my partner threw away the Ace of trumps so qui",
+    "player": null,
+    "seat": null,
+    "played": null,
+    "shouldPlay": null,
+    "trick": null,
+    "trickSoFar": [],
+    "handAtTheTime": [],
+    "trump": null,
+    "bid": 38,
+    "declarer": "Steve",
+    "dealer": "Randy",
+    "gameScore": [
+      71,
+      93
+    ],
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "startHands": [
+      [
+        "4♥",
+        "7♥",
+        "J♥",
+        "6♦",
+        "2♣",
+        "3♣",
+        "8♣",
+        "8♠",
+        "J♠"
+      ],
+      [
+        "K♥",
+        "A♥",
+        "6♣",
+        "K♣",
+        "A♣",
+        "4♠",
+        "5♠",
+        "6♠",
+        "9♠"
+      ],
+      [
+        "6♥",
+        "8♥",
+        "4♦",
+        "7♦",
+        "9♦",
+        "J♦",
+        "10♣",
+        "3♠",
+        "A♠"
+      ],
+      [
+        "2♥",
+        "3♥",
+        "2♦",
+        "3♦",
+        "K♦",
+        "4♣",
+        "9♣",
+        "Q♣",
+        "10♠"
+      ]
+    ],
+    "playsThisHand": [],
+    "raw": null,
+    "receivedAt": "2026-11-22T23:14:04.788Z",
+    "updatedAt": "2026-11-22T23:14:04.788Z"
+  },
+  {
+    "v": 1,
+    "id": "7f146a46-27ba-47b6-bef8-b5e510cf1644",
+    "gameId": "229bdee7-d068-41a3-a69a-a40d5a2f967e",
+    "handNo": 2,
+    "synced": false,
+    "at": "2026-11-23T01:19:12.223Z",
+    "why": "If your partner has six trumps at the start, an offer of your cards are not allowed.",
+    "summary": "If your partner has six trumps at the start, an offer of you",
+    "player": null,
+    "seat": null,
+    "played": null,
+    "shouldPlay": null,
+    "trick": null,
+    "trickSoFar": [],
+    "handAtTheTime": [],
+    "trump": "clubs",
+    "bid": 43,
+    "declarer": "Jean",
+    "dealer": "Grace",
+    "gameScore": [
+      56,
+      6
+    ],
+    "players": [
+      "Randy",
+      "Grace",
+      "Jean",
+      "Steve"
+    ],
+    "humanSeats": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "startHands": [
+      [
+        "3♥",
+        "A♥",
+        "2♦",
+        "9♦",
+        "Q♦",
+        "2♠",
+        "3♠",
+        "6♠",
+        "8♠"
+      ],
+      [
+        "2♥",
+        "Q♥",
+        "K♥",
+        "6♦",
+        "8♦",
+        "3♣",
+        "10♣",
+        "5♠",
+        "10♠"
+      ],
+      [
+        "4♣",
+        "5♣",
+        "9♣",
+        "J♣",
+        "Q♣",
+        "K♣",
+        "4♠",
+        "K♠",
+        "A♠"
+      ],
+      [
+        "7♥",
+        "8♥",
+        "3♦",
+        "5♦",
+        "7♦",
+        "10♦",
+        "A♦",
+        "2♣",
+        "8♣"
+      ]
+    ],
+    "playsThisHand": [
+      "T1 Jean A♣",
+      "T1 Steve 8♣",
+      "T1 Grace 5♠"
+    ],
+    "raw": null,
+    "receivedAt": "2026-11-23T01:19:12.443Z",
+    "updatedAt": "2026-11-23T01:19:12.443Z"
   }
 ]
