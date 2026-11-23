@@ -285,6 +285,9 @@ export function aceSignal(seat,st,legal,card,declarer){
   if(!ace || card===ace || declarer!==(seat+2)%4) return card;
   const trick=st.trick.filter(e=>!e.buried);
   if(trick.length ? (trick[0].seat===declarer && isTrump(trick[0].card,t)) : isTrump(card,t)) return ace;
+  // about to play any other trump (even trumping an off-suit lead): play the Ace so the declarer learns
+  // where it is early (Randy's reports R1,R2,R4,R5; acematch.js answer,lead,show,decl: no cost)
+  if(isTrump(card,t)) return ace;
   return card;
 }
 export function smartPlay(seat,st,legal){

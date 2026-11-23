@@ -3,6 +3,12 @@
 Source: `data/archive/` (games and reports backed up from the online server).
 Update this file each time reports are compiled; mark items **Fixed (PR #n)** when a fix ships.
 
+## 2026-11-22 — fixes
+
+- **R1, R2, R4, R5 Fixed:** the declarer's AI partner now plays the Ace of trump the first time it plays any trump (was: only when trump was led). Duplicate match `acematch.js answer,lead,show,decl` 2500 deals: +0.35 ± 0.50 pts/hand vs the old +0.5 ± 0.49, i.e. no cost.
+- **R3:** first-trick throws are already shown to all (thrown cards display, held by the table); no change.
+- **R6 Fixed (game 229bdee7 · hand 2):** no trump pass when the partner already holds six trumps (table + server).
+
 ## 2026-11-10 — Randy's saved Bad-play reports (amendment)
 
 Source: `data/archive/reports.json` (2 reports backed up) + the Report-a-bad-play panel (3 saved, all marked safely on the server).

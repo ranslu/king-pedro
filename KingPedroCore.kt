@@ -648,7 +648,9 @@ class KingPedroEngine(seed: Long? = null) {
                 trumps.isEmpty() -> {                       // must fold
                     p.say(Mood.FOLD); p.folded = true; p.hand.clear()
                 }
-                p.wantsToPassAndFold(trump, p.seat == declarer) -> {
+                // no offer when the partner already holds six trumps
+                players[p.partner].hand.count { it.isTrump(trump) } < 6 &&
+                    p.wantsToPassAndFold(trump, p.seat == declarer) -> {
                     val partner = players[p.partner]
                     if (!partner.folded) {                  // pass trump(s), then fold
                         p.say(Mood.PASS_TRUMP, trumps.joinToString(" "))
@@ -710,8 +712,13 @@ class KingPedroEngine(seed: Long? = null) {
                     continue
                 }
 
-                val card = p.choosePlay(trick, trump, forceTrumpLead = (trickNum == 1 && step == 0),
+                var card = p.choosePlay(trick, trump, forceTrumpLead = (trickNum == 1 && step == 0),
                     trumpAceGone = trumpAceGone, playOrder = playOrder)
+                // declarer's partner shows the Ace of trump the first time it plays any trump
+                if (p.partner == declarer && card.isTrump(trump) && card.rank != Rank.Ace) {
+                    p.hand.firstOrNull { it.isTrump(trump) && it.rank == Rank.Ace }
+                        ?.takeIf { a -> p.legalPlays(trick, trump).contains(a) }?.let { card = it }
+                }
                 p.hand.remove(card)
                 trick.add(p.seat to card)
                 if (card.isTrump(trump) && card.rank == Rank.Ace) trumpAceGone = true
