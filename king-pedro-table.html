@@ -1135,6 +1135,9 @@ function aceSignal(seat,st,legal,card,declarer){
   if(!ace || card===ace || declarer!==(seat+2)%4) return card;
   const trick=st.trick.filter(e=>!e.buried);
   if(trick.length ? (trick[0].seat===declarer && isTrump(trick[0].card,t)) : isTrump(card,t)) return ace;
+  // about to play any other trump (even trumping an off-suit lead): play the Ace so the declarer learns
+  // where it is early (Randy's reports R1,R2,R4,R5; acematch.js answer,lead,show,decl: no cost)
+  if(isTrump(card,t)) return ace;
   return card;
 }
 function smartPlay(seat,st,legal){
@@ -1278,7 +1281,8 @@ function* playHand(dealer,gameScore){
     if(tr.length===0){ folded[s]=true; hands[s]=[]; yield {type:"fold",seat:s}; }
     else {
       let doPass;
-      if(s===declarer || tr.length>2){ doPass=false; }
+      const partnerTrumps=hands[(s+2)%4].filter(c=>isTrump(c,trump)).length;
+      if(s===declarer || tr.length>2 || partnerTrumps>=6){ doPass=false; }   // no offer when partner already has six trumps
       else if(State.human[s]){ doPass = yield {needInput:"foldchoice", seat:s, trumps:tr.slice()}; }
       else { doPass = wantsPass(hands[s],trump,PLAYERS[s].aggr,PLAYERS[s].chaos,s===declarer); }
       if(doPass){

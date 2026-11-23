@@ -253,7 +253,8 @@ export class GameRoom {
       if (tr.length === 0) { folded[s] = true; hands[s] = []; this.broadcastEvent({ type: "fold", seat: s }); }
       else {
         let doPass;
-        if (s === declarer || tr.length > 2) doPass = false;
+        const partnerTrumps = hands[(s + 2) % 4].filter((c) => isTrump(c, trump)).length;
+        if (s === declarer || tr.length > 2 || partnerTrumps >= 6) doPass = false;   // no offer when partner already has six trumps
         else if (this.isHumanControlled(s)) doPass = await this.needInput(s, { needInput: "foldchoice", seat: s, trumps: tr.slice() });
         else { doPass = wantsPass(hands[s], trump, this.seatMeta[s].aggr, this.seatMeta[s].chaos, s === declarer); await sleep(350); }
         if (doPass) {
